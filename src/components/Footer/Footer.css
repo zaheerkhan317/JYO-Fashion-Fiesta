@@ -1,0 +1,24 @@
+/* src/components/Footer.css */
+.container-fluid { /* Remove default padding to ensure full width */
+    width: 100%;
+  }
+  
+  footer {
+    width: 100%; /* Ensures the footer spans the full width of the viewport */
+  }
+  
+  .footer {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 1rem; /* Adjust padding as needed */
+    text-align: center;
+  }
+  
+  .footer a {
+    color: white;
+    text-decoration: none;
+  }
+  
+  .footer a:hover {
+    text-decoration: underline;
+  }
+  
