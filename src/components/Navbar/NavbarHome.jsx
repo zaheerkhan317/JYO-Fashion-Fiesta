@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import "./Navbar.css"
 const NavbarHome = () => {
   return (
-    <Navbar bg="bg-transparent" expand="lg">
+    <Navbar className="sticky-top navbar-glossy" expand="lg">
     <Container>
       {/* Logo */}
       <Navbar.Brand as={Link} to="/home">Logo</Navbar.Brand>
@@ -17,9 +17,9 @@ const NavbarHome = () => {
         <Nav className="mx-auto">
           <Nav.Link as={Link} to="/home" className="mx-3">Home</Nav.Link>
           <NavDropdown title="Categories" id="basic-nav-dropdown" className="text-center mx-3">
-            <NavDropdown.Item href="#action/3.1">Kurtas</NavDropdown.Item>
-            <NavDropdown.Item href="#action/3.2">Sarees</NavDropdown.Item>
-            <NavDropdown.Item href="#action/3.3">Lounge wear</NavDropdown.Item>
+            <NavDropdown.Item className="navbar-glossy-glass" href="#action/3.1">Kurtas</NavDropdown.Item>
+            <NavDropdown.Item className="navbar-glossy-glass" href="#action/3.2">Sarees</NavDropdown.Item>
+            <NavDropdown.Item className="navbar-glossy-glass" href="#action/3.3">Lounge wear</NavDropdown.Item>
           </NavDropdown>
           <Nav.Link as={Link} to="/offers" className="mx-3">Offers Zone</Nav.Link>
           <Nav.Link as={Link} to="/about" className="mx-3">About Us</Nav.Link>
@@ -28,7 +28,7 @@ const NavbarHome = () => {
 
         {/* Buttons with responsive sizing */}
           <Nav className="d-flex align-items-center">
-            <Button variant="outline-primary" className="me-2 custom-button">Login</Button>
+            <Button variant="outline-primary" className="me-2 m-2 custom-button">Login</Button>
             <Button variant="primary" className="custom-button">Sign Up</Button>
           </Nav>
       </Navbar.Collapse>

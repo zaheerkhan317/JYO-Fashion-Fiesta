@@ -1,27 +1,52 @@
-/* src/components/Navbar.css */
+
 .custom-button {
-    width: 90px; /* Default width */
-    padding: 0.375rem 0.75rem; /* Adjust padding if needed */
+  width: 90px; 
+  padding: 0.375rem 0.75rem; 
+}
+
+
+@media (max-width: 768px) {
+  .custom-button {
+    width: 150px; 
   }
-  
-  /* Adjust button width for mobile view */
-  @media (max-width: 768px) {
-    .custom-button {
-      width: 150px; /* Decrease width for mobile view */
-    }
-  }
-  
-  /* Ensure proper alignment on mobile view */
+}
+
+
+.navbar-collapse {
+  display: inline-block;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+
+@media (max-width: 768px) {
   .navbar-collapse {
-    display: inline-block;
     justify-content: center;
-    align-items: center;
-    width: 100%;
   }
-  
-  @media (max-width: 768px) {
-    .navbar-collapse {
-      justify-content: center;
-    }
-  }
-  
+}
+
+
+.navbar-glossy {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px) brightness(70%); 
+  -webkit-backdrop-filter: blur(8px) brightness(80%); 
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+
+.navbar-glossy::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+  rgba(255, 255, 255, 0.1), 
+  rgba(255, 255, 255, 0.1)
+  );
+  pointer-events: none; 
+}
+
