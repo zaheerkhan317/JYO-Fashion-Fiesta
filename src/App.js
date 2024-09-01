@@ -14,10 +14,10 @@ import ProtectedRoute from './components/ProtectedRoutes/ProtectedRoute';
 
 function AppContent() {
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin');
+  const isAdminRoute = location.pathname === '/admin' || location.pathname === '/dashboard';
 
   return (
-    <>
+    <div className='App'>
       {!isAdminRoute && <NavbarHome />}
       <Routes>
         <Route path="/home" element={<Home />} />
@@ -30,7 +30,7 @@ function AppContent() {
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       </Routes>
       {!isAdminRoute && <Footer />}
-    </>
+    </div>
   );
 }
 
