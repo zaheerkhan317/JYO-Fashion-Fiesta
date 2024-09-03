@@ -1,0 +1,97 @@
+/* PhoneVerify.css */
+
+/* Basic styles for the OTP container */
+.otp-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    margin: 0 auto;
+    max-width: 600px; /* Max width for larger screens */
+    width: 100%;
+  }
+  
+  /* Style error messages */
+  .error-message {
+    color: red;
+    font-size: 1rem;
+    margin-top: 10px;
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .otp-container {
+      padding: 10px;
+      margin: 0 10px; /* Margin for small screens */
+    }
+  
+    .error-message {
+      font-size: 0.9rem; /* Smaller font size for mobile screens */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .otp-container {
+      padding: 5px;
+      margin: 0 5px; /* Margin for extra small screens */
+    }
+  
+    .error-message {
+      font-size: 0.8rem; /* Even smaller font size for very small screens */
+    }
+  }
+  
+
+  /* Animation for rotating spinner */
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Spinner style */
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid #fff; /* White color for visibility */
+  width: 20px;
+  height: 20px;
+  animation: rotate 1s linear infinite;
+  position: absolute; /* Position absolutely within the button */
+  top: 30%;
+  left: 40%;
+  transform: translate(-50%, -50%); /* Center the spinner */
+}
+
+#send-otp-button{
+  background-color: rgb(134, 153, 236);
+}
+
+#send-otp-button {
+  position: relative; /* Ensure button is a positioned container */
+  width: 100px; /* Set a fixed width for consistency */
+  height: 40px; /* Set a fixed height for consistency */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px; /* Adjust as needed */
+  padding: 0; /* Remove padding */
+  text-align: center; /* Center text if any */
+}
+
+/* Hide text and show spinner only when loading */
+#send-otp-button .spinner {
+  display: block;
+}
+
+#send-otp-button:not(.loading) {
+  text-align: center; /* Ensure text is centered */
+}
+
+.btn-send.loading {
+  padding: 0; /* Remove padding when loading */
+}

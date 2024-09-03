@@ -18,7 +18,7 @@ const reviews = [
     id: 3,
     name: 'Charlie Davis',
     review: 'The product is good, but the packaging could be improved. Overall, I am happy with the purchase.',
-    rating: 3,
+    rating: 2.5,
   },
   {
     id: 4,
@@ -28,17 +28,29 @@ const reviews = [
   },
 ];
 
+const generateStars = (rating) => {
+  const stars = [];
+  const fullStar = <i className="fas fa-star"></i>;
+  const halfStar = <i className="fas fa-star-half-alt"></i>;
+  const emptyStar = <i className="far fa-star"></i>;
+
+  for (let i = 0; i < 5; i++) {
+    if (rating >= i + 1) {
+      stars.push(fullStar);
+    } else if (rating > i && rating < i + 1) {
+      stars.push(halfStar);
+    } else {
+      stars.push(emptyStar);
+    }
+  }
+
+  return stars;
+};
+
 const ReviewCard = ({ name, review, rating }) => {
-    // Generate star ratings based on the rating value
-    const fullStar = <i className="fas fa-star"></i>;
-    const halfStar = <i className="fas fa-star-half-alt"></i>;
-    const emptyStar = <i className="far fa-star"></i>;
   
     // Create the star rating display
-    const stars = Array.from({ length: 5 }, (_, index) => {
-      if (index < rating) return fullStar;
-      return emptyStar;
-    });
+    const stars = generateStars(rating);
   
     return (
       <Card className="mb-4 text-center">

@@ -1,8 +1,56 @@
-import React from 'react'
-import { Navbar, Nav, NavDropdown, Container, Button } from "react-bootstrap";
+import React, { useState, useEffect }from 'react'
+import { Navbar, Nav, NavDropdown, Container, Button, Spinner } from "react-bootstrap";
 import { Link } from 'react-router-dom';
-import "./Navbar.css"
+import "./Navbar.css";
+import { useNavigate } from 'react-router-dom';
+import firebase from 'firebase/compat/app';
+import { useUser } from '../Context/UserProvider';
+
 const NavbarHome = () => {
+  const { user, firstName, setFirstName } = useUser();
+  const navigate = useNavigate();
+  const [loading, setIsLoading] = useState(false);
+  // useEffect(() => {
+  //   // Simulate fetching user data from an API or local storage
+  //   const fetchUserData = () => {
+  //     // Simulating an API call or local storage retrieval with setTimeout
+  //     setTimeout(() => {
+  //       // Example user data, replace with actual data retrieval logic
+  //       const userData = { firstname: " " };
+  //       setUser(userData); // Set the user state with fetched data
+  //     }, 1000); // Simulate a 1-second delay for fetching data
+  //   };
+
+  //   fetchUserData();
+  // }, []); // Empty dependency array means this effect runs once after initial render
+
+
+  useEffect(() => {
+    const storedFirstName = localStorage.getItem('firstName');
+    console.log(storedFirstName);
+    if (storedFirstName) {
+      setFirstName(storedFirstName);
+    } else {
+      // Handle the case where first name is not found in session storage
+      console.error('First name not found in local storage');
+    }
+  }, [setFirstName]);
+
+  const handleLogout = async () => {
+    setIsLoading(true);
+    try {
+      await firebase.auth().signOut();
+      setFirstName(''); // Clear context
+      navigate('/home');
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Handle any errors if necessary
+    }finally{
+      setIsLoading(false);
+    }
+  };
+  
+
   return (
     <Navbar className="sticky-top navbar-glossy" expand="lg">
     <Container>
@@ -27,10 +75,36 @@ const NavbarHome = () => {
         </Nav>
 
         {/* Buttons with responsive sizing */}
-          <Nav className="d-flex align-items-center">
-            <Button variant="outline-primary" className="me-2 m-2 custom-button">Login</Button>
-            <Button variant="primary" className="custom-button">Sign Up</Button>
-          </Nav>
+        <Nav className="d-flex justify-content-center align-items-center">
+          {user ? (
+            <Nav.Item className="d-flex align-items-center">
+              <span className="me-3">Hi, {firstName}</span>
+              <div className="dropdown me-3">
+                <Button variant="outline-primary" id="profileDropdown" className="d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i className="fa-solid fa-user"></i> {/* Profile icon */}
+                </Button>
+                <ul className="dropdown-menu" aria-labelledby="profileDropdown">
+                  <li><Link className="dropdown-item" to="/profile">Profile</Link></li>
+                  <li><hr className="dropdown-divider" /></li>
+                  <li><button className="dropdown-item" type="button" onClick={handleLogout} > 
+                    {loading ? <Spinner as="span" animation="border" size="sm" /> : 'Logout'}
+                    </button>
+                  </li>
+                </ul>
+              </div>
+              <Link to="/cart">
+                <Button variant="outline-primary">Cart</Button>
+              </Link>
+            </Nav.Item>
+          ) : (
+            <Nav.Item>
+              <Link to="/signup">
+                <Button variant="primary">Login / Signup</Button>
+              </Link>
+            </Nav.Item>
+          )}
+        </Nav>
+
       </Navbar.Collapse>
     </Container>
   </Navbar>

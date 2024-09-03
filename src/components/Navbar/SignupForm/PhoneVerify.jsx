@@ -1,0 +1,741 @@
+import React, { useEffect, useState } from "react";
+import { getDatabase, ref, set } from "firebase/database";
+import firebase from "firebase/compat/app";
+import "firebase/compat/auth";
+import * as firebaseui from "firebaseui";
+import "firebaseui/dist/firebaseui.css";
+import { useNavigate } from "react-router-dom";
+import './PhoneVerify.css';
+import { useUser } from '../../Context/UserProvider';
+
+const PhoneVerify = ({ auth }) => {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    countryCode:'+91',
+    phoneNumber: ''
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [confirmResult, setConfirmResult] = useState(null);
+  const [timeout, setTimeoutState] = useState(false);
+  const [showForm, setShowForm] = useState(true);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+  const [error, setError] = useState('');
+  const { setFirstName } = useUser();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
+
+    const uiConfig = {
+      signInOptions: [
+        {
+          provider: firebase.auth.PhoneAuthProvider.PROVIDER_ID,
+          defaultCountry: "IN",
+          recaptchaParameters: {
+            type: "image",
+            size: "normal",
+            badge: "bottomleft",
+          },
+        },
+      ],
+      signInSuccessUrl: "/home",
+      privacyPolicyUrl: "/privacy-policy",
+      callbacks: {
+        signInSuccessWithAuthResult: async (authResult) => {
+          const user = firebase.auth().currentUser;
+          if (user) {
+            try {
+              await user.updateProfile({
+                displayName: `${formData.firstName} ${formData.lastName}`
+              });
+
+              if (formData.email) {
+                await user.updateEmail(formData.email);
+              }
+
+              navigate('/home');
+              return false;
+            } catch (error) {
+              console.error("Error updating profile:", error);
+              setError("Failed to update profile. Please try again.");
+              return false;
+            }
+          } else {
+            console.log('No user found for profile update.');
+            return false;
+          }
+        },
+        uiShown: () => {
+          console.log('FirebaseUI displayed');
+        },
+      },
+    };
+
+    
+
+    const timerId = setTimeout(() => {
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.reset();
+        setError("reCAPTCHA challenge timed out. Please try again.");
+      }
+    }, 300000); // 5 minutes
+
+    return () => {
+      clearTimeout(timerId);
+      ui.reset();
+    };
+  }, [auth, formData, navigate, setError]);
+
+  useEffect(() => {
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('send-otp-button', {
+      'size': 'invisible',
+      'callback': (response) => {
+        console.log('reCAPTCHA solved, allow send OTP');
+      },
+      'expired-callback': () => {
+        console.log('reCAPTCHA expired, please re-verify.');
+        setError("reCAPTCHA challenge expired. Please try again.");
+        window.recaptchaVerifier.reset();
+      }
+    });
+
+    return () => {
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear();
+      }
+    };
+  }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    console.log(`Changing ${name} to ${value}`); // Debugging line
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleSendOtp = () => {
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+
+    if(!formData.phoneNumber){
+      alert("please enter your phone number");
+      return;
+    }
+
+    if (!formData.countryCode) {
+      alert("please select the country code");
+      return;
+    }
+
+    setIsLoading(true);
+
+    const appVerifier = window.recaptchaVerifier;
+    if (!appVerifier) {
+      console.error("reCAPTCHA verifier is not ready");
+      return;
+    }
+
+    const completePhone = `${formData.countryCode} ${formData.phoneNumber}`
+    firebase.auth().signInWithPhoneNumber(completePhone, appVerifier)
+      .then((confirmationResult) => {
+        setConfirmResult(confirmationResult);
+        setShowForm(false); // Hide form after OTP is sent
+      })
+      .catch((error) => {
+        console.error("Error during signInWithPhoneNumber:", error);
+        setError("Error during OTP request. Please try again.");
+      });
+  };
+
+  const handleOtpSubmit = async (e) => {
+    e.preventDefault();
+
+    setIsVerifying(true);
+
+    if (confirmResult && otp.length === 6) {
+      try {
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout')), 20000) // 10 seconds timeout
+        );
+
+        const result = await Promise.race([
+          confirmResult.confirm(otp),
+          timeoutPromise,
+        ]);
+
+        const user = result.user;
+        const db = getDatabase();
+        const userRef = ref(db, 'users/' + user.uid);
+
+        await set(userRef, {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email || user.email,
+          password: formData.password,
+          phoneNumber: formData.phoneNumber,
+        });
+
+        localStorage.setItem('firstName', formData.firstName);
+        setFirstName(formData.firstName);
+        
+        setIsVerified(true);
+        setError('');
+        setTimeout(() => {
+          navigate('/home');
+        }, 1000);
+      } catch (error) {
+        if (error.message === 'Timeout') {
+          setError("Operation timed out. Please try again.");
+        } else if (error.code === "auth/invalid-verification-code") {
+          setError("Invalid OTP. Please try again.");
+        } else if (error.code === "auth/operation-not-allowed") {
+          setError("Operation not allowed. Please check your authentication settings.");
+        } else {
+          console.error("Error during OTP confirmation or updating profile:", error);
+          setError("An error occurred. Please try again.");
+        }
+        setIsVerified(false);
+      }finally{
+        setIsVerifying(false);
+      }
+    } else {
+      alert("Please enter a valid 6-digit OTP.");
+    }
+  };
+
+  return (
+    <div className="container mt-5">
+  <h2 className="text-center mb-4">Phone Verification</h2>
+  {showForm ? (
+    <form className="needs-validation" noValidate>
+      <div className="row mb-3">
+        <div className="col-md-4">
+          <div className="form-group">
+            <label htmlFor="firstName">First Name</label>
+            <input type="text" className="form-control" id="firstName" name="firstName" placeholder="First Name" value={formData.firstName} onChange={handleInputChange} required />
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="form-group">
+            <label htmlFor="lastName">Last Name</label>
+            <input type="text" className="form-control" id="lastName" name="lastName" placeholder="Last Name" value={formData.lastName} onChange={handleInputChange} required />
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input type="email" className="form-control" id="email" name="email" placeholder="Email" value={formData.email} onChange={handleInputChange} />
+          </div>
+        </div>
+      </div>
+      <div className="row mb-3">
+        <div className="col-md-6 mx-auto">
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input type="password" className="form-control" id="password" name="password" placeholder="Password" value={formData.password} onChange={handleInputChange} required />
+          </div>
+        </div>
+        <div className="col-md-6 mx-auto">
+          <div className="form-group">
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <input type="password" className="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleInputChange} required />
+          </div>
+        </div>
+      </div>
+      <div className="form-group mb-3 col-md-6">
+        <label htmlFor="phoneNumber">Phone Number</label>
+        <div className="input-group">
+          <div className="input-group-prepend">
+            <select className="custom-select form-control" id="countryCode" name="countryCode" value={formData.countryCode} onChange={handleInputChange} required>
+              <option value="+91">+91 (India)</option>
+              <option value="+1">+1 (USA)</option>
+              <option value="+44">+44 (UK)</option>
+              <option value="+61">+61 (Australia)</option>
+              <option value="+81">+81 (Japan)</option>
+              <option value="+33">+33 (France)</option>
+              <option value="+49">+49 (Germany)</option>
+              <option value="+39">+39 (Italy)</option>
+              <option value="+55">+55 (Brazil)</option>
+              <option value="+86">+86 (China)</option>
+              <option value="+7">+7 (Russia)</option>
+              <option value="+27">+27 (South Africa)</option>
+              <option value="+82">+82 (South Korea)</option>
+              <option value="+20">+20 (Egypt)</option>
+              <option value="+34">+34 (Spain)</option>
+              <option value="+31">+31 (Netherlands)</option>
+              <option value="+52">+52 (Mexico)</option>
+              <option value="+60">+60 (Malaysia)</option>
+              <option value="+63">+63 (Philippines)</option>
+              <option value="+62">+62 (Indonesia)</option>
+              <option value="+90">+90 (Turkey)</option>
+              <option value="+41">+41 (Switzerland)</option>
+              <option value="+48">+48 (Poland)</option>
+              <option value="+30">+30 (Greece)</option>
+              <option value="+94">+94 (Sri Lanka)</option>
+              <option value="+91">+91 (India)</option>
+              <option value="+977">+977 (Nepal)</option>
+            </select>
+          </div>
+          <input type="tel" className="form-control" id="phoneNumber" name="phoneNumber" placeholder="Phone Number" value={formData.phoneNumber} onChange={handleInputChange} required />
+        </div>
+      </div>
+      <button type="button" className={`btn btn-send ${isLoading ? 'loading' : ''}`} id="send-otp-button" onClick={handleSendOtp} disabled={isLoading} > {isLoading && ( <div className="spinner"></div> )} {!isLoading && 'Send OTP'} </button>
+      
+    </form>
+  ) : (
+    <form onSubmit={handleOtpSubmit} className="needs-validation" noValidate>
+    <div className="form-group mb-3">
+      <label htmlFor="otp">Enter OTP</label>
+      <input type="text" className="form-control" id="otp" name="otp" placeholder="Enter OTP" value={otp} onChange={(e) => setOtp(e.target.value)} required />
+    </div>
+    <button type="submit" className={`btn btn-success btn-block ${isVerified ? 'verified' : ''}`} disabled={isVerifying} >
+      {isVerified ? (
+        <>
+           Verified <span className="tick-mark">✔</span>
+        </>
+      ) : isVerifying ? (
+        'Verifying...'
+      ) : (
+        'Verify OTP'
+      )}
+    </button>
+      {error && <div className="alert alert-danger mt-3">{error}</div>} 
+      </form>
+  )}
+</div>
+
+
+  );
+};
+
+export default PhoneVerify;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Second Successful code
+// import React, { useEffect, useState } from "react";
+// import { getDatabase, ref, set } from "firebase/database";
+// import firebase from "firebase/compat/app";
+// import "firebase/compat/auth";
+// import * as firebaseui from "firebaseui";
+// import "firebaseui/dist/firebaseui.css";
+// import { useNavigate } from "react-router-dom";
+// import './PhoneVerify.css';
+
+// const PhoneVerify = ({ auth, setError }) => {
+//   const [formData, setFormData] = useState({
+//     firstName: '',
+//     lastName: '',
+//     email: '',
+//     password: '',
+//     confirmPassword: '',
+//     phoneNumber: ''
+//   });
+//   const [otp, setOtp] = useState('');
+//   const [confirmResult, setConfirmResult] = useState(null);
+//   const [timeout, setTimeoutState] = useState(false);
+//   const [showForm, setShowForm] = useState(true); // State to show/hide the form
+  
+//   const navigate = useNavigate();
+
+//   useEffect(() => {
+//     const ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
+
+//     const uiConfig = {
+//       signInOptions: [
+//         {
+//           provider: firebase.auth.PhoneAuthProvider.PROVIDER_ID,
+//           defaultCountry: "IN",
+//           recaptchaParameters: {
+//             type: "image",
+//             size: "normal",
+//             badge: "bottomleft",
+//           },
+//         },
+//       ],
+//       signInSuccessUrl: "/home",
+//       privacyPolicyUrl: "/privacy-policy",
+//       callbacks: {
+//         signInSuccessWithAuthResult: async (authResult) => {
+//           const user = firebase.auth().currentUser;
+//           if (user) {
+//             try {
+//               await user.updateProfile({
+//                 displayName: `${formData.firstName} ${formData.lastName}`
+//               });
+
+//               if (formData.email) {
+//                 await user.updateEmail(formData.email);
+//               }
+
+//               navigate('/home');
+//               return false;
+//             } catch (error) {
+//               console.error("Error updating profile:", error);
+//               setError("Failed to update profile. Please try again.");
+//               return false;
+//             }
+//           } else {
+//             console.log('No user found for profile update.');
+//             return false;
+//           }
+//         },
+//         uiShown: () => {
+//           console.log('FirebaseUI displayed');
+//         },
+//       },
+//     };
+
+//     const container = document.querySelector(".otp-container");
+//     if (container) {
+//       ui.start(".otp-container", uiConfig);
+//     } else {
+//       console.error("Element with class 'otp-container' not found");
+//     }
+
+//     const timerId = setTimeout(() => {
+//       if (window.recaptchaVerifier) {
+//         window.recaptchaVerifier.reset();
+//         setError("reCAPTCHA challenge timed out. Please try again.");
+//       }
+//     }, 300000); // 5 minutes
+
+//     return () => {
+//       clearTimeout(timerId);
+//       ui.reset();
+//     };
+//   }, [auth, formData, navigate, setError]);
+
+//   useEffect(() => {
+//     // Initialize reCAPTCHA
+//     window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('send-otp-button', {
+//       'size': 'invisible',
+//       'callback': (response) => {
+//         console.log('reCAPTCHA solved, allow send OTP');
+//       },
+//       'expired-callback': () => {
+//         console.log('reCAPTCHA expired, please re-verify.');
+//       }
+//     });
+//     return () => {
+//        if (window.recaptchaVerifier) {
+//       window.recaptchaVerifier.clear(); // Use clear() if reset() is not available
+//     }
+//     };
+//   }, []);
+
+//   const handleInputChange = (e) => {
+//     const { name, value } = e.target;
+//     setFormData({
+//       ...formData,
+//       [name]: value
+//     });
+//   };
+
+//   const handleSendOtp = () => {
+//     if (formData.password !== formData.confirmPassword) {
+//       alert("Passwords do not match.");
+//       return;
+//     }
+
+//     const appVerifier = window.recaptchaVerifier;
+//     if (!appVerifier) {
+//       console.error("reCAPTCHA verifier is not ready");
+//       return;
+//     }
+
+//     firebase.auth().signInWithPhoneNumber(formData.phoneNumber, appVerifier)
+//       .then((confirmationResult) => {
+//         setConfirmResult(confirmationResult);
+//         setShowForm(false); // Hide form after OTP is sent
+//       })
+//       .catch((error) => {
+//         console.error("Error during signInWithPhoneNumber:", error);
+//         setError("Error during OTP request. Please try again.");
+//       });
+//   };
+  
+  
+//   const handleOtpSubmit = async (e) => {
+//     e.preventDefault();
+//     if (confirmResult && otp.length === 6) {
+//       try {
+//         const result = await confirmResult.confirm(otp);
+//         const user = result.user;
+//         // Initialize Realtime Database
+//         const db = getDatabase();
+  
+//         // Create a reference to the user's data in the database
+//         const userRef = ref(db, 'users/' + user.uid);
+  
+//         // Save user data in Realtime Database
+//         await set(userRef, {
+//           firstName: formData.firstName,
+//           lastName: formData.lastName,
+//           email: formData.email || user.email,
+//           password: formData.password,
+//           phoneNumber: formData.phoneNumber,
+//         });
+  
+//         navigate('/home'); // Navigate to home or another page after successful signup
+//       } catch (error) {
+//         if (error.code === "auth/invalid-verification-code") {
+//           setError("Invalid OTP. Please try again.");
+//         } else if (error.code === "auth/operation-not-allowed") {
+//           setError("Operation not allowed. Please check your authentication settings.");
+//         } else {
+//           console.error("Error during OTP confirmation or updating profile:", error);
+//           setError("An error occurred. Please try again.");
+//         }
+//       }
+//     } else {
+//       alert("Please enter a valid 6-digit OTP.");
+//     }
+//   };
+  
+
+//   const handleChangePhoneNumber = () => {
+//     setOtp('');
+//     setConfirmResult(null);
+//     setShowForm(true);
+//   };
+
+//   return (
+//     <div className="phone-verify-container">
+//       {showForm && (
+//         <div className="form-container">
+//           <h2>Register</h2>
+//           <form>
+//             <div>
+//               <label htmlFor="firstName">First Name:</label>
+//               <input
+//                 type="text"
+//                 id="firstName"
+//                 name="firstName"
+//                 value={formData.firstName}
+//                 onChange={handleInputChange}
+//                 required
+//               />
+//             </div>
+//             <div>
+//               <label htmlFor="lastName">Last Name:</label>
+//               <input
+//                 type="text"
+//                 id="lastName"
+//                 name="lastName"
+//                 value={formData.lastName}
+//                 onChange={handleInputChange}
+//                 required
+//               />
+//             </div>
+//             <div>
+//               <label htmlFor="email">Email:</label>
+//               <input
+//                 type="email"
+//                 id="email"
+//                 name="email"
+//                 value={formData.email}
+//                 onChange={handleInputChange}
+//                 required
+//               />
+//             </div>
+//             <div>
+//               <label htmlFor="password">Password:</label>
+//               <input
+//                 type="password"
+//                 id="password"
+//                 name="password"
+//                 value={formData.password}
+//                 onChange={handleInputChange}
+//                 required
+//               />
+//             </div>
+//             <div>
+//               <label htmlFor="confirmPassword">Confirm Password:</label>
+//               <input
+//                 type="password"
+//                 id="confirmPassword"
+//                 name="confirmPassword"
+//                 value={formData.confirmPassword}
+//                 onChange={handleInputChange}
+//                 required
+//               />
+//             </div>
+//             <div>
+//               <label htmlFor="phoneNumber">Phone Number:</label>
+//               <input
+//                 type="text"
+//                 id="phoneNumber"
+//                 name="phoneNumber"
+//                 value={formData.phoneNumber}
+//                 onChange={handleInputChange}
+//                 placeholder="Enter phone number with country code"
+//                 required
+//               />
+//             </div>
+//             <button id="send-otp-button" type="button" onClick={handleSendOtp}>Send OTP</button>
+//           </form>
+//         </div>
+//       )}
+//       {!showForm && (
+//         <div className="otp-container">
+//           {timeout && <div className="error-message">Your OTP has expired. Please request a new one.</div>}
+//           <form onSubmit={handleOtpSubmit}>
+//             <label htmlFor="otp">Enter OTP:</label>
+//             <input
+//               type="text"
+//               id="otp"
+//               value={otp}
+//               onChange={(e) => setOtp(e.target.value)}
+//               required
+//             />
+//             <button type="submit">Verify OTP</button>
+//             <button type="button" onClick={handleChangePhoneNumber}>Back</button>
+//           </form>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default PhoneVerify;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// First successful code
+// import React, { useEffect, useState } from "react";
+// import firebase from "firebase/compat/app";
+// import * as firebaseui from "firebaseui";
+// import "firebaseui/dist/firebaseui.css";
+// import { useNavigate } from "react-router-dom";
+// import './PhoneVerify.css'; // Import CSS if needed
+
+// const PhoneVerify = ({ auth, registrationData, setError }) => {
+  
+//   const [timeout, setTimeoutState] = useState(false);
+//   const navigate = useNavigate(); // Hook for navigation
+
+//   useEffect(() => {
+//     console.log("PhoneVerify component mounted");
+//     console.log("Registration data received in PhoneVerify:", registrationData);
+//     const ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
+
+//     const uiConfig = {
+//       signInOptions: [
+//         {
+//           provider: firebase.auth.PhoneAuthProvider.PROVIDER_ID,
+//           defaultCountry: "IN",
+//           recaptchaParameters: {
+//             type: "image",
+//             size: "normal",
+//             badge: "bottomleft",
+//           },
+//         },
+//       ],
+//       signInSuccessUrl: "/home", // FirebaseUI will handle this URL
+//       privacyPolicyUrl: "/privacy-policy",
+//       callbacks: {
+//         signInSuccessWithAuthResult: async (authResult) => {
+//           // Add additional user information to the profile
+//           console.log('signInSuccessWithAuthResult callback triggered');
+//           const user = firebase.auth().currentUser;
+//           if (user) {
+//             console.log('Current User:', user);
+//             try {
+//               // Update the user profile with the first and last name
+//               await user.updateProfile({
+//                 displayName: `${registrationData.firstName} ${registrationData.lastName}`
+//               });
+
+//               if (registrationData.email) {
+//                 await user.updateEmail(registrationData.email);
+//               }
+
+//               console.log('User profile updated successfully');
+//               navigate('/home');
+//               return false; // Prevent default redirection
+//             } catch (error) {
+//               console.error("Error updating profile:", error);
+//               setError("Failed to update profile. Please try again.");
+//               return false; // Prevent default redirection
+//             }
+//           }else{
+//             console.log('No user found for profile update.');
+//             return false;
+//           }
+          
+//         },
+//         uiShown: () => {
+//           console.log('FirebaseUI displayed');
+//         },
+//       },
+//     };
+
+//     try {
+//       ui.start(".otp-container", uiConfig);
+//     } catch (error) {
+//       console.error("Error initializing FirebaseUI:", error);
+//       setError("Error initializing FirebaseUI. Please try again.");
+//     }
+
+//     const timerId = setTimeout(() => {
+//       setTimeoutState(true);
+//       ui.reset();
+//     }, 300000); // 5 minutes
+
+//     return () => {
+//       clearTimeout(timerId);
+//       ui.reset();
+//     };
+//   }, [auth, registrationData, navigate, setError]); // Add navigate to dependencies
+
+//   return (
+//     <div className="otp-container">
+//       {timeout && <div className="error-message">Your OTP has expired. Please request a new one.</div>}
+      
+//     </div>
+//   );
+// };
+
+// export default PhoneVerify;
