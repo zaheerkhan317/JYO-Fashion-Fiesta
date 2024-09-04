@@ -1,4 +1,4 @@
-import React, { useState, useEffect }from 'react'
+import React, { useState }from 'react'
 import { Navbar, Nav, NavDropdown, Container, Button, Spinner } from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import "./Navbar.css";
@@ -7,7 +7,10 @@ import firebase from 'firebase/compat/app';
 import { useUser } from '../Context/UserProvider';
 
 const NavbarHome = () => {
-  const { user, firstName, setFirstName } = useUser();
+  const { user, setUser, firstName, setFirstName, displayName } = useUser();
+  console.log("firstName in NavbarHome : ",firstName);
+  console.log("user : ",user);
+  console.log("User firstName", firstName);
   const navigate = useNavigate();
   const [loading, setIsLoading] = useState(false);
   // useEffect(() => {
@@ -25,22 +28,25 @@ const NavbarHome = () => {
   // }, []); // Empty dependency array means this effect runs once after initial render
 
 
-  useEffect(() => {
-    const storedFirstName = localStorage.getItem('firstName');
-    console.log(storedFirstName);
-    if (storedFirstName) {
-      setFirstName(storedFirstName);
-    } else {
-      // Handle the case where first name is not found in session storage
-      console.error('First name not found in local storage');
-    }
-  }, [setFirstName]);
+  // useEffect(() => {
+  //   const storedFirstName = localStorage.getItem('firstName');
+  //   console.log("stored firstName",storedFirstName);
+  //   if (storedFirstName) {
+  //     setFirstName(storedFirstName);
+  //   } else {
+  //     // Handle the case where first name is not found in session storage
+  //     console.error('First name not found in local storage');
+  //   }
+  // }, [setFirstName]);
+
 
   const handleLogout = async () => {
     setIsLoading(true);
     try {
       await firebase.auth().signOut();
-      setFirstName(''); // Clear context
+      setUser(null);
+      setFirstName(''); 
+      localStorage.removeItem('firstName');
       navigate('/home');
     } catch (error) {
       console.error("Logout error:", error);
@@ -76,26 +82,34 @@ const NavbarHome = () => {
 
         {/* Buttons with responsive sizing */}
         <Nav className="d-flex justify-content-center align-items-center">
-          {user ? (
-            <Nav.Item className="d-flex align-items-center">
-              <span className="me-3">Hi, {firstName}</span>
-              <div className="dropdown me-3">
-                <Button variant="outline-primary" id="profileDropdown" className="d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i className="fa-solid fa-user"></i> {/* Profile icon */}
+          {(user|| firstName  ) ? (
+            <>
+            <Nav.Item className="d-flex flex-column flex-sm-row align-items-center">
+                  <div className="d-flex align-items-center me-0">
+                    <span className="me-3">Hi, {firstName||displayName}</span>
+                    <div className="dropdown">
+                      <Button variant="outline-primary" id="profileDropdown" className="d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i className="fa-solid fa-user"></i> {/* Profile icon */}
+                      </Button>
+                      <ul className="dropdown-menu" aria-labelledby="profileDropdown">
+                        <li><Link className="dropdown-item" to="/profile">Profile</Link></li>
+                        <li><hr className="dropdown-divider" /></li>
+                        <li><button className="dropdown-item" type="button" onClick={handleLogout}> 
+                          {loading ? <Spinner as="span" animation="border" size="sm" /> : 'Logout'}
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </Nav.Item>
+            <Nav.Item>
+              <Nav.Link as={Link} to="/cart" className="d-flex justify-content-center align-items-center">
+                <Button variant="outline-primary">
+                  <i className="fa-solid fa-cart-shopping"></i> {/* Cart icon */}
                 </Button>
-                <ul className="dropdown-menu" aria-labelledby="profileDropdown">
-                  <li><Link className="dropdown-item" to="/profile">Profile</Link></li>
-                  <li><hr className="dropdown-divider" /></li>
-                  <li><button className="dropdown-item" type="button" onClick={handleLogout} > 
-                    {loading ? <Spinner as="span" animation="border" size="sm" /> : 'Logout'}
-                    </button>
-                  </li>
-                </ul>
-              </div>
-              <Link to="/cart">
-                <Button variant="outline-primary">Cart</Button>
-              </Link>
+              </Nav.Link>
             </Nav.Item>
+          </>
           ) : (
             <Nav.Item>
               <Link to="/signup">

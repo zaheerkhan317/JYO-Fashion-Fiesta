@@ -10,32 +10,16 @@ const Home = () => {
     <div>
     <Carousel id="carouselExampleIndicators" interval={2000} controls={false}>
       <Carousel.Item>
-        <img
-          className="d-block w-100"
-          src={img1} // Replace with your image source
-          alt="First slide"
-        />
+        <img className="d-block w-100" src={img1} alt="First slide"/>
       </Carousel.Item>
       <Carousel.Item>
-        <img
-          className="d-block w-100"
-          src={img2} // Replace with your image source
-          alt="Second slide"
-        />
+        <img className="d-block w-100" src={img2} alt="Second slide" />
       </Carousel.Item>
       <Carousel.Item>
-        <img
-          className="d-block w-100"
-          src={img3} // Replace with your image source
-          alt="Third slide"
-        />
+        <img className="d-block w-100" src={img3} alt="Third slide" />
       </Carousel.Item>
       <Carousel.Item>
-        <img
-          className="d-block w-100"
-          src={img4} // Replace with your image source
-          alt="Third slide"
-        />
+        <img className="d-block w-100" src={img4} alt="Third slide" />
       </Carousel.Item>
     </Carousel>
 

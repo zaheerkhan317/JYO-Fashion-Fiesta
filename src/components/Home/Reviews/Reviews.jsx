@@ -72,8 +72,9 @@ const Reviews = () => (
     <h2 className="my-4 text-center">User Reviews</h2>
     <Row>
       {reviews.map((review) => (
-        <Col md={6} lg={4} key={review.id}>
+        <Col md={6} lg={4} key={review.id} className="d-flex align-items-stretch">
           <ReviewCard
+            className="card h-100"
             name={review.name}
             review={review.review}
             rating={review.rating}

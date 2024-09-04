@@ -28,6 +28,14 @@ const PhoneVerify = ({ auth }) => {
   const [error, setError] = useState('');
   const { setFirstName } = useUser();
 
+
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [appVerifier, setAppVerifier] = useState(null);
+  const [email, setEmail] = useState('');
+
+
+
+
   const navigate = useNavigate();
 
   useEffect(() => {

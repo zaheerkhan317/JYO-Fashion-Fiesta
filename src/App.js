@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import React, {useState, useEffect} from 'react';
+import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import NavbarHome from './components/Navbar/NavbarHome';
 import Footer from './components/Footer/Footer';
 import Home from './components/Home/Home';
@@ -9,26 +9,36 @@ import ContactUs from './components/Contact/ContactUs';
 import SignupForm from './components/Navbar/SignupForm/SignupForm';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
-
+import { auth } from './firebaseConfig';
 
 import AdminLogin from './components/Admin/AdminLogin/AdminLogin';
 import Dashboard from './components/Admin/Dashboard/Dashboard';
 import ProtectedRoute from './components/ProtectedRoutes/ProtectedRoute';
 import { UserProvider } from './components/Context/UserProvider';
 import { useNavigate } from 'react-router-dom';
+import LoginForm from './components/Navbar/LoginForm/LoginForm';
 
 
 function AppContent() {
+  const navigate = useNavigate(); 
   const location = useLocation();
   const isAdminRoute = location.pathname === '/admin' || location.pathname === '/dashboard';
+  const [user, setUser] = useState();
+    useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+      if (user && (location.pathname === '/login' || location.pathname === '/signup')) {
+        navigate('/home', { replace: true });
+      }
+    });
 
-  const [user, setUser] = useState(null);
-  const navigate = useNavigate(); // Initialize the useNavigate hook
+    return () => unsubscribe();
+  }, [navigate, location.pathname]);
 
-  const handleSignupSuccess = (userData) => {
-    setUser(userData);
-    navigate('/home', { replace: true }); // Replace the current history entry with /home
-  };
+  const firstName = localStorage.getItem('firstName');
+  
+
+  
 
   return (
     <UserProvider>
@@ -43,8 +53,9 @@ function AppContent() {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<ContactUs />} />
         {/* <Route path="/signup" element={user ? <Home /> : <SignupForm onSuccess={handleSignupSuccess} />} /> */}
-        <Route path="/signup" element={user ? <Home /> : <SignupForm onSuccess={handleSignupSuccess} />} />
-        
+        {/* <Route path="/signup" element={user ? <Home /> : <SignupForm onSuccess={handleSignupSuccess} />} /> */}
+        <Route path="/signup" element={user ? <Navigate to="/home" replace /> : <SignupForm />} />
+        <Route path="/login" element={firstName || user ? <Navigate to="/home" replace /> : <LoginForm />} /> 
 
 
         <Route path="/admin" element={<AdminLogin />} />

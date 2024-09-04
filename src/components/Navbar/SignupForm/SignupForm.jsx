@@ -17,27 +17,37 @@ function SignupForm() {
   if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
   }
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const unSubscriber = onAuthStateChanged(firebase.auth(), (currentUser) => {
       console.log(currentUser);
-      setUser(currentUser);
+      // setUser(currentUser);
       if (currentUser) {
         // If user is authenticated, redirect to home
-        navigate('/home', { replace: true }); // Replace ensures /signup is not in the history stack
+        navigate('/home');
       }
     });
 
     return () => unSubscriber();
   }, [navigate]);
 
+  const handleSignInClick = () => {
+    navigate("/login"); // Navigate to login page
+  };
+
   return (
     <>
       <PhoneVerify auth={firebase.auth()} setError={setError}></PhoneVerify>
       {error && <div className="error">{error}</div>}
+      <div className="text-center mb-3">
+        <span>Already a user? </span>
+        <button onClick={handleSignInClick} style={{ border: "none", background: "none", color: "blue", cursor: "pointer", textDecoration: "underline" }}>
+          Sign In
+        </button>
+      </div>
     </>
   );
 }
