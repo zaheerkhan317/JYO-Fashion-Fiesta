@@ -11,7 +11,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { auth } from './firebaseConfig';
 
-import AdminLogin from './components/Admin/AdminLogin/AdminLogin';
 import AdminLayout from './components/Admin/AdminLayout/AdminLayout ';
 import ProtectedRoute from './components/ProtectedRoutes/ProtectedRoute';
 import { UserProvider } from './components/Context/UserProvider';
