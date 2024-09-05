@@ -12,17 +12,24 @@ import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { auth } from './firebaseConfig';
 
 import AdminLogin from './components/Admin/AdminLogin/AdminLogin';
-import Dashboard from './components/Admin/Dashboard/Dashboard';
+import AdminLayout from './components/Admin/AdminLayout/AdminLayout ';
 import ProtectedRoute from './components/ProtectedRoutes/ProtectedRoute';
 import { UserProvider } from './components/Context/UserProvider';
 import { useNavigate } from 'react-router-dom';
 import LoginForm from './components/Navbar/LoginForm/LoginForm';
-
+import Dashboard from './components/Admin/AdminLayout/Dashboard/Dashboard';
+import Orders from './components/Admin/AdminLayout/Orders/Orders';
+import Products from './components/Admin/AdminLayout/Products/Products';
+import Users from './components/Admin/AdminLayout/Products/Products';
 
 function AppContent() {
   const navigate = useNavigate(); 
   const location = useLocation();
-  const isAdminRoute = location.pathname === '/admin' || location.pathname === '/dashboard';
+  const isAdminRoute = location.pathname === '/admin' || 
+                       location.pathname === '/admin/dashboard' ||
+                       location.pathname === '/admin/orders' ||
+                       location.pathname === '/admin/products' ||
+                       location.pathname === '/admin/users';
   const [user, setUser] = useState();
     useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -58,8 +65,22 @@ function AppContent() {
         <Route path="/login" element={firstName || user ? <Navigate to="/home" replace /> : <LoginForm />} /> 
 
 
-        <Route path="/admin" element={<AdminLogin />} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        
+        <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+            <Route index element={<Dashboard />} /> {/* Default to dashboard */}
+            <Route path="dashboard" element={<Dashboard />} /> {/* This handles /admin/dashboard */}
+            <Route path="orders" element={<Orders />} /> {/* Handles /admin/orders */}
+            <Route path="products" element={<Products />} /> {/* Handles /admin/products */}
+            <Route path="users" element={<Users />} /> {/* Handles /admin/users */}
+          </Route>
+
+
+
+        {/* <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/admin/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+        <Route path="/admin/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
+        <Route path="/admin/users" element={<ProtectedRoute><Users /></ProtectedRoute>} /> */}
        
       </Routes>
       

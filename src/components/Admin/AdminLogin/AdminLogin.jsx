@@ -13,7 +13,7 @@ const AdminLogin = () => {
   useEffect(() => {
     const loggedInUser = localStorage.getItem('adminUser');
     if (loggedInUser) {
-      navigate('/dashboard');
+      navigate('/admin/dashboard');
     }
   }, [navigate]);
 
@@ -34,7 +34,7 @@ const AdminLogin = () => {
           localStorage.setItem('adminUser', JSON.stringify({ username }));
 
           // Redirect to admin dashboard
-          navigate('/dashboard');
+          navigate('/admin/dashboard');
         } else {
           setError('Invalid username or password');
         }

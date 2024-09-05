@@ -53,17 +53,18 @@ const ReviewCard = ({ name, review, rating }) => {
     const stars = generateStars(rating);
   
     return (
-      <Card className="mb-4 text-center">
-        <Card.Body>
-          <Card.Title>{name}</Card.Title>
-          <Card.Text>{review}</Card.Text>
-          <Card.Footer>
-            {stars.map((star, index) => (
-              <span key={index} className="text-warning">{star}</span>
-            ))}
-          </Card.Footer>
-        </Card.Body>
-      </Card>
+      <Card className="text-center d-flex flex-column justify-content-between" style={{ height: '100%' }}>
+      <Card.Body>
+        <Card.Title>{name}</Card.Title>
+        <Card.Text>{review}</Card.Text>
+      </Card.Body>
+      <Card.Footer>
+        {stars.map((star, index) => (
+          <span key={index} className="text-warning">{star}</span>
+        ))}
+      </Card.Footer>
+    </Card>
+      
     );
   };
 
@@ -72,7 +73,7 @@ const Reviews = () => (
     <h2 className="my-4 text-center">User Reviews</h2>
     <Row>
       {reviews.map((review) => (
-        <Col md={6} lg={4} key={review.id} className="d-flex align-items-stretch">
+        <Col md={6} lg={4} key={review.id} className="d-flex align-items-stretch mb-5">
           <ReviewCard
             className="card h-100"
             name={review.name}
@@ -82,7 +83,10 @@ const Reviews = () => (
         </Col>
       ))}
     </Row>
+    
   </Container>
+
+  
 );
 
 export default Reviews;
