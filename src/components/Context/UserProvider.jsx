@@ -13,8 +13,12 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     const loadUserFromLocalStorage = () => {
       const storedFirstName = localStorage.getItem('firstName');
+      const storedDisplayName = localStorage.getItem('displayName');
       if (storedFirstName) {
         setFirstName(storedFirstName);
+      }
+      if (storedDisplayName) {
+        setDisplayName(storedDisplayName);
       }
     };
 

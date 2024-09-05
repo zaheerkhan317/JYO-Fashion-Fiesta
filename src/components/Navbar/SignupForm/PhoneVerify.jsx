@@ -21,17 +21,11 @@ const PhoneVerify = ({ auth }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [otp, setOtp] = useState('');
   const [confirmResult, setConfirmResult] = useState(null);
-  const [timeout, setTimeoutState] = useState(false);
   const [showForm, setShowForm] = useState(true);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [error, setError] = useState('');
-  const { setFirstName } = useUser();
-
-
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [appVerifier, setAppVerifier] = useState(null);
-  const [email, setEmail] = useState('');
+  const { setFirstName, setUser } = useUser();
 
 
 
@@ -41,56 +35,11 @@ const PhoneVerify = ({ auth }) => {
   useEffect(() => {
     const ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
 
-    const uiConfig = {
-      signInOptions: [
-        {
-          provider: firebase.auth.PhoneAuthProvider.PROVIDER_ID,
-          defaultCountry: "IN",
-          recaptchaParameters: {
-            type: "image",
-            size: "normal",
-            badge: "bottomleft",
-          },
-        },
-      ],
-      signInSuccessUrl: "/home",
-      privacyPolicyUrl: "/privacy-policy",
-      callbacks: {
-        signInSuccessWithAuthResult: async (authResult) => {
-          const user = firebase.auth().currentUser;
-          if (user) {
-            try {
-              await user.updateProfile({
-                displayName: `${formData.firstName} ${formData.lastName}`
-              });
-
-              if (formData.email) {
-                await user.updateEmail(formData.email);
-              }
-
-              navigate('/home');
-              return false;
-            } catch (error) {
-              console.error("Error updating profile:", error);
-              setError("Failed to update profile. Please try again.");
-              return false;
-            }
-          } else {
-            console.log('No user found for profile update.');
-            return false;
-          }
-        },
-        uiShown: () => {
-          console.log('FirebaseUI displayed');
-        },
-      },
-    };
-
     
 
     const timerId = setTimeout(() => {
       if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.reset();
+        window.recaptchaVerifier.clear();
         setError("reCAPTCHA challenge timed out. Please try again.");
       }
     }, 300000); // 5 minutes
@@ -130,7 +79,7 @@ const PhoneVerify = ({ auth }) => {
     }));
   };
 
-  const handleSendOtp = () => {
+  const handleSendOtp = async () => {
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match.");
       return;
@@ -154,16 +103,70 @@ const PhoneVerify = ({ auth }) => {
       return;
     }
 
-    const completePhone = `${formData.countryCode} ${formData.phoneNumber}`
-    firebase.auth().signInWithPhoneNumber(completePhone, appVerifier)
-      .then((confirmationResult) => {
-        setConfirmResult(confirmationResult);
-        setShowForm(false); // Hide form after OTP is sent
-      })
-      .catch((error) => {
-        console.error("Error during signInWithPhoneNumber:", error);
+    const completePhone = `${formData.countryCode} ${formData.phoneNumber}`;
+
+    // firebase.auth().signInWithPhoneNumber(completePhone, appVerifier)
+    //   .then((confirmationResult) => {
+    //     setConfirmResult(confirmationResult);
+    //     setShowForm(false); // Hide form after OTP is sent
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error during signInWithPhoneNumber:", error);
+    //     setError("Error during OTP request. Please try again.");
+    //   });
+
+    try {
+      const confirmationResult = await firebase.auth().signInWithPhoneNumber(completePhone, appVerifier);
+      setConfirmResult(confirmationResult);
+      setShowForm(false); // Hide form after OTP is sent
+    } catch (error) {
+      console.error("Error during signInWithPhoneNumber:", error);
+  
+      // Check for billing error and handle it
+      if (error.code === 'auth/billing-not-enabled' ||error.code === 'auth/too-many-requests') {
+        console.log("Billing is not enabled. Storing user data in Firebase Realtime Database.");
+        await storeUserInRealtimeDatabase();
+        setIsLoading(false);
+        return;
+      } else {
         setError("Error during OTP request. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Function to store user data in Firebase Realtime Database
+  const storeUserInRealtimeDatabase = async () => {
+    try {
+      const db = getDatabase();
+      const userRef = ref(db, 'users/' + Date.now()); // Using Date.now() as a temporary user ID for now
+      await set(userRef, {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        phoneNumber: `${formData.countryCode} ${formData.phoneNumber}`,
       });
+
+      localStorage.setItem('firstName', formData.firstName);
+      localStorage.setItem('displayName', formData.firstName);
+        setFirstName(formData.firstName);
+      setUser({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        phoneNumber: `${formData.countryCode} ${formData.phoneNumber}`,
+      })
+      console.log("User data stored in Firebase Realtime Database.");
+      navigate('/home');
+    } catch (error) {
+      console.error("Error storing user data in Firebase Realtime Database:", error);
+      setError("An error occurred while saving data.");
+    }
+
+
   };
 
   const handleOtpSubmit = async (e) => {
@@ -298,7 +301,7 @@ const PhoneVerify = ({ auth }) => {
           <input type="tel" className="form-control" id="phoneNumber" name="phoneNumber" placeholder="Phone Number" value={formData.phoneNumber} onChange={handleInputChange} required />
         </div>
       </div>
-      <button type="button" className={`btn btn-send ${isLoading ? 'loading' : ''}`} id="send-otp-button" onClick={handleSendOtp} disabled={isLoading} > {isLoading && ( <div className="spinner"></div> )} {!isLoading && 'Send OTP'} </button>
+      <button type="button" className={`btn btn-send ${isLoading ? 'loading' : ''}`} id="send-otp-button" onClick={handleSendOtp} disabled={isLoading} > {isLoading && ( <div className="spinner"></div> )} {!isLoading && 'Submit'} </button>
       
     </form>
   ) : (

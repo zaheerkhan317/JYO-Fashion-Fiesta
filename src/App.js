@@ -47,14 +47,14 @@ function AppContent() {
       
       <Routes>
         
-
+      <Route path="/" element={<Navigate to="/home" />} />
         <Route path="/home" element= {<Home />} />
         <Route path="/offers" element={<OffersZone />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<ContactUs />} />
         {/* <Route path="/signup" element={user ? <Home /> : <SignupForm onSuccess={handleSignupSuccess} />} /> */}
         {/* <Route path="/signup" element={user ? <Home /> : <SignupForm onSuccess={handleSignupSuccess} />} /> */}
-        <Route path="/signup" element={user ? <Navigate to="/home" replace /> : <SignupForm />} />
+        <Route path="/signup" element={user || firstName ? <Navigate to="/home" replace /> : <SignupForm />} />
         <Route path="/login" element={firstName || user ? <Navigate to="/home" replace /> : <LoginForm />} /> 
 
 

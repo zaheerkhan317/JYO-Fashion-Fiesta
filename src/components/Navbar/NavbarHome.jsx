@@ -11,6 +11,7 @@ const NavbarHome = () => {
   console.log("firstName in NavbarHome : ",firstName);
   console.log("user : ",user);
   console.log("User firstName", firstName);
+  // console.log("user.firstname",user.firstName);
   const navigate = useNavigate();
   const [loading, setIsLoading] = useState(false);
   // useEffect(() => {

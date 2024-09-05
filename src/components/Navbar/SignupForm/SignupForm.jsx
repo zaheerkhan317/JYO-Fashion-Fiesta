@@ -6,12 +6,12 @@ import { useNavigate } from "react-router-dom";
 
 function SignupForm() {
   const firebaseConfig = {
-    apiKey: "AIzaSyDxZVJLJN-zyGrlWjheCnx0DhvYsorb1w8",
-    authDomain: "jyo-fashion-47b0c.firebaseapp.com",
-    projectId: "jyo-fashion-47b0c",
-    storageBucket: "jyo-fashion-47b0c.appspot.com",
-    messagingSenderId: "706587465005",
-    appId: "1:706587465005:web:0193a5b9774d413e48efa4",
+    apiKey: "AIzaSyDkcqaMW-3B5MPIah69t7UXJGCPjjihI4k",
+    authDomain: "jyo-fashion-fiesta-6ddaa.firebaseapp.com",
+    projectId: "jyo-fashion-fiesta-6ddaa",
+    storageBucket: "jyo-fashion-fiesta-6ddaa.appspot.com",
+    messagingSenderId: "437720927659",
+    appId: "1:437720927659:web:572a5e7c8d64caa72b16ee",
   };
 
   if (!firebase.apps.length) {
