@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, ListGroup } from 'react-bootstrap';
 import { FaUsers, FaCalendarAlt } from 'react-icons/fa';
-import { database, ref, get } from '../../../../firebaseConfig';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
+
 
 const Dashboard = () => {
   const [userCount, setUserCount] = useState(0);
   //   const [productCount, setProductCount] = useState(0);
   //   const [orderCount, setOrderCount] = useState(0);
-
+  const db = getFirestore();
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch user count
-        const usersRef = ref(database, 'users');
-        const usersSnapshot = await get(usersRef);
-        const users = usersSnapshot.val();
-        const totalUsers = (users ? Object.keys(users).length : 0);
+        const usersCollection = collection(db, 'users');
+        const usersSnapshot = await getDocs(usersCollection);
+        const totalUsers = usersSnapshot.size;
         setUserCount(totalUsers);
 
         // Fetch product count
@@ -33,7 +33,7 @@ const Dashboard = () => {
     };
 
     fetchData();
-  }, []);
+  }, [db]);
 
   return (
     <Container fluid>

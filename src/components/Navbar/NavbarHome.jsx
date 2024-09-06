@@ -49,6 +49,7 @@ const NavbarHome = () => {
       setFirstName(''); 
       localStorage.removeItem('firstName');
       navigate('/home');
+      window.location.reload();
     } catch (error) {
       console.error("Logout error:", error);
       // Handle any errors if necessary

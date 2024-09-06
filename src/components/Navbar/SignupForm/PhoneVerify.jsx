@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { getFirestore, doc, setDoc, addDoc, collection } from "firebase/firestore";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import * as firebaseui from "firebaseui";
@@ -28,47 +28,57 @@ const PhoneVerify = ({ auth }) => {
   const { setFirstName, setUser } = useUser();
 
 
-
+  const getISTDate = (date) => {
+    const options = {
+      timeZone: 'Asia/Kolkata', // IST timezone
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    };
+    return new Intl.DateTimeFormat('en-IN', options).format(date);
+  };
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    const ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
+    try {
+      const ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
 
-    
-
-    const timerId = setTimeout(() => {
-      if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.clear();
-        setError("reCAPTCHA challenge timed out. Please try again.");
+      const recaptchaContainer = document.getElementById('send-otp-button');
+      if (recaptchaContainer) {
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(recaptchaContainer, {
+          'size': 'invisible',
+          'callback': (response) => {
+            console.log('reCAPTCHA solved, allow send OTP');
+          },
+          'expired-callback': () => {
+            console.log('reCAPTCHA expired, please re-verify.');
+            setError("reCAPTCHA challenge expired. Please try again.");
+            window.recaptchaVerifier.reset();
+          }
+        });
+      } else {
+        console.error("send-otp-button element not found");
       }
-    }, 300000); // 5 minutes
 
-    return () => {
-      clearTimeout(timerId);
-      ui.reset();
-    };
-  }, [auth, formData, navigate, setError]);
+      return () => {
+        ui.reset();
+        if (window.recaptchaVerifier) {
+          window.recaptchaVerifier.clear();
+        }
+      };
+    } catch (err) {
+      console.error('Error setting up reCAPTCHA:', err);
+      setError('Error setting up reCAPTCHA. Please try again.');
+    }
+  }, [auth, navigate, setError]);
 
-  useEffect(() => {
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('send-otp-button', {
-      'size': 'invisible',
-      'callback': (response) => {
-        console.log('reCAPTCHA solved, allow send OTP');
-      },
-      'expired-callback': () => {
-        console.log('reCAPTCHA expired, please re-verify.');
-        setError("reCAPTCHA challenge expired. Please try again.");
-        window.recaptchaVerifier.reset();
-      }
-    });
 
-    return () => {
-      if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.clear();
-      }
-    };
-  }, []);
+ 
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -79,7 +89,7 @@ const PhoneVerify = ({ auth }) => {
     }));
   };
 
-  const handleSendOtp = async () => {
+  const handleSendOtp = () => {
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match.");
       return;
@@ -100,6 +110,7 @@ const PhoneVerify = ({ auth }) => {
     const appVerifier = window.recaptchaVerifier;
     if (!appVerifier) {
       console.error("reCAPTCHA verifier is not ready");
+      setIsLoading(false);
       return;
     }
 
@@ -115,25 +126,24 @@ const PhoneVerify = ({ auth }) => {
     //     setError("Error during OTP request. Please try again.");
     //   });
 
-    try {
-      const confirmationResult = await firebase.auth().signInWithPhoneNumber(completePhone, appVerifier);
+    firebase.auth().signInWithPhoneNumber(completePhone, appVerifier)
+    .then((confirmationResult) => {
       setConfirmResult(confirmationResult);
       setShowForm(false); // Hide form after OTP is sent
-    } catch (error) {
+    })
+    .catch((error) => {
       console.error("Error during signInWithPhoneNumber:", error);
-  
-      // Check for billing error and handle it
-      if (error.code === 'auth/billing-not-enabled' ||error.code === 'auth/too-many-requests') {
-        console.log("Billing is not enabled. Storing user data in Firebase Realtime Database.");
-        await storeUserInFirestore();
-        setIsLoading(false);
-        return;
+
+      if (error.code === 'auth/billing-not-enabled' || error.code === 'auth/too-many-requests') {
+        console.log("Billing is not enabled. Storing user data in Firebase Firestore.");
+        storeUserInFirestore().then(() => {
+          setIsLoading(false);
+        });
       } else {
         setError("Error during OTP request. Please try again.");
+        setIsLoading(false);
       }
-    } finally {
-      setIsLoading(false);
-    }
+    });
   };
   
   // Function to store user data in Firebase Realtime Database
@@ -186,6 +196,12 @@ const PhoneVerify = ({ auth }) => {
         password: formData.password,  // Storing plain text passwords is insecure! Use Firebase Authentication for passwords.
         phoneNumber: `${formData.countryCode} ${formData.phoneNumber}`,
       });
+
+      const activitiesRef = collection(db, 'activities');
+      await addDoc(activitiesRef, {
+        timestamp: getISTDate(new Date()).toString(),
+        description: `User ${formData.firstName } ${formData.lastName } registered`,
+      });
   
       // Optionally store in local storage and set context
       localStorage.setItem('firstName', formData.firstName);
@@ -208,74 +224,81 @@ const PhoneVerify = ({ auth }) => {
   };
 
 
-  const handleOtpSubmit = async (e) => {
+  const handleOtpSubmit = (e) => {
     e.preventDefault();
-
+  
     setIsVerifying(true);
-
+  
     if (confirmResult && otp.length === 6) {
-      try {
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Timeout')), 20000) // 10 seconds timeout
-        );
-
-        const result = await Promise.race([
-          confirmResult.confirm(otp),
-          timeoutPromise,
-        ]);
-
-        const user = result.user;
-
-        if (!user || !user.uid) {
-          throw new Error("User UID is missing or invalid.");
-        }
-        console.log("User UID:", user.uid);
-
-        const db = getFirestore();
-
-        // Check that user.uid is a string
-        if (typeof user.uid !== "string") {
-          throw new TypeError("user.uid is not a string");
-        }
-
-        // Create Firestore document reference using UID
-        const userRef = doc(db, 'users' + user.uid);
-
-        await setDoc(userRef, {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email || user.email,
-          password: formData.password,
-          phoneNumber: formData.phoneNumber,
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Timeout')), 20000) // 20 seconds timeout
+      );
+  
+      Promise.race([
+        confirmResult.confirm(otp),
+        timeoutPromise
+      ])
+        .then((result) => {
+          const user = result.user;
+  
+          if (!user || !user.uid) {
+            throw new Error("User UID is missing or invalid.");
+          }
+          console.log("User UID:", user.uid);
+  
+          const db = getFirestore();
+  
+          // Create Firestore document reference using UID
+          const userRef = doc(db, 'users', user.uid);
+  
+          return setDoc(userRef, {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email || user.email,
+            password: formData.password,
+            phoneNumber: formData.phoneNumber,
+          });
+        })
+        .then(() => {
+          const db = getFirestore();
+          const activitiesRef = collection(db, 'activities');
+  
+          return addDoc(activitiesRef, {
+            timestamp: getISTDate(new Date()).toString(),
+            description: `User ${formData.firstName} ${formData.lastName} registered`,
+          });
+        })
+        .then(() => {
+          localStorage.setItem('firstName', formData.firstName);
+          setFirstName(formData.firstName);
+          
+          setIsVerified(true);
+          setError('');
+          setTimeout(() => {
+            navigate('/home');
+          }, 1000);
+        })
+        .catch((error) => {
+          if (error.message === 'Timeout') {
+            setError("Operation timed out. Please try again.");
+          } else if (error.code === "auth/invalid-verification-code") {
+            setError("Invalid OTP. Please try again.");
+          } else if (error.code === "auth/operation-not-allowed") {
+            setError("Operation not allowed. Please check your authentication settings.");
+          } else {
+            console.error("Error during OTP confirmation or updating profile:", error);
+            setError("An error occurred. Please try again.");
+          }
+          setIsVerified(false);
+        })
+        .finally(() => {
+          setIsVerifying(false);
         });
-
-        localStorage.setItem('firstName', formData.firstName);
-        setFirstName(formData.firstName);
-        
-        setIsVerified(true);
-        setError('');
-        setTimeout(() => {
-          navigate('/home');
-        }, 1000);
-      } catch (error) {
-        if (error.message === 'Timeout') {
-          setError("Operation timed out. Please try again.");
-        } else if (error.code === "auth/invalid-verification-code") {
-          setError("Invalid OTP. Please try again.");
-        } else if (error.code === "auth/operation-not-allowed") {
-          setError("Operation not allowed. Please check your authentication settings.");
-        } else {
-          console.error("Error during OTP confirmation or updating profile:", error);
-          setError("An error occurred. Please try again.");
-        }
-        setIsVerified(false);
-      }finally{
-        setIsVerifying(false);
-      }
     } else {
       alert("Please enter a valid 6-digit OTP.");
     }
   };
+  
 
   return (
     <div className="container mt-5">

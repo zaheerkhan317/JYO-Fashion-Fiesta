@@ -5,11 +5,26 @@ import { toast } from 'react-toastify';
 import google from '../../../img/google.png';
 import { UserContext } from '../../Context/UserProvider'; // Correct import path
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, addDoc, collection } from 'firebase/firestore';
 
 const SignInWithGoogle = () => {
   const { setUser, setFirstName } = useContext(UserContext); // Get context setters
   const navigate = useNavigate(); // Initialize useNavigate
+
+  const getISTDate = (date) => {
+    const options = {
+      timeZone: 'Asia/Kolkata', // IST timezone
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    };
+    return new Intl.DateTimeFormat('en-IN', options).format(date);
+  };
+  
+
 
   const googleLogin = async () => {
     const provider = new GoogleAuthProvider();
@@ -45,9 +60,16 @@ const SignInWithGoogle = () => {
             firstName: firstName,
             lastName: lastName,
             photo: userPhoto,
-            createdAt: new Date().toISOString(), // Add a timestamp of account creation
+            createdAt: getISTDate(new Date()).toString(), // Add a timestamp of account creation
           });
         }
+
+        const activitiesRef = collection(db, 'activities');
+
+        await addDoc(activitiesRef, {
+          timestamp: getISTDate(new Date()).toString(),
+          description: `User ${firstName } ${lastName } registered`,
+        });
 
         toast.success('User logged in successfully', {
           position: 'top-center',

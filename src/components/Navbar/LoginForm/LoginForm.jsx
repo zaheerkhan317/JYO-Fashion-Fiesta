@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getDatabase, ref, get } from 'firebase/database';
+import { getFirestore, getDocs, collection } from "firebase/firestore";
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../Context/UserProvider';
 import SignInWithGoogle from './SignInWithGoogle';
@@ -16,34 +16,33 @@ function LoginForm() {
     e.preventDefault();
     
     try {
-      const db = getDatabase();
-      const userRef = ref(db, 'users');
-      const snapshot = await get(userRef);
+      const db = getFirestore();
+      const usersCollection = collection(db, 'users');
+      const userSnapshot = await getDocs(usersCollection);
 
-      if (snapshot.exists()) {
-        const users = snapshot.val();
-        const user = Object.values(users).find(user => user.email === email.trim());
+      let userFound = false;
 
-        if (user && user.password === password.trim()) {
-          setUser(user);
-          setFirstName(user.firstName);
-          localStorage.setItem('firstName', user.firstName);
-          console.log("firstname in loginform : ",user.firstName);
-
+      userSnapshot.forEach((doc) => {
+        const userData = doc.data();
+        if (userData.email === email.trim() && userData.password === password.trim()) {
+          userFound = true;
           setUser({
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            phoneNumber: user.phoneNumber,
-            password: user.password,
+            email: userData.email,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            phoneNumber: userData.phoneNumber,
+            password: userData.password,
           });
-          
+          setFirstName(userData.firstName);
+          localStorage.setItem('firstName', userData.firstName);
+          console.log("firstname in loginform : ", userData.firstName);
+
           navigate('/home');
-        } else {
-          setError('Invalid email or password');
         }
-      } else {
-        setError('No users found');
+      });
+
+      if (!userFound) {
+        setError('Invalid email or password');
       }
     } catch (error) {
       console.error('Login error:', error);
