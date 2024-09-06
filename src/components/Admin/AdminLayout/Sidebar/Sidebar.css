@@ -1,7 +1,7 @@
 /* Sidebar.css */
 .sidebar {
   width: 250px; /* Default width when open */
-  height: 100vh;
+  height: 300vh;
   position: fixed;
   top: 0;
   left: 0;
