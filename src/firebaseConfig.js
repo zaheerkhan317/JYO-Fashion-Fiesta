@@ -3,10 +3,12 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import firebase from "firebase/compat/app";
+import { getDatabase, ref, get } from 'firebase/database';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDkcqaMW-3B5MPIah69t7UXJGCPjjihI4k",
   authDomain: "jyo-fashion-fiesta-6ddaa.firebaseapp.com",
+  databaseURL: "https://jyo-fashion-fiesta-6ddaa-default-rtdb.firebaseio.com/",
   projectId: "jyo-fashion-fiesta-6ddaa",
   storageBucket: "jyo-fashion-fiesta-6ddaa.appspot.com",
   messagingSenderId: "437720927659",
@@ -20,6 +22,6 @@ if (!firebase.apps.length) {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app); // Initialize Firestore
-
-export { auth, db };
+const database = getDatabase(app);
+export { auth, ref, db, database, get };
 

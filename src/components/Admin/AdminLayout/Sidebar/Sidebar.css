@@ -19,8 +19,7 @@
 
 .sidebar-content {
   padding: 20px;
-  height: calc(100% - 50px); /* Adjust for the toggle button height */
-  overflow-y: auto;
+  height: calc(100% - 50px); 
 }
 
 .sidebar-header {

@@ -1,10 +1,11 @@
 import React, { useContext } from 'react';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { auth } from '../../../firebaseConfig';
+import { auth, db } from '../../../firebaseConfig';
 import { toast } from 'react-toastify';
 import google from '../../../img/google.png';
 import { UserContext } from '../../Context/UserProvider'; // Correct import path
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 const SignInWithGoogle = () => {
   const { setUser, setFirstName } = useContext(UserContext); // Get context setters
@@ -20,15 +21,33 @@ const SignInWithGoogle = () => {
         console.log("got user 2nd line");
         
         console.log("setting user.....");
+        const firstName = user.displayName.split(' ')[0] || '';
+        const lastName = user.displayName.split(' ')[1] || '';
+        const userEmail = user.email;
+        const userPhoto = user.photoURL;
         // Update UserContext with the new user data
         setUser({
-          email: user.email,
-          firstName: user.displayName.split(' ')[0] || '',
-          lastName: user.displayName.split(' ')[1] || '',
-          photo: user.photoURL,
+          email: userEmail,
+          firstName: firstName,
+          lastName: lastName,
+          photo: userPhoto,
         });
         console.log("set USer",setUser);
         setFirstName(user.displayName.split(' ')[0] || '');
+
+        const userRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userRef);
+
+        if (!userDoc.exists()) {
+          await setDoc(userRef, {
+            uid: user.uid,
+            email: userEmail,
+            firstName: firstName,
+            lastName: lastName,
+            photo: userPhoto,
+            createdAt: new Date().toISOString(), // Add a timestamp of account creation
+          });
+        }
 
         toast.success('User logged in successfully', {
           position: 'top-center',

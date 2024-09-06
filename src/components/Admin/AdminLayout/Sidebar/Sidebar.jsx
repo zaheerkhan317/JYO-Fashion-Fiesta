@@ -10,7 +10,7 @@ const Sidebar = ({ isSidebarOpen, setSidebarOpen }) => {
 
   const handleLogout = () => {
     localStorage.removeItem('adminUser');
-    navigate('/admin'); // Redirect to login page
+    navigate('/home'); // Redirect to login page
   };
 
   return (

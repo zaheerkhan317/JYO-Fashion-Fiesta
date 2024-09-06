@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getDatabase, ref, set } from "firebase/database";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import * as firebaseui from "firebaseui";
@@ -125,7 +125,7 @@ const PhoneVerify = ({ auth }) => {
       // Check for billing error and handle it
       if (error.code === 'auth/billing-not-enabled' ||error.code === 'auth/too-many-requests') {
         console.log("Billing is not enabled. Storing user data in Firebase Realtime Database.");
-        await storeUserInRealtimeDatabase();
+        await storeUserInFirestore();
         setIsLoading(false);
         return;
       } else {
@@ -137,37 +137,76 @@ const PhoneVerify = ({ auth }) => {
   };
   
   // Function to store user data in Firebase Realtime Database
-  const storeUserInRealtimeDatabase = async () => {
+  // const storeUserInRealtimeDatabase = async () => {
+  //   try {
+  //     const db = getDatabase();
+  //     const userRef = ref(db, 'users/' + Date.now()); // Using Date.now() as a temporary user ID for now
+  //     await set(userRef, {
+  //       firstName: formData.firstName,
+  //       lastName: formData.lastName,
+  //       email: formData.email,
+  //       password: formData.password,
+  //       phoneNumber: `${formData.countryCode} ${formData.phoneNumber}`,
+  //     });
+
+  //     localStorage.setItem('firstName', formData.firstName);
+  //     localStorage.setItem('displayName', formData.firstName);
+  //       setFirstName(formData.firstName);
+  //     setUser({
+  //       firstName: formData.firstName,
+  //       lastName: formData.lastName,
+  //       email: formData.email,
+  //       password: formData.password,
+  //       phoneNumber: `${formData.countryCode} ${formData.phoneNumber}`,
+  //     })
+  //     console.log("User data stored in Firebase Realtime Database.");
+  //     navigate('/home');
+  //   } catch (error) {
+  //     console.error("Error storing user data in Firebase Realtime Database:", error);
+  //     setError("An error occurred while saving data.");
+  //   }
+
+
+  // };
+
+  //Function to store user data in Firebase Firstore Database
+  const storeUserInFirestore = async () => {
     try {
-      const db = getDatabase();
-      const userRef = ref(db, 'users/' + Date.now()); // Using Date.now() as a temporary user ID for now
-      await set(userRef, {
+      const db = getFirestore(); // Get Firestore instance
+      const userId = Date.now().toString(); // Use authenticated user's ID or fallback to Date.now()
+      
+      // Create a reference to the user's document in the 'users' collection
+      const userRef = doc(db, 'users', userId);
+      
+      // Set user data in Firestore
+      await setDoc(userRef, {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
-        password: formData.password,
+        password: formData.password,  // Storing plain text passwords is insecure! Use Firebase Authentication for passwords.
         phoneNumber: `${formData.countryCode} ${formData.phoneNumber}`,
       });
-
+  
+      // Optionally store in local storage and set context
       localStorage.setItem('firstName', formData.firstName);
       localStorage.setItem('displayName', formData.firstName);
-        setFirstName(formData.firstName);
+      setFirstName(formData.firstName);
       setUser({
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
         password: formData.password,
         phoneNumber: `${formData.countryCode} ${formData.phoneNumber}`,
-      })
-      console.log("User data stored in Firebase Realtime Database.");
+      });
+  
+      console.log("User data stored in Firestore.");
       navigate('/home');
     } catch (error) {
-      console.error("Error storing user data in Firebase Realtime Database:", error);
+      console.error("Error storing user data in Firestore:", error);
       setError("An error occurred while saving data.");
     }
-
-
   };
+
 
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
@@ -186,10 +225,23 @@ const PhoneVerify = ({ auth }) => {
         ]);
 
         const user = result.user;
-        const db = getDatabase();
-        const userRef = ref(db, 'users/' + user.uid);
 
-        await set(userRef, {
+        if (!user || !user.uid) {
+          throw new Error("User UID is missing or invalid.");
+        }
+        console.log("User UID:", user.uid);
+
+        const db = getFirestore();
+
+        // Check that user.uid is a string
+        if (typeof user.uid !== "string") {
+          throw new TypeError("user.uid is not a string");
+        }
+
+        // Create Firestore document reference using UID
+        const userRef = doc(db, 'users' + user.uid);
+
+        await setDoc(userRef, {
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email || user.email,

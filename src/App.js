@@ -11,6 +11,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { auth } from './firebaseConfig';
 
+import AdminLogin from './components/Admin/AdminLogin/AdminLogin';
 import AdminLayout from './components/Admin/AdminLayout/AdminLayout ';
 import ProtectedRoute from './components/ProtectedRoutes/ProtectedRoute';
 import { UserProvider } from './components/Context/UserProvider';
@@ -28,7 +29,8 @@ function AppContent() {
                        location.pathname === '/admin/dashboard' ||
                        location.pathname === '/admin/orders' ||
                        location.pathname === '/admin/products' ||
-                       location.pathname === '/admin/users';
+                       location.pathname === '/admin/users' ||
+                       location.pathname === '/adminlogin';
   const [user, setUser] = useState();
     useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -65,9 +67,10 @@ function AppContent() {
 
 
         
-        <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+        <Route path="/adminlogin" element={<AdminLogin />} />
+          <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
             <Route index element={<Dashboard />} /> {/* Default to dashboard */}
-            <Route path="dashboard" element={<Dashboard />} /> {/* This handles /admin/dashboard */}
+            <Route path="dashboard" element={<Dashboard />} /> {/* Handles /admin/dashboard */}
             <Route path="orders" element={<Orders />} /> {/* Handles /admin/orders */}
             <Route path="products" element={<Products />} /> {/* Handles /admin/products */}
             <Route path="users" element={<Users />} /> {/* Handles /admin/users */}

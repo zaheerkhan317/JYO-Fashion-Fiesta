@@ -13,7 +13,7 @@ const AdminLayout = () => {
   return (
     <div className="d-flex">
       <Sidebar isSidebarOpen={isSidebarOpen} setSidebarOpen={setSidebarOpen}/>
-      <div className="content flex-grow" 
+      <div className="content flex-grow-1" 
        style={{
         marginLeft: isSidebarOpen ? '250px' : '80px',
         transition: 'margin-left 0.3s', // Smooth transition for margin
