@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Card, Table } from 'react-bootstrap';
-import { getFirestore, collection, getDocs} from 'firebase/firestore';
+import { collection, getDocs} from 'firebase/firestore';
 import { db } from '../../../../firebaseConfig';
 
 const Users = () => {
@@ -9,7 +9,6 @@ const Users = () => {
   const [users, setUsers] = useState([]);
 
   // Firestore instance
-  const firestore = getFirestore();
 
   const fetchUserDetails = async () => {
     try {
@@ -18,6 +17,7 @@ const Users = () => {
       const userList = userSnapshot.docs.map(doc => doc.data());
       setUsers(userList);
       setUserCount(userList.length);
+      console.log(userCount);
     } catch (error) {
       console.error("Error fetching user details:", error);
     }
@@ -26,7 +26,7 @@ const Users = () => {
   useEffect(() => {
 
     fetchUserDetails();
-  }, []);
+  });
 
   return (
     <Row className="mb-4">

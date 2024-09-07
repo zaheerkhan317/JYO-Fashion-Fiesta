@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, ListGroup, Table } from 'react-bootstrap';
+import { Container, Row, Col, Card, ListGroup } from 'react-bootstrap';
 import { FaUsers, FaCalendarAlt, FaBox, FaShoppingCart, FaStar } from 'react-icons/fa';
-import { getFirestore, collection, getDocs, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { getFirestore, collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, TimeScale } from 'chart.js';
 import 'chartjs-adapter-date-fns';
@@ -63,7 +63,6 @@ const Dashboard = () => {
   const [userCount, setUserCount] = useState(0);
   const [recentActivities, setRecentActivities] = useState([]);
   const [userRegistrations, setUserRegistrations] = useState([]);
-  const [users, setUsers] = useState([]);
   const db = getFirestore();
 
   useEffect(() => {
