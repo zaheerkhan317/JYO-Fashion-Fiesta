@@ -1,0 +1,19 @@
+/* You can add this CSS to your global or component-specific stylesheet */
+
+.Toastify__toast--success {
+    background-color: #4caf50 !important;  /* Green for success */
+  }
+  
+  .Toastify__toast--error {
+    background-color: #f44336 !important;  /* Red for error */
+  }
+  
+  .Toastify__toast-body {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+  .Toastify__close-button {
+    color: #fff;
+  }
+  
