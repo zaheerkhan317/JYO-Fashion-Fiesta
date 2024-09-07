@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getFirestore, doc, setDoc, addDoc, collection } from "firebase/firestore";
+import { getFirestore, doc, setDoc, addDoc, collection, Timestamp } from "firebase/firestore";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import * as firebaseui from "firebaseui";
@@ -195,6 +195,7 @@ const PhoneVerify = ({ auth }) => {
         email: formData.email,
         password: formData.password,  // Storing plain text passwords is insecure! Use Firebase Authentication for passwords.
         phoneNumber: `${formData.countryCode} ${formData.phoneNumber}`,
+        registeredDate: Timestamp.now()
       });
 
       const activitiesRef = collection(db, 'activities');
@@ -213,6 +214,7 @@ const PhoneVerify = ({ auth }) => {
         email: formData.email,
         password: formData.password,
         phoneNumber: `${formData.countryCode} ${formData.phoneNumber}`,
+        registeredDate: Timestamp.now()
       });
   
       console.log("User data stored in Firestore.");
@@ -257,6 +259,7 @@ const PhoneVerify = ({ auth }) => {
             email: formData.email || user.email,
             password: formData.password,
             phoneNumber: formData.phoneNumber,
+            registeredDate: Timestamp.now()
           });
         })
         .then(() => {

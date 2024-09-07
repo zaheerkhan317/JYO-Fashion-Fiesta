@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, ListGroup } from 'react-bootstrap';
-import { FaUsers, FaCalendarAlt } from 'react-icons/fa';
-import { getFirestore, collection, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { Container, Row, Col, Card, ListGroup, Table } from 'react-bootstrap';
+import { FaUsers, FaCalendarAlt, FaBox, FaShoppingCart, FaStar } from 'react-icons/fa';
+import { getFirestore, collection, getDocs, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, TimeScale } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 import './Dashboard.css';
+import Users from '../Users/Users';
 
 
 ChartJS.register( Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, TimeScale );
@@ -62,6 +63,7 @@ const Dashboard = () => {
   const [userCount, setUserCount] = useState(0);
   const [recentActivities, setRecentActivities] = useState([]);
   const [userRegistrations, setUserRegistrations] = useState([]);
+  const [users, setUsers] = useState([]);
   const db = getFirestore();
 
   useEffect(() => {
@@ -184,52 +186,87 @@ const Dashboard = () => {
 
   return (
     <Container fluid>
-      <Row className="mb-4">
-        <Col xs={12} md={6} lg={4}>
-          <Card>
-            <Card.Body>
-              <Card.Title>Users</Card.Title>
-              <Card.Text>
-                <h3><FaUsers /> {userCount}</h3>
-                Total users registered
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col xs={12} md={6} lg={4} className="mb-4">
-          <Card>
-            <Card.Body>
-              <Card.Title>Products</Card.Title>
-              <Card.Text>
-                Products available
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col xs={12} md={6} lg={4} className="mb-4">
-          <Card>
-            <Card.Body>
-              <Card.Title>Orders</Card.Title>
-              <Card.Text>
-                Orders placed this month
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+  <Row className="mb-4">
+    {/* First row with 4 cards (Users, Products, Orders, Reviews) */}
+    <Col xs={12} sm={6} md={3} lg={3} className="mb-4">
+      <Card>
+        <Card.Body>
+          <Card.Title>Users</Card.Title>
+          <Card.Text>
+            <h3><FaUsers /> {userCount}</h3>
+            Total users registered
+          </Card.Text>
+        </Card.Body>
+      </Card>
+    </Col>
+    <Col xs={12} sm={6} md={3} lg={3} className="mb-4">
+      <Card>
+        <Card.Body>
+          <Card.Title>Products</Card.Title>
+          <Card.Text>
+            <h3><FaBox /> {/* {productCount} */}</h3> 
+            Products available
+          </Card.Text>
+        </Card.Body>
+      </Card>
+    </Col>
+    <Col xs={12} sm={6} md={3} lg={3} className="mb-4">
+      <Card>
+        <Card.Body>
+          <Card.Title>Orders</Card.Title>
+          <Card.Text>
+            <h3><FaShoppingCart /> {/* {orderCount} */}</h3>
+            Orders placed this month
+          </Card.Text>
+        </Card.Body>
+      </Card>
+    </Col>
+    <Col xs={12} sm={6} md={3} lg={3} className="mb-4">
+      <Card>
+        <Card.Body>
+          <Card.Title>Reviews</Card.Title>
+          <Card.Text>
+            <h3><FaStar /> {/* {reviewCount} */}</h3>
+            Customer reviews and ratings
+          </Card.Text>
+        </Card.Body>
+      </Card>
+    </Col>
+  </Row>
 
-      <Row className="mb-4">
-      <Col xs={12} md={8} className="mb-4">
+  {/* Second row for Quick Summary and Users (side by side) */}
+  <Row className="mb-4">
+    <Col xs={12} md={8} className="mb-4">
+      <Card>
+        <Card.Header>User Registrations This Week</Card.Header>
+        <Card.Body>
+          <div className="chart-container">
+            <Line data={chartData} options={chartOptions} />
+          </div>
+        </Card.Body>
+      </Card>
+    </Col>
+    
+    {/* Quick Summary and Recent Activities side by side */}
+    <Col xs={12} md={4} className="mb-4">
+      <Row>
+        {/* Quick Summary */}
+        <Col xs={12} className="mb-4">
           <Card>
-            <Card.Header>User Registrations This Week</Card.Header>
+            <Card.Header>Quick Summary</Card.Header>
             <Card.Body>
-              <div className="chart-container">
-                <Line data={chartData} options={chartOptions} />
-              </div>
+              <ul>
+                <li><strong>Total Users:</strong> {userCount}</li>
+                <li><strong>Total Products:</strong> {/*{productCount}*/}</li>
+                <li><strong>Total Orders:</strong> {/*{orderCount}*/}</li>
+                <li><strong>Total Reviews:</strong> {/*{reviewCount}*/}</li>
+              </ul>
             </Card.Body>
           </Card>
         </Col>
-        <Col xs={12} md={4} className="mb-4">
+
+        {/* Recent Activities */}
+        <Col xs={12} className="mb-4">
           <Card>
             <Card.Header>Recent Activities</Card.Header>
             <ListGroup variant="flush">
@@ -241,19 +278,14 @@ const Dashboard = () => {
             </ListGroup>
           </Card>
         </Col>
-
-        <Col xs={12} md={4} className="mb-4">
-          <Card>
-            <Card.Header>Quick Summary</Card.Header>
-            <Card.Body>
-              <ul>
-                <li><strong>Total Users:</strong> {userCount}</li>
-              </ul>
-            </Card.Body>
-          </Card>
-        </Col>
       </Row>
-    </Container>
+    </Col>
+  </Row>
+
+  <Users />
+</Container>
+
+
   );
 };
 
