@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { Form, Button, Col, Row, Container, Modal, Table } from 'react-bootstrap';
 import { db, storage } from '../../../../firebaseConfig';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { addDoc, updateDoc, getDoc, setDoc, collection, doc, Timestamp, onSnapshot, deleteDoc} from 'firebase/firestore';
-import { ToastContainer, toast } from 'react-toastify';
+import { updateDoc, getDoc, setDoc, collection, doc, onSnapshot, deleteDoc} from 'firebase/firestore';
 import './Products.css';
 
 const getISTDate = (date) => {

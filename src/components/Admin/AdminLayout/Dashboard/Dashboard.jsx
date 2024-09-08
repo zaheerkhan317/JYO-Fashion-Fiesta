@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, ListGroup } from 'react-bootstrap';
-import { FaUsers, FaCalendarAlt, FaBox, FaShoppingCart, FaStar, FaBoxOpen } from 'react-icons/fa';
-import { getFirestore, collection, onSnapshot, orderBy, query, count } from 'firebase/firestore';
+import { FaUsers, FaCalendarAlt, FaShoppingCart, FaStar, FaBoxOpen } from 'react-icons/fa';
+import { getFirestore, collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, TimeScale } from 'chart.js';
 import 'chartjs-adapter-date-fns';
@@ -211,13 +211,13 @@ const Dashboard = () => {
       unsubscribeActivities();
       products();
     };
-  }, [db]);
+  },);
 
 
 
    const chartData = {
     labels: userRegistrations.map(reg => reg.date),
-    labels: productGraph.map(reg1 => reg1.date),
+    labels1: productGraph.map(reg1 => reg1.date),
     datasets: [
       {
         label: 'User Registrations',
@@ -230,7 +230,7 @@ const Dashboard = () => {
         fill: true,
       },
       {
-        label: 'Product Counts',
+        label1: 'Product Counts',
         data: productGraph.map(reg1 => ({
           x: reg1.date,
           y: reg1.count
