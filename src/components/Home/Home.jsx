@@ -7,6 +7,8 @@ import { Carousel } from 'react-bootstrap'
 import Reviews from './Reviews/Reviews'
 import TopCollections from './TopCollections/TopCollections'
 import { FaStar, FaMoneyBillWave, FaClock } from 'react-icons/fa';
+import BestSellingProducts from './BestSellingProducts/BestSellingProducts'
+import NewArrivals from './NewArrivals/NewArrivals'
 const Home = () => {
   return (
     <div>
@@ -26,6 +28,8 @@ const Home = () => {
     </Carousel>
 
     <TopCollections />
+    <BestSellingProducts />
+    <NewArrivals />
 
     <div className="container mt-5 mb-5">
       <div className="row justify-content-center">
