@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, ListGroup } from 'react-bootstrap';
 import { FaUsers, FaCalendarAlt, FaShoppingCart, FaStar, FaBoxOpen } from 'react-icons/fa';
-import { getFirestore, collection, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, TimeScale } from 'chart.js';
 import 'chartjs-adapter-date-fns';
@@ -92,98 +92,79 @@ const Dashboard = () => {
   const db = getFirestore();
 
   useEffect(() => {
+    const fetchData = async () => {
 
-    const weekDates = getCurrentWeekDates();
-    const dayCounts = {};
-
-    weekDates.forEach(date => {
-      dayCounts[date] = 0;
-    });
-
-
-    const productsWeekDates = getCurrentWeekDates();
-    const productsDayCounts = {};
-
-    productsWeekDates.forEach(date => {
-      productsDayCounts[date] = 0;
-    });
-
-    const users_reg_Collection = collection(db, 'activities');
-    const usersQuery = query(users_reg_Collection);
-
-    const unsubscribe = onSnapshot(usersQuery, (snapshot) => {
-      snapshot.docs.forEach(doc => {
+      const weekDates = getCurrentWeekDates();
+      const dayCounts = {};
+      const productsDayCounts = {};
+  
+      weekDates.forEach(date => {
+        dayCounts[date] = 0;
+        productsDayCounts[date] = 0;
+      });
+      
+      // Fetch all data once
+      const activitiesCollection = collection(db, 'activities');
+      const activitiesQuery = query(activitiesCollection, orderBy('timestamp', 'desc'));
+      const activitiesSnapshot = await getDocs(activitiesQuery);
+    
+      const productsCollection = collection(db, 'products');
+      const productsSnapshot = await getDocs(productsCollection);
+    
+      const usersCollection = collection(db, 'users');
+      const usersSnapshot = await getDocs(usersCollection);
+    
+      activitiesSnapshot.docs.forEach(doc => {
         const data = doc.data();
         const timestamp = parseTimestamp(data.timestamp);
         const formattedDate = timestamp.toLocaleDateString('en-GB');
-
+    
         if (dayCounts.hasOwnProperty(formattedDate)) {
           dayCounts[formattedDate] += 1;
         }
       });
-
-      const chartData = weekDates.map(date => ({
+    
+      const userRegistrationsData = weekDates.map(date => ({
         date,
         count: dayCounts[date] || 0
       }));
-
-      setUserRegistrations(chartData);
-      console.log("user registrations log : ",userRegistrations);
-    });
-
-
-    const products_reg_Collection = collection(db, 'products');
-    const productQuery = query(products_reg_Collection);
-
-    const productGraph = onSnapshot(productQuery, (snapshot) => {
-      snapshot.docs.forEach(doc => {
+    
+      setUserRegistrations(userRegistrationsData);
+    
+      // Process products data
+      productsSnapshot.docs.forEach(doc => {
         const productsData = doc.data();
         const productsTimestamp = parseTimestamp(productsData.createdAt);
         const productsFormattedDate = productsTimestamp.toLocaleDateString('en-GB');
+        console.log(`Product Date: ${productsFormattedDate}`);
+        console.log('Current Day Counts:', productsDayCounts);
         if (productsDayCounts.hasOwnProperty(productsFormattedDate)) {
           productsDayCounts[productsFormattedDate] += 1;
         }
+        console.log(productsDayCounts);
       });
-
-      const chartData = productsWeekDates.map(date => ({
+    
+      const productGraphData = weekDates.map(date => ({
         date,
         count: productsDayCounts[date] || 0
       }));
-      setProductGraph(chartData);
-      
-    });
-
-    //Fetch Product Count
-    const productCollection = collection(db, 'products');
-    const products = onSnapshot(productCollection, (snapshot) => {
-      const totalProducts = snapshot.size;
+    
+      console.log(productsDayCounts);
+      setProductGraph(productGraphData);
+    
+      // Set product and user counts
+      const totalProducts = productsSnapshot.size;
       setProductCount(totalProducts);
-    }, (error) => {
-      console.error('Error fetching products:', error);
-    });
-
-
-    // Fetch user count
-    const usersCollection = collection(db, 'users');
-    const unsubscribeUsers = onSnapshot(usersCollection, (snapshot) => {
-      const totalUsers = snapshot.size;
+    
+      const totalUsers = usersSnapshot.size;
       setUserCount(totalUsers);
-    }, (error) => {
-      console.error('Error fetching users:', error);
-    });
-
-    // Fetch recent activities
-    const activitiesCollection = collection(db, 'activities');
-    const activitiesQuery = query(activitiesCollection, orderBy('timestamp', 'desc'));
-
-    const unsubscribeActivities = onSnapshot(activitiesQuery, (snapshot) => {
+    
+      // Process recent activities
       const todayDateString = new Date().toLocaleDateString('en-GB');
-
-      const activities = snapshot.docs.map(doc => {
+    
+      const recentActivities = activitiesSnapshot.docs.map(doc => {
         const data = doc.data();
         const timestamp = parseDateString(data.timestamp);
-        const timestampDateString = timestamp.toLocaleDateString('en-GB');
-        console.log("Activities time stamp: ",timestampDateString);
         return {
           id: doc.id,
           ...data,
@@ -193,31 +174,25 @@ const Dashboard = () => {
         const activityDateString = activity.timestamp.toLocaleDateString('en-GB');
         return activityDateString === todayDateString;
       });
-
-      console.log('Filtered activities:', activities);
-      setRecentActivities(activities);
-    }, (error) => {
-      console.error('Error fetching activities:', error);
-    });
-
+    
+      setRecentActivities(recentActivities);
+    };
     
 
-    
+    fetchData();
 
     return () => {
-      unsubscribe();
-      productGraph();
-      unsubscribeUsers();
-      unsubscribeActivities();
-      products();
     };
-  },);
+  },[]);
 
 
+  const allLabels = Array.from(new Set([
+    ...userRegistrations.map(reg => reg.date),
+    ...productGraph.map(reg1 => reg1.date)
+  ]));
 
    const chartData = {
-    labels: userRegistrations.map(reg => reg.date),
-    labels1: productGraph.map(reg1 => reg1.date),
+    labels: allLabels,
     datasets: [
       {
         label: 'User Registrations',
@@ -230,7 +205,7 @@ const Dashboard = () => {
         fill: true,
       },
       {
-        label1: 'Product Counts',
+        label: 'Product Counts',
         data: productGraph.map(reg1 => ({
           x: reg1.date,
           y: reg1.count
@@ -256,6 +231,9 @@ const Dashboard = () => {
           text: 'Count'
         },
         beginAtZero: true,
+        ticks: {
+          stepSize: 1 // Sets the step size on the y-axis to 1
+        }
       }
     }
   };

@@ -5,6 +5,7 @@ import img3 from '../../img/3.png'
 import img4 from '../../img/4.png'
 import { Carousel } from 'react-bootstrap'
 import Reviews from './Reviews/Reviews'
+import TopCollections from './TopCollections/TopCollections'
 import { FaStar, FaMoneyBillWave, FaClock } from 'react-icons/fa';
 const Home = () => {
   return (
@@ -24,7 +25,7 @@ const Home = () => {
       </Carousel.Item>
     </Carousel>
 
-    
+    <TopCollections />
 
     <div className="container mt-5 mb-5">
       <div className="row justify-content-center">

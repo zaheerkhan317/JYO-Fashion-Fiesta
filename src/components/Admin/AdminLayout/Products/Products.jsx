@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Col, Row, Container, Modal, Table } from 'react-bootstrap';
+import { Form, Button, Col, Row, Container, Modal, Table, InputGroup } from 'react-bootstrap';
 import { db, storage } from '../../../../firebaseConfig';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { updateDoc, getDoc, setDoc, collection, doc, onSnapshot, deleteDoc} from 'firebase/firestore';
+import { updateDoc, getDocs, getDoc, setDoc, collection, doc, onSnapshot, deleteDoc} from 'firebase/firestore';
 import './Products.css';
 
 const getISTDate = (date) => {
@@ -54,16 +54,25 @@ const Products = () => {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
 
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filter products based on the search term
+  const filteredProducts = products.filter(product =>
+    product.id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'products'), (snapshot) => {
-      const productsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setProducts(productsList);
-    });
-  
-    // Cleanup function to unsubscribe from updates
-    return () => {
-      unsubscribe();
+    const fetchProducts = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'products'));
+        const productsList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setProducts(productsList);
+      } catch (error) {
+        console.error('Error fetching products: ', error);
+      }
     };
+
+    fetchProducts();
   }, []);
   
 
@@ -269,10 +278,11 @@ const Products = () => {
     try {
       const productId = selectedProduct ? selectedProduct.id : await generateUniqueId();
       console.log(productId);
+      const productRef = doc(db, 'products', productId);
       const photoUrls = await uploadPhotos(formData.photos, productId);
 
       if (selectedProduct) {
-        const productRef = doc(db, 'products', productId);
+        
         await updateDoc(productRef, {
           brand: formData.brand,
           itemName: formData.itemName,
@@ -284,7 +294,10 @@ const Products = () => {
           quantityLeft: formData.quantityLeft,
           sizes: formData.sizes,
           colours: formData.colours,
-          photos: { ...photoUrls } // Replace photos with only existing + new ones
+          photos: { ...photoUrls },
+          topCollections: formData.topCollections || false, // Added field
+          bestSelling: formData.bestSelling || false,       // Added field
+          newArrivals: formData.newArrivals || false,       // Added field
         });
         setIsUpdate(true);
       console.log("Product updated successfully!");
@@ -306,6 +319,9 @@ const Products = () => {
           sizes: formData.sizes,
           colours: formData.colours,
           photos: photoUrls,
+          topCollections: formData.topCollections || false, // Added field
+          bestSelling: formData.bestSelling || false,       // Added field
+          newArrivals: formData.newArrivals || false,       // Added field
           createdAt: getISTDate(new Date()).toString(),
         });
         setIsUpdate(false);
@@ -339,7 +355,10 @@ const Products = () => {
       quantityLeft: product.quantityLeft,
       sizes: product.sizes,
       colours: product.colours,
-      photos: product.photos
+      photos: product.photos,
+      topCollections: product.topCollections, // Added field
+      bestSelling: product.bestSelling,       // Added field
+      newArrivals: product.newArrivals,       // Added field
     });
 
     setSelectedProduct(product);
@@ -550,6 +569,7 @@ const Products = () => {
         </Form.Group>
 
         {/* Colours */}
+        {/* Colours */}
         <Form.Group controlId="formColours">
           <Form.Label>Colours</Form.Label>
           <div className="d-flex flex-wrap mb-4">
@@ -606,10 +626,40 @@ const Products = () => {
                     onChange={handlePhotoChange}
                   />
                 )}
-              </div>
+                </div>
             ))}
           </div>
         </Form.Group>
+
+
+        <Form.Group as={Row} className="mb-4">
+  <Col xs={12} md={4}>
+    <Form.Check
+      type="checkbox"
+      label="Top Collections"
+      checked={formData.topCollections}
+      onChange={(e) => setFormData({ ...formData, topCollections: e.target.checked })}
+    />
+  </Col>
+  <Col xs={12} md={4}>
+    <Form.Check
+      type="checkbox"
+      label="Best Selling Product"
+      checked={formData.bestSelling}
+      onChange={(e) => setFormData({ ...formData, bestSelling: e.target.checked })}
+    />
+  </Col>
+  <Col xs={12} md={4}>
+    <Form.Check
+      type="checkbox"
+      label="New Arrivals"
+      checked={formData.newArrivals}
+      onChange={(e) => setFormData({ ...formData, newArrivals: e.target.checked })}
+    />
+  </Col>
+</Form.Group>
+
+
 
         <div className="d-flex justify-content-end mx-5">
           <Button variant="primary" type="submit" className='mx-2'>
@@ -623,7 +673,26 @@ const Products = () => {
     </Modal.Body>
   </Modal>
 
+
+  <Form.Group className="mb-3 d-flex justify-content-center">
+    <InputGroup style={{ maxWidth: '300px' }}>
+      <Form.Control
+        type="text"
+        placeholder="Search by Product ID"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        style={{ borderRadius: '0.25rem' }} // Make it smaller
+      />
+      <InputGroup.Text>
+        <i className="fas fa-search"></i> {/* Font Awesome Search Icon */}
+      </InputGroup.Text>
+    </InputGroup>
+  </Form.Group>
+
+
+
   {/* Product List */}
+  <div className="table-container">
   <h2 className="mt-5 text-center">Product List</h2>
   <Table responsive striped bordered hover className="text-center">
     <thead>
@@ -641,7 +710,7 @@ const Products = () => {
       </tr>
     </thead>
     <tbody>
-      {products.map((product) => (
+      {filteredProducts.map((product) => (
         <tr key={product.id}>
           <td>{product.id}</td>
           <td>{product.brand}</td>
@@ -660,6 +729,7 @@ const Products = () => {
       ))}
     </tbody>
   </Table>
+  </div>
 
   {/* Success Popup */}
   {showSuccessPopup && (

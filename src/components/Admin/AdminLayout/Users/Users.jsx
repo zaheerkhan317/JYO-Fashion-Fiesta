@@ -26,7 +26,7 @@ const Users = () => {
   useEffect(() => {
 
     fetchUserDetails();
-  });
+  },[]);
 
   return (
     <Row className="mb-4">

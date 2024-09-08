@@ -7,13 +7,13 @@ import { getDatabase, ref, get } from 'firebase/database';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDkcqaMW-3B5MPIah69t7UXJGCPjjihI4k",
-  authDomain: "jyo-fashion-fiesta-6ddaa.firebaseapp.com",
-  databaseURL: "https://jyo-fashion-fiesta-6ddaa-default-rtdb.firebaseio.com/",
-  projectId: "jyo-fashion-fiesta-6ddaa",
-  storageBucket: "jyo-fashion-fiesta-6ddaa.appspot.com",
-  messagingSenderId: "437720927659",
-  appId: "1:437720927659:web:572a5e7c8d64caa72b16ee",
+  apiKey: "AIzaSyAmiN-jCQ92rYdf8ttrxrpheeGmAJ3KxVA",
+  authDomain: "jyo-fashion-fiesta.firebaseapp.com",
+  databaseURL: "https://jyo-fashion-fiesta-default-rtdb.firebaseio.com",
+  projectId: "jyo-fashion-fiesta",
+  storageBucket: "jyo-fashion-fiesta.appspot.com",
+  messagingSenderId: "430873953674",
+  appId: "1:430873953674:web:26f71e479f11da127f3473",
 };
 
 if (!firebase.apps.length) {

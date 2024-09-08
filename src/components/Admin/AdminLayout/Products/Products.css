@@ -60,3 +60,58 @@
     max-width: 60%; /* Width for large screens and up */
   }
 }
+
+
+/* Styling the table container */
+.table-container {
+  max-width: 100%;
+  margin: 0 auto; /* Center the table horizontally */
+  overflow-x: auto; /* Enable horizontal scrolling if needed */
+}
+
+/* Basic table styling */
+.table {
+  width: 100%;
+  border-collapse: collapse; /* Remove space between borders */
+}
+
+/* Table header styling */
+.table thead th {
+  background-color: #007bff; /* Bootstrap primary color */
+  color: white; /* Text color for header */
+  padding: 10px; /* Padding inside header cells */
+  font-weight: bold; /* Make header text bold */
+  border: 1px solid #dee2e6; /* Border color */
+}
+
+/* Table body styling */
+.table tbody td {
+  padding: 10px; /* Padding inside cells */
+  border: 1px solid #dee2e6; /* Border color */
+}
+
+/* Zebra striping for table rows */
+.table tbody tr:nth-child(odd) {
+  background-color: #f9f9f9; /* Light grey background for odd rows */
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #ffffff; /* White background for even rows */
+}
+
+/* Hover effect for table rows */
+.table tbody tr:hover {
+  background-color: #f1f1f1; /* Light grey background on hover */
+}
+
+/* Styling for action buttons */
+.table td .btn {
+  margin: 0 5px; /* Margin between buttons */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .table-container {
+    max-width: 100%; /* Full width on smaller screens */
+  }
+}
