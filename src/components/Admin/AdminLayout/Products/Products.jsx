@@ -7,6 +7,19 @@ import { addDoc, updateDoc, getDoc, setDoc, collection, doc, Timestamp, onSnapsh
 import { ToastContainer, toast } from 'react-toastify';
 import './Products.css';
 
+const getISTDate = (date) => {
+  const options = {
+    timeZone: 'Asia/Kolkata', // IST timezone
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  };
+  return new Intl.DateTimeFormat('en-IN', options).format(date);
+};
+
 const generateUniqueId = async () => {
   const id = Math.floor(Math.random() * 9000000000) + 1000000000; // Generate a 10-digit number
 
@@ -295,7 +308,7 @@ const Products = () => {
           sizes: formData.sizes,
           colours: formData.colours,
           photos: photoUrls,
-          createdAt: Timestamp.now()
+          createdAt: getISTDate(new Date()).toString(),
         });
         setIsUpdate(false);
         console.log("Product added successfully!");

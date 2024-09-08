@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, ListGroup } from 'react-bootstrap';
-import { FaUsers, FaCalendarAlt, FaBox, FaShoppingCart, FaStar } from 'react-icons/fa';
-import { getFirestore, collection, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { FaUsers, FaCalendarAlt, FaBox, FaShoppingCart, FaStar, FaBoxOpen } from 'react-icons/fa';
+import { getFirestore, collection, onSnapshot, orderBy, query, count } from 'firebase/firestore';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, TimeScale } from 'chart.js';
 import 'chartjs-adapter-date-fns';
@@ -10,6 +10,7 @@ import Users from '../Users/Users';
 
 
 ChartJS.register( Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, TimeScale );
+
 
 // Function to convert a date string to a JavaScript Date object
 const parseDateString = (dateString) => {
@@ -39,10 +40,33 @@ const parseDateString = (dateString) => {
 };
 
 const parseTimestamp = (timestamp) => {
+  if (!timestamp) {
+    // Handle undefined or null timestamps by returning a default value
+    console.warn('Timestamp is undefined or null');
+    return new Date(); // Default to the current date
+  }
+
+  // Check if timestamp is a string
+  if (typeof timestamp !== 'string') {
+    console.warn('Timestamp is not a string');
+    return new Date(); // Default to the current date
+  }
+
   const [datePart] = timestamp.split(', ');
+  if (!datePart) {
+    console.warn('Date part is missing from timestamp');
+    return new Date(); // Default to the current date
+  }
+
   const [day, month, year] = datePart.split('/');
+  if (!day || !month || !year) {
+    console.warn('Date components are missing from date part');
+    return new Date(); // Default to the current date
+  }
+
   return new Date(year, month - 1, day);
 };
+
 
 const getCurrentWeekDates = () => {
   const now = new Date();
@@ -61,6 +85,8 @@ const getCurrentWeekDates = () => {
 
 const Dashboard = () => {
   const [userCount, setUserCount] = useState(0);
+  const [productCount, setProductCount] = useState(0);
+  const [productGraph, setProductGraph] = useState([]);
   const [recentActivities, setRecentActivities] = useState([]);
   const [userRegistrations, setUserRegistrations] = useState([]);
   const db = getFirestore();
@@ -72,6 +98,14 @@ const Dashboard = () => {
 
     weekDates.forEach(date => {
       dayCounts[date] = 0;
+    });
+
+
+    const productsWeekDates = getCurrentWeekDates();
+    const productsDayCounts = {};
+
+    productsWeekDates.forEach(date => {
+      productsDayCounts[date] = 0;
     });
 
     const users_reg_Collection = collection(db, 'activities');
@@ -94,8 +128,39 @@ const Dashboard = () => {
       }));
 
       setUserRegistrations(chartData);
+      console.log("user registrations log : ",userRegistrations);
     });
 
+
+    const products_reg_Collection = collection(db, 'products');
+    const productQuery = query(products_reg_Collection);
+
+    const productGraph = onSnapshot(productQuery, (snapshot) => {
+      snapshot.docs.forEach(doc => {
+        const productsData = doc.data();
+        const productsTimestamp = parseTimestamp(productsData.createdAt);
+        const productsFormattedDate = productsTimestamp.toLocaleDateString('en-GB');
+        if (productsDayCounts.hasOwnProperty(productsFormattedDate)) {
+          productsDayCounts[productsFormattedDate] += 1;
+        }
+      });
+
+      const chartData = productsWeekDates.map(date => ({
+        date,
+        count: productsDayCounts[date] || 0
+      }));
+      setProductGraph(chartData);
+      
+    });
+
+    //Fetch Product Count
+    const productCollection = collection(db, 'products');
+    const products = onSnapshot(productCollection, (snapshot) => {
+      const totalProducts = snapshot.size;
+      setProductCount(totalProducts);
+    }, (error) => {
+      console.error('Error fetching products:', error);
+    });
 
 
     // Fetch user count
@@ -141,8 +206,10 @@ const Dashboard = () => {
 
     return () => {
       unsubscribe();
+      productGraph();
       unsubscribeUsers();
       unsubscribeActivities();
+      products();
     };
   }, [db]);
 
@@ -150,6 +217,7 @@ const Dashboard = () => {
 
    const chartData = {
     labels: userRegistrations.map(reg => reg.date),
+    labels: productGraph.map(reg1 => reg1.date),
     datasets: [
       {
         label: 'User Registrations',
@@ -159,6 +227,16 @@ const Dashboard = () => {
         })),
         borderColor: 'rgba(75,192,192,1)',
         backgroundColor: 'rgba(75,192,192,0.2)',
+        fill: true,
+      },
+      {
+        label: 'Product Counts',
+        data: productGraph.map(reg1 => ({
+          x: reg1.date,
+          y: reg1.count
+        })),
+        borderColor: 'rgba(255,99,132,1)', // Different color for the product count dataset
+        backgroundColor: 'rgba(255,99,132,0.2)',
         fill: true,
       }
     ]
@@ -175,7 +253,7 @@ const Dashboard = () => {
       y: {
         title: {
           display: true,
-          text: 'Number of Registrations'
+          text: 'Count'
         },
         beginAtZero: true,
       }
@@ -199,15 +277,15 @@ const Dashboard = () => {
       </Card>
     </Col>
     <Col xs={12} sm={6} md={3} lg={3} className="mb-4">
-      <Card>
-        <Card.Body>
-          <Card.Title>Products</Card.Title>
-          <Card.Text>
-            <h3><FaBox /> {/* {productCount} */}</h3> 
-            Products available
-          </Card.Text>
-        </Card.Body>
-      </Card>
+    <Card>
+      <Card.Body>
+        <Card.Title>Products</Card.Title>
+        <Card.Text>
+        <h3><FaBoxOpen size={30}/> {productCount}</h3>
+          Products available
+        </Card.Text>
+      </Card.Body>
+    </Card>
     </Col>
     <Col xs={12} sm={6} md={3} lg={3} className="mb-4">
       <Card>
@@ -256,7 +334,7 @@ const Dashboard = () => {
             <Card.Body>
               <ul>
                 <li><strong>Total Users:</strong> {userCount}</li>
-                <li><strong>Total Products:</strong> {/*{productCount}*/}</li>
+                <li><strong>Total Products:</strong> {productCount}</li>
                 <li><strong>Total Orders:</strong> {/*{orderCount}*/}</li>
                 <li><strong>Total Reviews:</strong> {/*{reviewCount}*/}</li>
               </ul>
