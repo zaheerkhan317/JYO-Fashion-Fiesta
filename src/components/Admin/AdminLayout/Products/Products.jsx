@@ -36,11 +36,12 @@ const Products = () => {
     photos: {}
   });
 
-  
+  const [showModal, setShowModal] = useState(false);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null); // Store the product being edited
   const [showDiscountInput, setShowDiscountInput] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'products'), (snapshot) => {
@@ -269,10 +270,12 @@ const Products = () => {
           cost: formData.cost,
           discountValue: formData.discountValue, // Store discount percentage
           discountedPrice: formData.discountedPrice,
+          quantityLeft: formData.quantityLeft,
           sizes: formData.sizes,
           colours: formData.colours,
           photos: { ...photoUrls } // Replace photos with only existing + new ones
         });
+        setIsUpdate(true);
       console.log("Product updated successfully!");
 
 
@@ -288,11 +291,13 @@ const Products = () => {
           cost: formData.cost,
           discountValue: formData.discountValue,
           discountedPrice: formData.discountedPrice,
+          quantityLeft: formData.quantityLeft,
           sizes: formData.sizes,
           colours: formData.colours,
           photos: photoUrls,
           createdAt: Timestamp.now()
         });
+        setIsUpdate(false);
         console.log("Product added successfully!");
       }
 
@@ -300,6 +305,7 @@ const Products = () => {
       setTimeout(() => {
         setShowSuccessPopup(false);
       }, 3000);
+      handleCloseModal();
 
       // Reset form
       resetForm();
@@ -310,7 +316,7 @@ const Products = () => {
   };
 
   const handleEdit = (product) => {
-    setSelectedProduct(product);
+    
     setFormData({
       brand: product.brand,
       itemName: product.itemName,
@@ -319,12 +325,37 @@ const Products = () => {
       cost: product.cost,
       discountValue: product.discountValue,
       discountedPrice: product.discountedPrice,
+      quantityLeft: product.quantityLeft,
       sizes: product.sizes,
       colours: product.colours,
       photos: product.photos
     });
 
+    setSelectedProduct(product);
+    setIsUpdate(true);
+    setShowModal(true);
+
   };
+
+  const handleShowModal = () => setShowModal(true);
+  
+  const handleCloseModal = () => {
+    setShowModal(false);
+    // Optionally reset formData or selectedProduct if needed
+    setFormData({
+      brand: '',
+      itemName: '',
+      type: '',
+      description: '',
+      cost: '',
+      discountValue: '',
+      sizes: [],
+      colours: [],
+      photos: {}
+    });
+    setSelectedProduct(null); // Reset selected product for edit mode
+  };
+  
 
   const resetForm = () => {
     setFormData({
@@ -343,242 +374,293 @@ const Products = () => {
   };
 
   return (
-    <Container>
-      <h1 className="mb-4">Add or Edit Product</h1>
+    <Container fluid>
+  <h1 className="mb-4 text-center">Products</h1>
+
+  {/* Button to open the modal */}
+  <div className="d-flex justify-content-center mb-4">
+    <Button variant="primary" onClick={handleShowModal}>
+      Add Product
+    </Button>
+  </div>
+
+  {/* Modal for Adding or Editing Product */}
+  <Modal show={showModal} onHide={handleCloseModal} className="custom-modal" centered>
+    <Modal.Header closeButton>
+      <Modal.Title>{selectedProduct ? 'Edit Product' : 'Add Product'}</Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
       <Form onSubmit={handleSubmit}>
-        <Form.Group as={Row} controlId="formBrand">
-          <Form.Label column sm={2}>Brand</Form.Label>
-          <Col sm={10}>
-            <Form.Control
-              as="select"
-              name="brand"
-              value={formData.brand}
-              onChange={handleChange}
-            >
-              <option value="">Select brand</option>
-              <option value="Adidas">Adidas</option>
-              <option value="Puma">Puma</option>
-              <option value="Bata">Bata</option>
-            </Form.Control>
+        <Row>
+          {/* Brand */}
+          <Col xs={12} md={6} className='mb-4'>
+            <Form.Group controlId="formBrand">
+              <Form.Label>Brand</Form.Label>
+              <Form.Control
+                as="select"
+                name="brand"
+                value={formData.brand}
+                onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+              >
+                <option value="">Select brand</option>
+                <option value="Adidas">Adidas</option>
+                <option value="Puma">Puma</option>
+                <option value="Bata">Bata</option>
+              </Form.Control>
+            </Form.Group>
           </Col>
-        </Form.Group>
 
-        <Form.Group as={Row} controlId="formItemName">
-          <Form.Label column sm={2}>Item Name</Form.Label>
-          <Col sm={10}>
-            <Form.Control
-              type="text"
-              placeholder="Enter item name"
-              name="itemName"
-              value={formData.itemName}
-              onChange={handleChange}
-            />
+          {/* Item Name */}
+          <Col xs={12} md={6} className='mb-4'>
+            <Form.Group controlId="formItemName">
+              <Form.Label>Item Name</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter item name"
+                name="itemName"
+                value={formData.itemName}
+                onChange={(e) => setFormData({ ...formData, itemName: e.target.value })}
+              />
+            </Form.Group>
           </Col>
-        </Form.Group>
-
-        <Form.Group as={Row} controlId="formType">
-          <Form.Label column sm={2}>Type</Form.Label>
-          <Col sm={10}>
-            <Form.Control
-              as="select"
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
-            >
-              <option value="">Select type</option>
-              <option value="Kurtas">Kurtas</option>
-              <option value="Sarees">Sarees</option>
-              <option value="Lounge wear">Lounge wear</option>
-            </Form.Control>
+          <Col xs={12} md={6} className='mb-4'>
+            <Form.Group controlId="formItemDescription">
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter item name"
+                name="itemName"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              />
+            </Form.Group>
           </Col>
-        </Form.Group>
 
-        <Form.Group as={Row} controlId="formDescription">
-          <Form.Label column sm={2}>Description</Form.Label>
-          <Col sm={10}>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              placeholder="Enter description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-            />
+          {/* Type */}
+          <Col xs={12} md={6} className='mb-4'>
+            <Form.Group controlId="formType">
+              <Form.Label>Type</Form.Label>
+              <Form.Control
+                as="select"
+                name="type"
+                value={formData.type}
+                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+              >
+                <option value="">Select type</option>
+                <option value="Kurtas">Kurtas</option>
+                <option value="Sarees">Sarees</option>
+                <option value="Lounge wear">Lounge wear</option>
+              </Form.Control>
+            </Form.Group>
           </Col>
-        </Form.Group>
 
-        <Form.Group as={Row} controlId="formCost">
-          <Form.Label column sm={2}>Cost</Form.Label>
-          <Col sm={10}>
-            <Form.Control
-              type="number"
-              placeholder="Enter cost"
-              name="cost"
-              value={formData.cost}
-              onChange={handleChange}
-            />
-            {showDiscountInput && (
-              <Form.Text className="text-muted mt-2">
-                <strong>Want to apply a discount?</strong>
-              </Form.Text>
-            )}
-          </Col>
-        </Form.Group>
+        </Row>
 
-        {showDiscountInput && (
-          <Form.Group as={Row} controlId="formDiscount">
-            <Form.Label column sm={2}>Discount</Form.Label>
-            <Col sm={10}>
+        <Row>
+          {/* Cost */}
+          <Col xs={12} md={6} className='mb-4'>
+            <Form.Group controlId="formCost">
+              <Form.Label>Cost</Form.Label>
               <Form.Control
                 type="number"
-                placeholder="Enter discount percentage"
-                name="discountValue"
-                value={formData.discountValue}
-                onChange={handleChange}
+                placeholder="Enter cost"
+                name="cost"
+                value={formData.cost}
+                onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
+                onWheel={(e) => e.target.blur()} // Prevent changing value on scroll
               />
-              {formData.discountedPrice && (
-                <Form.Text className="mt-2">
-                  <strong>Price after discount:</strong> ${formData.discountedPrice}
+              {showDiscountInput && (
+                <Form.Text className="text-muted">
+                  <strong>Want to apply a discount?</strong>
                 </Form.Text>
               )}
+            </Form.Group>
+          </Col>
+          
+          {showDiscountInput && (
+
+          <Col xs={12} md={6} className='mb-4'>
+              <Form.Group controlId="formDiscount">
+                <Form.Label>Discount (%)</Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="Enter discount percentage"
+                  name="discountValue"
+                  value={formData.discountValue}
+                  onChange={handleChange}
+                  onWheel={(e) => e.target.blur()} // Prevent changing value on scroll
+                />
+                {formData.discountedPrice && (
+                  <Form.Text className="mt-2">
+                    <strong>Price after discount:</strong> ${formData.discountedPrice}
+                  </Form.Text>
+                )}
+              </Form.Group>
+            </Col>
+             )}
+        </Row>      
+
+          <Form.Group as={Row} controlId="formQuantityLeft">
+            <Form.Label column sm={2}>Quantity Left</Form.Label>
+            <Col sm={10} md={4} className='mb-4'>
+              <Form.Control
+                type="number"
+                placeholder="Enter quantity left"
+                name="quantityLeft"
+                value={formData.quantityLeft}
+                onChange={(e) => setFormData({ ...formData, quantityLeft: e.target.value })}
+                onWheel={(e) => e.target.blur()} // Prevent changing value on scroll
+              />
             </Col>
           </Form.Group>
-        )}
 
-        <Form.Group as={Row} controlId="formSizes">
-          <Form.Label column sm={2}>Size</Form.Label>
-          <Col sm={10}>
+        {/* Sizes */}
+        <Form.Group controlId="formSizes">
+          <Form.Label>Size</Form.Label>
+          <div className="d-flex flex-wrap mb-4">
             {['S', 'M', 'L', 'XL'].map(size => (
               <Form.Check
-                key={size}
                 inline
+                key={size}
                 label={size}
                 type="checkbox"
                 name="sizes"
                 value={size}
                 checked={formData.sizes.includes(size)}
-                onChange={handleChange}
+                onChange={(e) => {
+                  const checkedSizes = formData.sizes.includes(size)
+                    ? formData.sizes.filter(s => s !== size)
+                    : [...formData.sizes, size];
+                  setFormData({ ...formData, sizes: checkedSizes });
+                }}
               />
             ))}
-          </Col>
+          </div>
         </Form.Group>
 
-        <Form.Group as={Row} controlId="formColours">
-  <Form.Label column sm={2}>Colours</Form.Label>
-  <Col sm={10}>
-    {['Red', 'Green', 'Blue', 'Black', 'White', 'Yellow', 'Purple', 'Orange'].map(colour => (
-      <div key={colour} className="mb-3">
-        {formData.photos[colour] && formData.photos[colour].length > 0 && (
-          <div className="mb-2">
-            {formData.photos[colour].map((url, index) => (
-              <div key={index} style={{ position: 'relative', display: 'inline-block', marginRight: '5px' }}>
-                <img
-                  src={url}
-                  alt={`${colour} preview`}
-                  style={{ width: '100px', height: 'auto' }}
+        {/* Colours */}
+        <Form.Group controlId="formColours">
+          <Form.Label>Colours</Form.Label>
+          <div className="d-flex flex-wrap mb-4">
+            {['Red', 'Green', 'Blue', 'Black', 'White', 'Yellow', 'Purple', 'Orange'].map(colour => (
+              <div key={colour} className="mb-3">
+                {formData.photos[colour] && formData.photos[colour].length > 0 && (
+                  <div className="mb-2">
+                    {formData.photos[colour].map((url, index) => (
+                      <div key={index} style={{ position: 'relative', display: 'inline-block', marginRight: '5px' }}>
+                        <img
+                          src={url}
+                          alt={`${colour} preview`}
+                          style={{ width: '100px', height: 'auto' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removePhoto(colour, index)}
+                          style={{
+                            position: 'absolute',
+                            top: '0',
+                            right: '0',
+                            backgroundColor: 'red',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: '20px',
+                            height: '20px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          X
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <Form.Check
+                  inline
+                  label={colour}
+                  type="checkbox"
+                  name="colours"
+                  value={colour}
+                  checked={formData.colours.includes(colour)}
+                  onChange={handleChange}
                 />
-                <button
-                  type="button"
-                  onClick={() => removePhoto(colour, index)}
-                  style={{
-                    position: 'absolute',
-                    top: '0',
-                    right: '0',
-                    backgroundColor: 'red',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '50%',
-                    width: '20px',
-                    height: '20px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer'
-                  }}
-                >
-                  X
-                </button>
+                {formData.colours.includes(colour) && (
+                  <Form.Control
+                    type="file"
+                    name={colour}
+                    multiple
+                    onChange={handlePhotoChange}
+                  />
+                )}
               </div>
             ))}
           </div>
-        )}
-        <Form.Check
-          inline
-          label={colour}
-          type="checkbox"
-          name="colours"
-          value={colour}
-          checked={formData.colours.includes(colour)}
-          onChange={handleChange}
-        />
-        {formData.colours.includes(colour) && (
-          <Form.Control
-            type="file"
-            name={colour}
-            multiple
-            onChange={handlePhotoChange}
-          />
-        )}
-      </div>
-    ))}
-  </Col>
-</Form.Group>
+        </Form.Group>
 
-
-        <Button variant="primary" type="submit">
-          {selectedProduct ? 'Update Product' : 'Add Product'}
-        </Button>
-        {selectedProduct && (
-          <Button variant="secondary" className="ml-2" onClick={resetForm}>
+        <div className="d-flex justify-content-end mx-5">
+          <Button variant="primary" type="submit" className='mx-2'>
+            {selectedProduct ? 'Update Product' : 'Add Product'}
+          </Button>
+          <Button variant="secondary" onClick={handleCloseModal} className="mr-2 mx-2">
             Cancel
           </Button>
-        )}
+        </div>
       </Form>
+    </Modal.Body>
+  </Modal>
 
-      <h2 className="mt-5">Product List</h2>
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>ProductId</th>
-            <th>Brand</th>
-            <th>Item Name</th>
-            <th>Description</th>
-            <th>Type</th>
-            <th>Cost</th>
-            <th>Discount %</th>
-            <th>After Discount</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((product, index) => (
-            <tr key={product.id}>
-              <td>{product.id}</td>
-              <td>{product.brand}</td>
-              <td>{product.itemName}</td>
-              <td>{product.description}</td>
-              <td>{product.type}</td>
-              <td>{product.cost}</td>
-              <td>{product.discountValue}</td>
-              <td>{product.discountedPrice}</td>
-              <td>
-                <Button variant="warning" onClick={() => handleEdit(product)}>Edit</Button>
-                <Button variant="danger" onClick={() => handleDelete(product.id)}>Delete</Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+  {/* Product List */}
+  <h2 className="mt-5 text-center">Product List</h2>
+  <Table responsive striped bordered hover className="text-center">
+    <thead>
+      <tr>
+        <th>ProductId</th>
+        <th>Brand</th>
+        <th>Item Name</th>
+        <th>Description</th>
+        <th>Type</th>
+        <th>Cost</th>
+        <th>Discount %</th>
+        <th>After Discount</th>
+        <th>Quantity Left</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {products.map((product) => (
+        <tr key={product.id}>
+          <td>{product.id}</td>
+          <td>{product.brand}</td>
+          <td>{product.itemName}</td>
+          <td>{product.description}</td>
+          <td>{product.type}</td>
+          <td>{product.cost}</td>
+          <td>{product.discountValue}</td>
+          <td>{product.discountedPrice}</td>
+          <td>{product.quantityLeft}</td>
+          <td>
+            <Button variant="warning" onClick={() => handleEdit(product)}>Edit</Button>{' '}
+            <Button variant="danger" onClick={() => handleDelete(product.id)}>Delete</Button>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </Table>
 
-      {showSuccessPopup && (
-         <Modal show={showSuccessPopup} onHide={() => setShowSuccessPopup(false)}>
-         <Modal.Body>
-           <h4>Success!</h4>
-           <p>Product has been {selectedProduct ? 'updated' : 'added'} successfully!</p>
-         </Modal.Body>
-       </Modal>
-      )}
-    </Container>
+  {/* Success Popup */}
+  {showSuccessPopup && (
+    <Modal show={showSuccessPopup} onHide={() => setShowSuccessPopup(false)} centered>
+      <Modal.Body>
+        <h4 className="text-success text-center">Success!</h4>
+        <p className="text-center">Product has been {isUpdate ? 'updated' : 'added'} successfully!</p>
+      </Modal.Body>
+    </Modal>
+  )}
+</Container>
+
   );
 };
 

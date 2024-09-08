@@ -17,3 +17,46 @@
     color: #fff;
   }
   
+  .custom-modal.show {
+    background-color: rgba(0, 0, 0, 0.8); /* Black background with some opacity */
+  }
+  
+  /* Style the modal content to ensure it displays well */
+  .custom-modal {
+    max-width: 100%;
+    margin: 0;
+  }
+  
+  .custom-modal-content {
+    border: none;
+    border-radius: 0;
+    height: 100%;
+  }
+  
+  .custom-modal-body {
+    height: calc(100vh - 60px); /* Adjust based on header/footer height */
+    overflow-y: auto;
+  }
+
+  /* Custom modal width for different screen sizes */
+.custom-modal .modal-dialog {
+  max-width: 100%; /* Default width for smaller screens */
+}
+
+@media (min-width: 576px) {
+  .custom-modal .modal-dialog {
+    max-width: 80%; /* Width for small screens and up */
+  }
+}
+
+@media (min-width: 992px) {
+  .custom-modal .modal-dialog {
+    max-width: 70%; /* Width for medium screens and up */
+  }
+}
+
+@media (min-width: 1200px) {
+  .custom-modal .modal-dialog {
+    max-width: 60%; /* Width for large screens and up */
+  }
+}
