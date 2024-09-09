@@ -27,9 +27,8 @@ const Home = () => {
       </Carousel.Item>
     </Carousel>
 
-    <TopCollections />
-    <BestSellingProducts />
-    <NewArrivals />
+    
+    
 
     <div className="container mt-5 mb-5">
       <div className="row justify-content-center">
@@ -68,6 +67,10 @@ const Home = () => {
       </div>
     </div>
 
+
+    <NewArrivals />
+    <TopCollections />
+    <BestSellingProducts />
 
     <Reviews />
     
