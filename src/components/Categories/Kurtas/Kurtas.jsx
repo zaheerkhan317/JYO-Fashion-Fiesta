@@ -7,6 +7,7 @@ const Kurtas = ({ products }) => {
     return <div>Loading...</div>; // Handle loading state
   }
 
+
   return (
     <Container className="category-section">
       <h2 className="text-center mb-5 category-title">Kurtas Collection</h2>

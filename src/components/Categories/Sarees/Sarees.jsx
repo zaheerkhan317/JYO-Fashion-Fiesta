@@ -3,6 +3,7 @@ import { Card, Badge, Container, Row, Col, Button } from 'react-bootstrap';
 import '../Categories.css'; // Ensure the custom CSS is applied here
 
 const Sarees = ({ products }) => {
+  
   return (
     <Container className="category-section">
       <h2 className="text-center mb-5 category-title">Sarees Collection</h2>
