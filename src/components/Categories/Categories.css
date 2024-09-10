@@ -1,0 +1,193 @@
+/* General styling for the category section */
+.category-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.card-body .text-muted {
+  margin-bottom: 0.5rem; /* Adjust margin for consistent spacing */
+}
+
+.card-body .card-title {
+  margin-bottom: 1rem; /* Adjust margin between title and text */
+}
+
+.category-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  color: #333;
+  font-size: 2rem;
+  padding-bottom: 10px;
+  text-align: center;
+  width: 100%;
+}
+
+.grid-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Center the cards horizontally */
+  align-items: center;
+  gap: 0px;
+  max-width: 100%;
+  margin: 0 auto; /* Center the grid container */
+  padding: 20px;
+}
+
+/* Product card styling */
+.product-card {
+  border-radius: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: #fff;
+  overflow: hidden;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  width: 100%; /* Full width within its column */
+  max-width: 300px; /* Set a max-width for the cards */
+  position: relative;
+}
+
+.product-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Styling for product image container */
+.product-image-container {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+.product-img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-img {
+  transform: scale(1.1);
+}
+
+/* Discount badge */
+.discount-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.9rem;
+  padding: 5px 10px;
+  border-radius: 12px;
+  background-color: #ff6f61;
+  color: #fff;
+}
+
+/* Product title */
+.product-card h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-top: 15px;
+}
+
+/* Description */
+.description {
+  font-size: 0.95rem;
+  color: #777;
+  margin-bottom: 20px;
+}
+
+/* Pricing */
+.price-section {
+  font-size: 1.2rem;
+  margin-top: auto;
+}
+
+.price {
+  font-weight: bold;
+}
+
+.original-price {
+  font-size: 1rem;
+  text-decoration: line-through;
+  color: #999;
+}
+
+/* Add to cart button */
+.product-card .btn-primary {
+  background-color: #ff6f61;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.product-card .btn-primary:hover {
+  background-color: #e65b4d;
+}
+
+/* Responsive adjustments handled by Bootstrap grid classes */
+
+/* Color and size display */
+.color-box {
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  margin-right: 5px;
+  text-align: center;
+  line-height: 25px;
+  color: #fff;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.size-list {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.size-item {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+
+.ribbon-wrapper {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.ribbon {
+  position: absolute;
+  left: -25px;
+  top: 80px;
+  width: 150px;
+  padding: 5px 0;
+  background-color: #007bff;
+  color: #fff;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transform: rotate(-45deg);
+  transform-origin: 0 0;
+}
+
+/* Stacking ribbons */
+.ribbon-wrapper.top-collection {
+  top: 10px;
+}
+

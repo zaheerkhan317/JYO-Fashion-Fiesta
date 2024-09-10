@@ -21,6 +21,10 @@ import Dashboard from './components/Admin/AdminLayout/Dashboard/Dashboard';
 import Orders from './components/Admin/AdminLayout/Orders/Orders';
 import Products from './components/Admin/AdminLayout/Products/Products';
 import Users from './components/Admin/AdminLayout/Products/Products';
+import Kurtas from './components/Categories/Kurtas/Kurtas';
+import Loungewear from './components/Categories/LoungeWear/Loungewear';
+import Sarees from './components/Categories/Sarees/Sarees';
+import Categories from './components/Categories/Categories';
 
 function AppContent() {
   const navigate = useNavigate(); 
@@ -65,9 +69,11 @@ function AppContent() {
         <Route path="/signup" element={user || firstName ? <Navigate to="/home" replace /> : <SignupForm />} />
         <Route path="/login" element={firstName || user ? <Navigate to="/home" replace /> : <LoginForm />} /> 
 
-
+        <Route path="/categories/kurtas" element={<Categories />} />
+        <Route path="/categories/sarees" element={<Categories />} />
+        <Route path="/categories/loungewear" element={<Categories />} />
         
-        <Route path="/adminlogin" element={<AdminLogin />} />
+          <Route path="/adminlogin" element={<AdminLogin />} />
           <Route path="/admin/*" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
             <Route index element={<Dashboard />} /> {/* Default to dashboard */}
             <Route path="dashboard" element={<Dashboard />} /> {/* Handles /admin/dashboard */}
