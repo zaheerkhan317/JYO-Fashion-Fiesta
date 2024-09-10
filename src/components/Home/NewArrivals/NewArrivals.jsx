@@ -6,35 +6,55 @@ import './NewArrivals.css'; // Add or adjust the CSS file accordingly
 const NewArrivals = () => {
   const [newArrivals, setNewArrivals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [lastVisible, setLastVisible] = useState(null);
   const scrollRef = useRef(null);
+  const intervalId = useRef(null);
 
+  // Fetch data once on component mount
   useEffect(() => {
-    fetchNewArrivals();
-    startAutoScroll();
-    return () => {
-      // Cleanup interval on component unmount
-      if (scrollRef.current && scrollRef.current.intervalId) {
-        clearInterval(scrollRef.current.intervalId);
-      }
+    const fetchInitialCollections = async () => {
+      await fetchNewArrivals();
+      setLoading(false);
     };
+
+    fetchInitialCollections();
   }, []);
 
+  // Trigger auto-scroll after newArrivals are loaded
+  useEffect(() => {
+    if (newArrivals.length > 0) {
+      startAutoScroll();
+    }
+    return () => clearAutoScroll(); // Clean up on unmount
+  }, [newArrivals]); // Re-run when newArrivals are updated
+
+
+
+
+  const clearAutoScroll = () => {
+    if (intervalId.current) {
+      clearInterval(intervalId.current);
+    }
+  };
+
   const startAutoScroll = () => {
-    if (scrollRef.current) {
-      const scrollWidth = scrollRef.current.scrollWidth;
-      const clientWidth = scrollRef.current.clientWidth;
+    clearAutoScroll(); // Clear previous interval if it exists
+    const scrollContainer = scrollRef.current;
 
-      const intervalId = setInterval(() => {
-        if (scrollRef.current.scrollLeft + clientWidth >= scrollWidth-1) {
-          scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+    if (scrollContainer) {
+      const scroll = () => {
+        const maxScrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+
+        if (scrollContainer.scrollLeft >= maxScrollLeft) {
+          scrollContainer.scrollTo({ left: 0, behavior: 'smooth' });
         } else {
-          scrollRef.current.scrollBy({ left: clientWidth, behavior: 'smooth' });
+          scrollContainer.scrollBy({ left: 150, behavior: 'smooth' }); // Adjust scroll distance
         }
-      }, 2000); // Adjust the speed of scrolling here
+      };
 
-      scrollRef.current.intervalId = intervalId;
+      intervalId.current = setInterval(scroll, 2000); // Adjust the interval duration here
     }
   };
 
@@ -42,7 +62,7 @@ const NewArrivals = () => {
     setLoading(true);
     const db = getFirestore();
     const productsRef = collection(db, 'products');
-    let q = query(productsRef, where('newArrivals', '==', true), limit(2));
+    let q = query(productsRef, where('newArrivals', '==', true), limit(5));
 
     if (startAfterDoc) {
       q = query(q, startAfter(startAfterDoc));
@@ -51,7 +71,7 @@ const NewArrivals = () => {
     try {
       const querySnapshot = await getDocs(q);
       const docs = querySnapshot.docs;
-      setHasMore(docs.length === 2); // Adjust limit and hasMore logic as needed
+      setHasMore(docs.length === 5); // Adjust limit and hasMore logic as needed
       setLastVisible(docs[docs.length - 1] || null);
 
       const fetchedNewArrivals = docs.map(doc => ({
@@ -72,6 +92,7 @@ const NewArrivals = () => {
       console.error('Error fetching new arrivals:', error);
     } finally {
       setLoading(false);
+      setIsFetching(false);
     }
   };
 
@@ -90,16 +111,8 @@ const NewArrivals = () => {
     return 'placeholder.jpg';
   };
 
-  const formatSizes = sizes => {
-    if (!Array.isArray(sizes) || sizes.length === 0) return 'No sizes available';
-    return sizes.join(', ');
-  };
-
-  const formatColours = colours => {
-    if (!Array.isArray(colours) || colours.length === 0) return 'No colors available';
-    if (colours.length === 1) return colours[0];
-    return 'Multicolour';
-  };
+  const formatSizes = sizes => sizes && sizes.length ? sizes.join(', ') : 'No sizes available';
+  const formatColours = colours => colours && colours.length === 1 ? colours[0] : 'Multicolour';
 
   if (loading && newArrivals.length === 0) {
     return (
@@ -127,10 +140,16 @@ const NewArrivals = () => {
           </Card>
         ))}
       </div>
-      {hasMore && !loading && (
-        <div className="load-more-container">
-          <Button className="load-more-button" variant="secondary" onClick={handleLoadMore}>Load More</Button>
-        </div>
+      {hasMore && (
+         <div className="load-more-container">
+         <Button className="load-more-button" variant="link" onClick={handleLoadMore} disabled={isFetching}>
+           {isFetching ? (
+             <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+           ) : (
+             'Load More'
+           )}
+         </Button>
+       </div>
       )}
     </div>
   );

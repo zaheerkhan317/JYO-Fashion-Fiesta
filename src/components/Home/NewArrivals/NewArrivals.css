@@ -12,19 +12,31 @@
   padding: 0;
   margin: 0;
   gap: 15px;
+  -ms-overflow-style: none; /* Hides scrollbar for IE and Edge */
   white-space: nowrap;
+  scroll-behavior: smooth;
+  padding-bottom: 10px;
 }
 
 .scroll-container::-webkit-scrollbar {
-  height: 8px;
+  display: none;
+  overflow-x: hidden;
+  border-radius: 50%;
+  height: 5px;
 }
 
 .scroll-container::-webkit-scrollbar-thumb {
-  background-color: #888;
+  background-color: #888; /* Color of the scrollbar */
+  border-radius: 5px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Color on hover */
 }
 
 .scroll-container::-webkit-scrollbar-track {
-  background-color: #eee;
+  background: #f1f1f1;
+  border-radius: 5px;
 }
 
 .new-arrival-card {
@@ -82,30 +94,31 @@
 /* Responsive Design */
 @media (min-width: 1200px) {
   .new-arrival-card {
-    max-width: 300px;
+    max-width: 270px;
+    max-height: 60%;
   }
 }
 
 @media (max-width: 1199px) and (min-width: 992px) {
   .new-arrival-card {
-    max-width: 270px;
+    max-width: 250px;
   }
 }
 
 @media (max-width: 991px) and (min-width: 768px) {
   .new-arrival-card {
-    max-width: 240px;
+    max-width: 230px;
   }
 }
 
 @media (max-width: 767px) {
   .new-arrival-card {
-    max-width: 200px;
+    max-width: 210px;
   }
 }
 
 @media (max-width: 576px) {
   .new-arrival-card {
-    max-width: 200px;
+    max-width: 190px;
   }
 }

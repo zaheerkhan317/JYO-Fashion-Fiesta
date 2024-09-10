@@ -6,53 +6,71 @@ import './TopCollections.css';
 const TopCollections = () => {
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [lastVisible, setLastVisible] = useState(null);
   const scrollRef = useRef(null);
+  const intervalId = useRef(null);
 
+  // Fetch data once on component mount
   useEffect(() => {
-    fetchTopCollections();
-    startAutoScroll();
-    return () => {
-      // Cleanup interval on component unmount
-      if (scrollRef.current && scrollRef.current.intervalId) {
-        clearInterval(scrollRef.current.intervalId);
-      }
+    const fetchInitialCollections = async () => {
+      await fetchTopCollections();
+      setLoading(false);
     };
+
+    fetchInitialCollections();
   }, []);
 
-  const startAutoScroll = () => {
-    if (scrollRef.current) {
-      const scrollWidth = scrollRef.current.scrollWidth;
-      const clientWidth = scrollRef.current.clientWidth;
+  // Trigger auto-scroll after collections are loaded
+  useEffect(() => {
+    if (collections.length > 0) {
+      startAutoScroll();
+    }
+    return () => clearAutoScroll(); // Clean up on unmount
+  }, [collections]); // Re-run when collections are updated
 
-      const intervalId = setInterval(() => {
-        if (scrollRef.current.scrollLeft + clientWidth >= scrollWidth-1) {
-          scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
-        } else {
-          scrollRef.current.scrollBy({ left: clientWidth, behavior: 'smooth' });
-        }
-      }, 2000); // Adjust the speed of scrolling here
-
-      scrollRef.current.intervalId = intervalId;
+  const clearAutoScroll = () => {
+    if (intervalId.current) {
+      clearInterval(intervalId.current);
     }
   };
 
+  const startAutoScroll = () => {
+    clearAutoScroll(); // Clear previous interval if it exists
+    const scrollContainer = scrollRef.current;
+
+    if (scrollContainer) {
+      const scroll = () => {
+        const maxScrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+
+        if (scrollContainer.scrollLeft >= maxScrollLeft) {
+          scrollContainer.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          scrollContainer.scrollBy({ left: 150, behavior: 'smooth' }); // Adjust scroll distance
+        }
+      };
+
+      intervalId.current = setInterval(scroll, 2000); // Adjust the interval duration here
+    }
+  };
+
+  // Fetch collections from Firestore
   const fetchTopCollections = async (startAfterDoc = null) => {
-    setLoading(true);
+    setIsFetching(true);
     const db = getFirestore();
     const productsRef = collection(db, 'products');
-    let q = query(productsRef, where('topCollections', '==', true), limit(2)); // Fetch 2 cards initially
+    let q = query(productsRef, where('topCollections', '==', true), limit(5));  // Fetch 5 items initially
 
     if (startAfterDoc) {
-      q = query(q, startAfter(startAfterDoc));
+      q = query(productsRef, where('topCollections', '==', true), startAfter(startAfterDoc), limit(5));
     }
 
     try {
       const querySnapshot = await getDocs(q);
       const docs = querySnapshot.docs;
-      setHasMore(docs.length === 2); // Adjust limit and hasMore logic as needed
-      setLastVisible(docs[docs.length - 1] || null);
+      setHasMore(docs.length === 5);  // Check if there are more items to load
+      setLastVisible(docs[docs.length - 1] || null);  // Keep track of the last document
 
       const fetchedCollections = docs.map(doc => ({
         id: doc.id,
@@ -65,19 +83,19 @@ const TopCollections = () => {
 
       setCollections(prevCollections => (
         startAfterDoc === null
-          ? fetchedCollections
-          : [...prevCollections, ...fetchedCollections]
+          ? fetchedCollections  // Initial load
+          : [...prevCollections, ...fetchedCollections]  // Load more
       ));
     } catch (error) {
       console.error('Error fetching top collections:', error);
     } finally {
-      setLoading(false);
+      setIsFetching(false);
     }
   };
 
   const handleLoadMore = () => {
-    if (lastVisible) {
-      fetchTopCollections(lastVisible);
+    if (lastVisible && hasMore) {
+      fetchTopCollections(lastVisible);  // Load more data when "Load More" is clicked
     }
   };
 
@@ -90,16 +108,8 @@ const TopCollections = () => {
     return 'placeholder.jpg';
   };
 
-  const formatSizes = sizes => {
-    if (!Array.isArray(sizes) || sizes.length === 0) return 'No sizes available';
-    return sizes.join(', ');
-  };
-
-  const formatColours = colours => {
-    if (!Array.isArray(colours) || colours.length === 0) return 'No colors available';
-    if (colours.length === 1) return colours[0];
-    return 'Multicolour';
-  };
+  const formatSizes = sizes => sizes && sizes.length ? sizes.join(', ') : 'No sizes available';
+  const formatColours = colours => colours && colours.length === 1 ? colours[0] : 'Multicolour';
 
   if (loading && collections.length === 0) {
     return (
@@ -127,9 +137,13 @@ const TopCollections = () => {
           </Card>
         ))}
       </div>
-      {hasMore && !loading && (
+      {hasMore && (
         <div className="load-more-container">
-          <Button className="load-more-button" variant="secondary" onClick={handleLoadMore}>Load More</Button>
+          <Button className="load-more-button" variant="link" onClick={handleLoadMore} disabled={isFetching}>
+            {isFetching ? (
+              <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+            ) : 'Load More'}
+          </Button>
         </div>
       )}
     </div>

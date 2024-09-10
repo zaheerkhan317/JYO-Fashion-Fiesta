@@ -4,29 +4,6 @@
   overflow: hidden;
 }
 
-/* Scrollable wrapper styles */
-.scroll-container {
-  display: flex;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 0;
-  margin: 0;
-  gap: 15px;
-  white-space: nowrap;
-}
-
-.scroll-container::-webkit-scrollbar {
-  height: 8px;
-}
-
-.scroll-container::-webkit-scrollbar-thumb {
-  background-color: #888;
-}
-
-.scroll-container::-webkit-scrollbar-track {
-  background-color: #eee;
-}
-
 .top-collection-card {
   flex: 0 0 auto;
   width: 100%;
@@ -45,67 +22,34 @@
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
-.card-img {
-  border-radius: 12px 12px 0 0;
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-}
-
-.card-body {
-  background-color: #fff;
-  border-radius: 0 0 12px 12px;
-  padding: 15px;
-  flex: 1;
-}
-
-.card-title {
-  font-size: 1.25rem;
-  font-weight: bold;
-}
-
-.card-text {
-  font-size: 0.875rem;
-  color: #555;
-}
-
-.load-more-container {
-  text-align: center;
-  margin-top: 15px;
-}
-
-.load-more-button {
-  font-size: 1rem;
-  padding: 10px 20px;
-}
-
 /* Responsive Design */
 @media (min-width: 1200px) {
   .top-collection-card {
-    max-width: 300px;
+    max-width: 270px;
+    max-height: 60%;
   }
 }
 
 @media (max-width: 1199px) and (min-width: 992px) {
   .top-collection-card {
-    max-width: 270px;
+    max-width: 250px;
   }
 }
 
 @media (max-width: 991px) and (min-width: 768px) {
   .top-collection-card {
-    max-width: 240px;
+    max-width: 230px;
   }
 }
 
 @media (max-width: 767px) {
   .top-collection-card {
-    max-width: 200px;
+    max-width: 210px;
   }
 }
 
 @media (max-width: 576px) {
   .top-collection-card {
-    max-width: 200px;
+    max-width: 190px;
   }
 }
