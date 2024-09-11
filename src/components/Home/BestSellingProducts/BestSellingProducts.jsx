@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, Button, Spinner } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import { query, where, getFirestore, collection, getDocs, limit, startAfter } from 'firebase/firestore';
 import './BestSellingProducts.css'; // Add or adjust the CSS file accordingly
 
@@ -12,6 +13,7 @@ const BestSellingProducts = () => {
   const scrollRef = useRef(null);
   const intervalId = useRef(null);
 
+  const navigate = useNavigate();
   // Fetch data once on component mount
   useEffect(() => {
     const fetchInitialCollections = async () => {
@@ -31,7 +33,9 @@ const BestSellingProducts = () => {
   }, [bestSellingProducts]); // Re-run when bestSellingProducts are updated
 
 
-  
+  const handleAddToCart = (productId) => {
+    navigate(`/product/${productId}`); // Navigate to the product detail page
+  };
 
   const clearAutoScroll = () => {
     if (intervalId.current) {
@@ -134,7 +138,10 @@ const BestSellingProducts = () => {
               <Card.Text className="text-center mb-1"><strong>Categories:</strong> {product.type}</Card.Text>
               <Card.Text className="text-center mb-1"><strong>Size:</strong> {formatSizes(product.sizes)}</Card.Text>
               <Card.Text className="text-center mb-2"><strong>Colors:</strong> {formatColours(product.colours)}</Card.Text>
-              <Button variant="primary" className="w-100">View Product</Button>
+              {/* Call to Action Button */}
+              <Button variant="primary" className="mt-3" onClick={() => handleAddToCart(product.id)}>
+                View Product
+              </Button>
             </Card.Body>
           </Card>
         ))}
