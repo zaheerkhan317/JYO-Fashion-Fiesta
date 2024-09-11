@@ -70,13 +70,19 @@ const ProductDetail = () => {
         cart[uid] = [];
       }
 
+      
       // Add the selected product to the user's cart
       cart[uid].push({
         id: product.id,
         name: product.itemName,
+        description: product.description,
+        brand: product.brand,
         size: selectedSize,
         color: selectedColor,
         image: selectedImage,
+        discountvalue: product.discountValue,
+        price: product.cost,
+        total: (product.cost - (product.cost * (product.discountValue / 100))).toFixed(2),
         quantity: 1 // Set initial quantity
       });
 

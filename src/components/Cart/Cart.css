@@ -1,36 +1,254 @@
+/* Cart.css */
 .cart-section {
-    margin-top: 2rem;
+  margin-top: 2rem;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease-in-out;
+  flex-direction: row; /* Ensure items are arranged horizontally */
+  margin-bottom: 1rem; /* Add spacing between items */
+}
+
+.cart-item:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.cart-item-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.cart-item-info {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: 1.5rem;
+  flex-grow: 1;
+}
+
+.cart-item-info .info-group {
+  display: flex;
+  flex: 1 1 50%;
+  margin-bottom: 0.5rem;
+  align-items: center;
+}
+
+.cart-item-info .info-group strong {
+  width: 150px;
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem; /* Base font size */
+}
+
+.cart-item-info .info-group span {
+  color: #555;
+  font-size: 0.875rem; /* Base font size for spans */
+}
+
+.cart-item-name {
+  font-size: 1.5rem; /* Base font size */
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.cart-item-info .description,
+.cart-item-info .brand {
+  font-style: italic;
+  font-size: 0.875rem; /* Slightly smaller font size */
+}
+
+.cart-item-actions {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.cart-item-actions button {
+  background-color: #e74c3c;
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem; /* Base font size for button text */
+  font-weight: 500;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.cart-item-actions button:hover {
+  background-color: #c0392b;
+}
+
+.cart-item-info .discount-price {
+  color: #e74c3c; /* Highlighted color for discount price */
+  font-weight: bold; /* Make text bold */
+}
+
+.cart-item-info .original-price {
+  color: #888;
+  margin-right: 0.5rem;
+}
+
+.total-price {
+  font-size: 1.25rem; /* Base font size for total price */
+  font-weight: 700; /* Bold text for the price */
+  color: #d9534f; /* Red color to indicate price */
+  background-color: #fff; 
+  border-radius: 0.25rem; /* Slightly rounded corners */
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .cart-item-info .info-group strong {
+    font-size: 0.9rem; /* Slightly smaller font size for tablets */
   }
-  
-  .cart-item {
-    border: 1px solid #ddd;
-    padding: 1rem;
-    border-radius: 5px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+
+  .cart-item-info .info-group span {
+    font-size: 0.75rem; /* Slightly smaller font size for tablets */
   }
-  
-  .cart-item-image {
-    max-width: 100%;
-    height: auto;
-    margin-bottom: 1rem;
-  }
-  
-  .cart-item-info {
-    text-align: center;
-  }
-  
+
   .cart-item-name {
-    font-size: 1.25rem;
-    margin-bottom: 0.5rem;
+    font-size: 1.25rem; /* Smaller font size for item name on tablets */
   }
-  
-  .cart-item p {
-    margin: 0.25rem 0;
+
+  .cart-item-info .description,
+  .cart-item-info .brand {
+    font-size: 0.75rem; /* Smaller font size for description and brand on tablets */
   }
-  
-  .btn-danger {
-    margin-top: 1rem;
+
+  .cart-item-actions button {
+    font-size: 0.8rem; /* Smaller font size for buttons on tablets */
   }
-  
+
+  .total-price {
+    font-size: 1rem; /* Smaller font size for total price on tablets */
+  }
+}
+
+@media (max-width: 576px) {
+  .cart-item-info .info-group strong {
+    font-size: 0.8rem; /* Smaller font size for mobile phones */
+  }
+
+  .cart-item-info .info-group span {
+    font-size: 0.7rem; /* Smaller font size for mobile phones */
+  }
+
+  .cart-item-name {
+    font-size: 1.125rem; /* Smaller font size for item name on mobile phones */
+  }
+
+  .cart-item-info .description,
+  .cart-item-info .brand {
+    font-size: 0.7rem; /* Smaller font size for description and brand on mobile phones */
+  }
+
+  .cart-item-actions button {
+    font-size: 0.7rem; /* Smaller font size for buttons on mobile phones */
+  }
+
+  .total-price {
+    font-size: 0.9rem; /* Smaller font size for total price on mobile phones */
+  }
+}
+
+
+
+@media (max-width: 425px) {
+  .cart-item-info .info-group strong {
+    font-size: 0.9rem; /* Smaller font size for small mobile phones */
+  }
+
+  .cart-item-info .info-group span {
+    font-size: 0.8rem; /* Smaller font size for small mobile phones */
+  }
+
+  .cart-item-name {
+    font-size: 1.2rem; /* Smaller font size for item name on small mobile phones */
+  }
+
+  .cart-item-info .description,
+  .cart-item-info .brand {
+    font-size: 0.8rem; /* Smaller font size for description and brand on small mobile phones */
+  }
+
+  .cart-item-actions button {
+    font-size: 0.8rem; /* Smaller font size for buttons on small mobile phones */
+    padding: 0.6rem 1rem; /* Adjust button padding */
+  }
+
+  .total-price {
+    font-size: 1rem; /* Smaller font size for total price on small mobile phones */
+  }
+
+  .cart-item {
+    flex-direction: column; /* Stack content vertically on very small screens */
+    align-items: flex-start;
+  }
+
+  .cart-item-image {
+    width: 200px; /* Smaller image size */
+    height: 350px; /* Smaller image size */
+  }
+
+  .cart-item-info {
+    margin-left: 0; /* Remove left margin for smaller screens */
+    margin-top: 1rem; /* Add some top margin for spacing */
+  }
+}
+
+
+
+
+
+@media (max-width: 320px) {
+  .cart-item-info .info-group strong {
+    font-size: 0.7rem; /* Smaller font size for small mobile phones */
+  }
+
+  .cart-item-info .info-group span {
+    font-size: 0.6rem; /* Smaller font size for small mobile phones */
+  }
+
+  .cart-item-name {
+    font-size: 1rem; /* Smaller font size for item name on small mobile phones */
+  }
+
+  .cart-item-info .description,
+  .cart-item-info .brand {
+    font-size: 0.6rem; /* Smaller font size for description and brand on small mobile phones */
+  }
+
+  .cart-item-actions button {
+    font-size: 0.6rem; /* Smaller font size for buttons on small mobile phones */
+    padding: 0.4rem 0.8rem; /* Adjust button padding */
+  }
+
+  .total-price {
+    font-size: 0.8rem; /* Smaller font size for total price on small mobile phones */
+  }
+
+  .cart-item {
+    flex-direction: column; /* Stack content vertically on very small screens */
+    align-items: flex-start;
+  }
+
+  .cart-item-image {
+    width: 150px; /* Smaller image size */
+    height: 250px; /* Smaller image size */
+  }
+
+  .cart-item-info {
+    margin-left: 0; /* Remove left margin for smaller screens */
+    margin-top: 1rem; /* Add some top margin for spacing */
+  }
+}
+
