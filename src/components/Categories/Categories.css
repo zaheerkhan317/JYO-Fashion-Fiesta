@@ -186,8 +186,19 @@
   transform-origin: 0 0;
 }
 
-/* Stacking ribbons */
-.ribbon-wrapper.top-collection {
-  top: 10px;
+.ribbon.top-collection {
+  background-color: #17a2b8; /* Info color - Blue */
 }
 
+.ribbon.best-seller {
+  background-color: #ffc107; /* Warning color - Yellow */
+}
+
+.ribbon.new-arrivals {
+  background-color: #6f42c1; /* Purple color */
+}
+
+/* Optional: Ribbon positioning */
+.ribbon-wrapper .ribbon {
+  margin-bottom: 5px; /* Spacing between multiple ribbons */
+}

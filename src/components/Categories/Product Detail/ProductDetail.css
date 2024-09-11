@@ -1,0 +1,315 @@
+.product-detail-section {
+    margin-top: 20px;
+    padding: 0 15px; /* Add some padding for smaller devices */
+  }
+
+  .product-attributes {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .attribute-group {
+    display: flex;
+    align-items: center;
+    gap: 30px; /* Add space between color and size */
+  }
+  
+  .image-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-height: 500px;
+    overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+  }
+  
+  .image-column::-webkit-scrollbar {
+    display: none; /* WebKit (Chrome, Safari, etc.) */
+  }
+  
+  .product-thumbnail {
+    width: 100px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease;
+  }
+  
+  .product-thumbnail:hover {
+    border-color: #007bff;
+  }
+  
+  .selected-thumbnail {
+    border-color: #007bff;
+  }
+  
+  .product-main-image-container {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .product-detail-card {
+    width: 100%;
+    text-align: left;
+  }
+  
+  .product-main-image {
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    max-width: 100%;
+  }
+  
+  .product-detail-info {
+    width: 100%;
+    transition: all 0.3s ease;
+  }
+  
+  .product-price {
+    font-size: 1.5rem;
+    color: #ff5722;
+    margin-bottom: 15px;
+  }
+  
+  .product-detail-card .card-body {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  
+  .product-title {
+    font-size: 1.75rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+  
+  .product-description {
+    color: #6c757d;
+    margin-bottom: 15px;
+  }
+  
+  .product-brand, .product-id {
+    margin-bottom: 15px;
+  }
+  
+  .original-price {
+    color: #6c757d;
+    text-decoration: line-through;
+  }
+  
+  .discounted-price {
+    color: #ff5722;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  
+
+  .color-selection, .size-selection {
+    display: flex;
+    align-items: center;
+  }
+  
+  .size-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .size-box {
+    padding: 3px;
+    width: 35px;
+    margin-left: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+  }
+  
+  .size-box:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .selected-size {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .color-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-left: 10px;
+  }
+  
+  .color-box {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, border-color 0.2s;
+  }
+  
+  .color-box:hover {
+    transform: scale(1.1); /* Slight zoom effect on hover */
+  }
+  
+  .selected-color {
+    border-color: #007bff; /* Highlight border of the selected color */
+  }
+  
+  /* Ensure proper display when there are more colors */
+  @media (max-width: 768px) {
+    .color-options {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+  
+  /* Responsive for tablets */
+  @media (max-width: 1024px) {
+    .product-thumbnail {
+      width: 80px; /* Smaller thumbnail width for tablet */
+    }
+  
+    .product-detail-info {
+      padding: 10px; /* Smaller padding for tablets */
+    }
+
+    .size-selection,
+  .color-options {
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .size-options,
+  .color-options {
+    justify-content: flex-start;
+  }
+    
+  }
+  
+  /* Responsive for mobile */
+  @media (max-width: 768px) {
+    .product-main-image {
+      width: 100%;
+      height: auto;
+    }
+  
+    .image-column {
+      flex-direction: row;
+      overflow-x: auto;
+      max-height: none; /* Remove height restriction for mobile */
+    }
+  
+    .product-thumbnail {
+      width: 80px;
+    }
+  
+    .product-detail-info {
+      text-align: center;
+      padding: 10px; /* Smaller padding for mobile */
+    }
+  
+    .product-price {
+      font-size: 1.2rem; /* Smaller font size for price */
+    }
+  
+    .product-title {
+      font-size: 1.5rem;
+    }
+
+    .color-options {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .size-selection,
+  .color-selection {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .size-options,
+  .color-options {
+    justify-content: center;
+  }
+  }
+  
+  /* Responsive for small mobile screens */
+  @media (max-width: 576px) {
+    .product-title {
+      font-size: 1.25rem; /* Further reduction for small screens */
+    }
+  
+    .product-price {
+      font-size: 1rem; /* Smaller price text for small mobile */
+    }
+  
+    .product-thumbnail {
+      width: 60px; /* Smaller thumbnails for small mobile */
+    }
+  
+    .product-main-image {
+      max-width: 100%;
+      height: auto;
+    }
+  
+    .product-detail-info {
+      padding: 5px; /* Even smaller padding for small screens */
+    }
+  }
+ 
+
+ /* Style for available colors on small screens */
+@media (max-width: 350px) {
+    .color-options {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px; /* Adjust gap between color options */
+    }
+  
+    .color-option {
+      width: 30px; /* Adjust the width of each color option */
+      height: 30px; /* Adjust the height of each color option */
+      border-radius: 50%; /* Make color options circular */
+      border: 1px solid #ddd; /* Add a border for better visibility */
+      cursor: pointer; /* Indicate that the color options are clickable */
+      background-color: #f0f0f0; /* Default background color */
+      transition: background-color 0.3s; /* Smooth transition for hover effect */
+    }
+  
+    .color-option:hover {
+      background-color: #ddd; /* Change color on hover */
+    }
+  
+    .color-selection {
+      display: flex;
+      justify-content: center;
+      gap: 10px; /* Adjust gap between color selection items */
+      align-items: center;
+    }
+  
+    .size-selection {
+      display: flex;
+      justify-content: center;
+      gap: 10px; /* Adjust gap between size selection items */
+      align-items: center;
+    }
+  
+    .size-options,
+    .color-options {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px; /* Adjust gap between items */
+    }
+  }
+  

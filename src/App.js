@@ -24,6 +24,7 @@ import Users from './components/Admin/AdminLayout/Products/Products';
 import Kurtas from './components/Categories/Kurtas/Kurtas';
 import Loungewear from './components/Categories/LoungeWear/Loungewear';
 import Sarees from './components/Categories/Sarees/Sarees';
+import ProductDetail from './components/Categories/Product Detail/ProductDetail';
 import Categories from './components/Categories/Categories';
 
 function AppContent() {
@@ -69,6 +70,8 @@ function AppContent() {
         <Route path="/signup" element={user || firstName ? <Navigate to="/home" replace /> : <SignupForm />} />
         <Route path="/login" element={firstName || user ? <Navigate to="/home" replace /> : <LoginForm />} /> 
 
+       
+        <Route path="/product/:productId" element={<ProductDetail />} />
         <Route path="/categories/kurtas" element={<Categories />} />
         <Route path="/categories/sarees" element={<Categories />} />
         <Route path="/categories/loungewear" element={<Categories />} />

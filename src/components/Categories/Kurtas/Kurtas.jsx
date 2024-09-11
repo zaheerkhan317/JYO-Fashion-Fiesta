@@ -1,8 +1,16 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, Badge, Container, Row, Col, Button } from 'react-bootstrap';
 import '../Categories.css'; // Ensure the custom CSS is applied here
 
 const Kurtas = ({ products }) => {
+
+  const navigate = useNavigate();
+
+  const handleAddToCart = (productId) => {
+    navigate(`/product/${productId}`); // Navigate to the product detail page
+  };
+
   if (!Array.isArray(products)) {
     return <div>Loading...</div>; // Handle loading state
   }
@@ -124,8 +132,8 @@ const Kurtas = ({ products }) => {
                   </Card.Text>
 
                   {/* Call to Action Button */}
-                  <Button variant="primary" className="mt-3">
-                    Add to Cart
+                  <Button variant="primary" className="mt-3" onClick={() => handleAddToCart(product.id)}>
+                    View Product
                   </Button>
                 </Card.Body>
               </Card>

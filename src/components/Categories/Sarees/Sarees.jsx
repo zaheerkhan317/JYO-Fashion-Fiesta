@@ -1,8 +1,19 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, Badge, Container, Row, Col, Button } from 'react-bootstrap';
 import '../Categories.css'; // Ensure the custom CSS is applied here
 
 const Sarees = ({ products }) => {
+
+  const navigate = useNavigate();
+
+  const handleAddToCart = (productId) => {
+    navigate(`/product/${productId}`); // Navigate to the product detail page
+  };
+
+  if (!Array.isArray(products)) {
+    return <div>Loading...</div>; // Handle loading state
+  }
   
   return (
     <Container className="category-section">
@@ -12,15 +23,15 @@ const Sarees = ({ products }) => {
           <Col key={product.id} md={4} sm={6} xs={12} className="mb-4">
             <Card className="product-card h-100 shadow position-relative">
               <div className="ribbon-wrapper">
-                  {product.topCollections && (
-                    <div className="ribbon top-collection">Top Collection</div>
-                  )}
-                  {product.bestSelling && (
-                    <div className="ribbon best-seller">Best Seller</div>
-                  )}
-                  {product.newArrivals && (
-                    <div className="ribbon new-arrivals">New Arrivals</div>
-                  )}
+                {product.topCollections && (
+                  <div className="ribbon top-collection">Top Collection</div>
+                )}
+                {product.bestSelling && (
+                  <div className="ribbon best-seller">Best Seller</div>
+                )}
+                {product.newArrivals && (
+                  <div className="ribbon new-arrivals">New Arrivals</div>
+                )}
               </div>
               {/* Product Image */}
               <div className="product-image-container">
@@ -103,7 +114,11 @@ const Sarees = ({ products }) => {
                 </Card.Text>
 
                 {/* Call to Action Button */}
-                <Button variant="primary" className="mt-3">
+                <Button
+                  variant="primary"
+                  className="mt-3"
+                  onClick={() => handleAddToCart(product.id)}
+                >
                   Add to Cart
                 </Button>
               </Card.Body>
