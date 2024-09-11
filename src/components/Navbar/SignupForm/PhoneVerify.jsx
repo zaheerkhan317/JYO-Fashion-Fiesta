@@ -25,7 +25,7 @@ const PhoneVerify = ({ auth }) => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [error, setError] = useState('');
-  const { setFirstName, setUser } = useUser();
+  const { setUid, setFirstName, setUser } = useUser();
 
 
   const getISTDate = (date) => {
@@ -182,14 +182,16 @@ const PhoneVerify = ({ auth }) => {
   //Function to store user data in Firebase Firstore Database
   const storeUserInFirestore = async () => {
     try {
-      const db = getFirestore(); // Get Firestore instance
-      const userId = Date.now().toString(); // Use authenticated user's ID or fallback to Date.now()
-      
+      const db = getFirestore(); // Get Firestore instance      
       // Create a reference to the user's document in the 'users' collection
-      const userRef = doc(db, 'users', userId);
+      
+      const userRef = doc(collection(db, 'users'));
+      const userId = userRef.id;
+      // Use authenticated user's ID or fallback to Date.now()
       
       // Set user data in Firestore
       await setDoc(userRef, {
+        uid: userId,
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
@@ -203,12 +205,17 @@ const PhoneVerify = ({ auth }) => {
         timestamp: getISTDate(new Date()).toString(),
         description: `User ${formData.firstName } ${formData.lastName } registered`,
       });
+
+      const userid = userId;
   
       // Optionally store in local storage and set context
       localStorage.setItem('firstName', formData.firstName);
       localStorage.setItem('displayName', formData.firstName);
+      localStorage.setItem('uid',userid);
       setFirstName(formData.firstName);
+      setUid(userid);
       setUser({
+        uid: userId,
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
@@ -242,7 +249,8 @@ const PhoneVerify = ({ auth }) => {
       ])
         .then((result) => {
           const user = result.user;
-  
+          const userId = user.uid;
+          
           if (!user || !user.uid) {
             throw new Error("User UID is missing or invalid.");
           }
@@ -254,6 +262,7 @@ const PhoneVerify = ({ auth }) => {
           const userRef = doc(db, 'users', user.uid);
   
           return setDoc(userRef, {
+            uid: userId,
             firstName: formData.firstName,
             lastName: formData.lastName,
             email: formData.email || user.email,

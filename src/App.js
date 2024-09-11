@@ -21,11 +21,9 @@ import Dashboard from './components/Admin/AdminLayout/Dashboard/Dashboard';
 import Orders from './components/Admin/AdminLayout/Orders/Orders';
 import Products from './components/Admin/AdminLayout/Products/Products';
 import Users from './components/Admin/AdminLayout/Products/Products';
-import Kurtas from './components/Categories/Kurtas/Kurtas';
-import Loungewear from './components/Categories/LoungeWear/Loungewear';
-import Sarees from './components/Categories/Sarees/Sarees';
 import ProductDetail from './components/Categories/Product Detail/ProductDetail';
 import Categories from './components/Categories/Categories';
+import Cart from './components/Cart/Cart';
 
 function AppContent() {
   const navigate = useNavigate(); 
@@ -65,6 +63,7 @@ function AppContent() {
         <Route path="/offers" element={<OffersZone />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<ContactUs />} />
+        <Route path="/cart" element={<Cart />} />
         {/* <Route path="/signup" element={user ? <Home /> : <SignupForm onSuccess={handleSignupSuccess} />} /> */}
         {/* <Route path="/signup" element={user ? <Home /> : <SignupForm onSuccess={handleSignupSuccess} />} /> */}
         <Route path="/signup" element={user || firstName ? <Navigate to="/home" replace /> : <SignupForm />} />

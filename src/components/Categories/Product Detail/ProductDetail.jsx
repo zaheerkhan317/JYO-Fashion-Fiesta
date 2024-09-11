@@ -57,6 +57,38 @@ const ProductDetail = () => {
       alert('Please select a size');
       return;
     }
+
+    // Retrieve the user's first name from localStorage
+    const uid = localStorage.getItem('uid');
+    console.log(uid);
+    if (uid) {
+      // Get the existing cart from localStorage or initialize it
+      const cart = JSON.parse(localStorage.getItem('cart')) || {};
+      
+      // Ensure there's a cart for this user
+      if (!cart[uid]) {
+        cart[uid] = [];
+      }
+
+      // Add the selected product to the user's cart
+      cart[uid].push({
+        id: product.id,
+        name: product.itemName,
+        size: selectedSize,
+        color: selectedColor,
+        image: selectedImage,
+        quantity: 1 // Set initial quantity
+      });
+
+      // Save the updated cart back to localStorage
+      localStorage.setItem('cart', JSON.stringify(cart));
+      
+      // Show modal to confirm addition to cart
+      setShowModal(true);
+    } else {
+      alert('User not logged in');
+    }
+
     setShowModal(true);
   };
 

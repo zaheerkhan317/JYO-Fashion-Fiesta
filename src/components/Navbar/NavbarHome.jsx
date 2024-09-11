@@ -7,9 +7,10 @@ import firebase from 'firebase/compat/app';
 import { useUser } from '../Context/UserProvider';
 
 const NavbarHome = () => {
-  const { user, setUser, firstName, setFirstName, displayName } = useUser();
+  const { user, setUser, firstName, setFirstName, displayName, uid, setUid } = useUser();
   console.log("firstName in NavbarHome : ",firstName);
   console.log("user : ",user);
+  console.log("user id : ",uid);
   console.log("User firstName", firstName);
   // console.log("user.firstname",user.firstName);
   const navigate = useNavigate();
