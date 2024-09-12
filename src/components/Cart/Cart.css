@@ -68,6 +68,7 @@
 
 .cart-item-actions {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   margin-left: auto;
 }
@@ -104,6 +105,56 @@
   background-color: #fff; 
   border-radius: 0.25rem; /* Slightly rounded corners */
 }
+
+.quantity-btn {
+  font-size: 12px; /* Smaller font size for the icons */
+  padding: 2px 6px; /* Adjust padding for a more compact button */
+  width: 25px; /* Set width to ensure consistent size */
+  height: 25px; /* Set height to make it smaller */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 1; /* Ensure the icons are vertically centered */
+}
+
+.quantity-btn .fa {
+  font-size: 14px; /* Control the size of the icon */
+}
+
+.quantity-span {
+  font-size: 14px; /* Adjust the quantity number size */
+  font-weight: bold; /* Optional, to make the number stand out */
+}
+
+.cart-item-actions .btn-danger {
+  padding: 5px; /* Smaller padding for the icon button */
+  width: 40px; /* Ensure the trash button has a fixed width */
+  height: 40px; /* Ensure the height is square */
+  display: flex;
+  margin-left: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+.cart-item-actions .btn-success {
+  padding: 5px; /* Smaller padding for the icon button */
+  width: 100px; /* Ensure the trash button has a fixed width */
+  height: 40px; /* Ensure the height is square */
+  display: flex;
+  background-color: #ffc107;
+  margin-left: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+.cart-item-actions .btn-success:hover {
+  background-color: #e0a800; /* Darker gold on hover */
+}
+
+.cart-item-actions .fa-trash {
+  font-size: 16px; /* Adjust icon size */
+}
+
 
 /* Responsive Styles */
 @media (max-width: 768px) {
