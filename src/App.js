@@ -24,6 +24,7 @@ import Users from './components/Admin/AdminLayout/Products/Products';
 import ProductDetail from './components/Categories/Product Detail/ProductDetail';
 import Categories from './components/Categories/Categories';
 import Cart from './components/Cart/Cart';
+import MyOrders from './components/Navbar/MyOrders/MyOrders';
 
 function AppContent() {
   const navigate = useNavigate(); 
@@ -64,6 +65,7 @@ function AppContent() {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/myorders" element={<MyOrders />} />
         {/* <Route path="/signup" element={user ? <Home /> : <SignupForm onSuccess={handleSignupSuccess} />} /> */}
         {/* <Route path="/signup" element={user ? <Home /> : <SignupForm onSuccess={handleSignupSuccess} />} /> */}
         <Route path="/signup" element={user || firstName ? <Navigate to="/home" replace /> : <SignupForm />} />

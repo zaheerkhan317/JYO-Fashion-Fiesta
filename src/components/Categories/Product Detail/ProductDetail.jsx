@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Row, Col, Image, Button, Modal } from 'react-bootstrap';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 import './ProductDetail.css'; // Import the custom CSS
 
 const ProductDetail = () => {
   const { productId } = useParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [selectedImage, setSelectedImage] = useState('');
   const [loading, setLoading] = useState(true);
@@ -89,13 +91,19 @@ const ProductDetail = () => {
       // Save the updated cart back to localStorage
       localStorage.setItem('cart', JSON.stringify(cart));
       
-      // Show modal to confirm addition to cart
+       // Update cart count in localStorage
+      const totalItems = cart[uid].length;
+      localStorage.setItem('cartCount', totalItems.length > 0 ? totalItems.length : 0);
+
       setShowModal(true);
+
+      setTimeout(() => {
+        navigate('/cart', { replace: true }); // Navigate to /cart
+        window.location.reload(); // Force the page to refresh
+      }, 1000); // Delay navigation slightly to show the modal briefly
     } else {
       alert('User not logged in');
     }
-
-    setShowModal(true);
   };
 
   const handleCloseModal = () => setShowModal(false);

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Image, Button } from 'react-bootstrap';
+import { Container, Row, Col, Image, Button, ListGroup, Card } from 'react-bootstrap';
 import { FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
+import { collection, addDoc, doc, getDoc } from "firebase/firestore";
+import { db } from "../../firebaseConfig";
 import './Cart.css'; // Import custom CSS
 
 const Cart = () => {
@@ -14,20 +16,45 @@ const Cart = () => {
       if (uid) {
         const cart = JSON.parse(localStorage.getItem('cart')) || {};
         const items = cart[uid] || [];
-        console.log('Cart Items:', items); // Debugging line
-        console.log("discount price",items.discountValue);
-        items.forEach(item => {
-          item.quantity = item.quantity || 1; // Ensure each item has an initial quantity of 1
-        });
-        setCartItems(items);
+        if (Array.isArray(items) && items.length === 0) {
+          localStorage.setItem('cartCount', 0);
+        } else {
+          items.forEach(item => {
+            item.quantity = item.quantity || 1; // Ensure each item has an initial quantity of 1
+            item.total = (item.price * item.quantity * (1 - (item.discountvalue / 100))).toFixed(2);
+          });
+          setCartItems(items);
+          // Update cart count in localStorage
+          localStorage.setItem('cartCount', items.length);
+        }
       } else {
         setError('User not logged in');
       }
-
     };
 
     fetchCartItems();
   }, []);
+
+  const generateOrderId = async () => {
+    const generateId = () => Math.floor(100000 + Math.random() * 900000).toString();
+  
+    const checkIdExists = async (id) => {
+      const orderRef = doc(db, 'orders', id);
+      const docSnap = await getDoc(orderRef);
+      return docSnap.exists();
+    };
+  
+    const generateUniqueId = async () => {
+      let id = generateId();
+      while (await checkIdExists(id)) {
+        id = generateId(); // Generate a new ID if the current one already exists
+      }
+      return id;
+    };
+  
+    return generateUniqueId();
+  };
+  
 
   const handleRemoveFromCart = (index) => {
     const uid = localStorage.getItem('uid');
@@ -37,23 +64,42 @@ const Cart = () => {
       
       if (cart[uid]) {
         cart[uid].splice(index, 1);
-        localStorage.setItem('cart', JSON.stringify(cart));
-        setCartItems(cart[uid]);
+        if (cart[uid].length === 0) {
+          delete cart[uid];
+          localStorage.removeItem('cart');
+          localStorage.setItem('cartCount', 0); 
+          setCartItems([]);// Set cart count to 0 if empty
+        } else {
+          localStorage.setItem('cart', JSON.stringify(cart));
+          localStorage.setItem('cartCount', cart[uid].length);
+          setCartItems(cart[uid]);
+        }
       }
+    
     }
   };
 
   const handleQuantityChange = (index, change) => {
     const updatedCartItems = [...cartItems];
     updatedCartItems[index].quantity += change;
-
+  
     // Ensure quantity doesn't go below 1
     if (updatedCartItems[index].quantity < 1) {
       updatedCartItems[index].quantity = 1;
     }
-
+  
+    // Calculate original price (price * quantity)
+    const originalPrice = updatedCartItems[index].price * updatedCartItems[index].quantity;
+    
+    // Calculate discounted total price
+    const discountedPrice = (originalPrice * (1 - updatedCartItems[index].discountvalue / 100)).toFixed(2);
+    
+    // Update the item with both original price and total discounted price
+    updatedCartItems[index].originalPrice = originalPrice.toFixed(2);
+    updatedCartItems[index].total = discountedPrice;
+  
     setCartItems(updatedCartItems);
-
+  
     // Update the cart in localStorage
     const uid = localStorage.getItem('uid');
     if (uid) {
@@ -63,6 +109,58 @@ const Cart = () => {
     }
   };
 
+
+  const getISTDate = (date) => {
+    const options = {
+      timeZone: 'Asia/Kolkata', // IST timezone
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    };
+    return new Intl.DateTimeFormat('en-IN', options).format(date);
+  };
+  
+
+  const handlePlaceAllOrders = async () => {
+    try {
+      const orderId = await generateOrderId(); // Ensure the order ID is awaited
+      const uid = localStorage.getItem('uid');
+  
+      if (!uid) {
+        setError("User not logged in");
+        return;
+      }
+  
+      // Create order object
+      const orderData = {
+        orderId: orderId,
+        userId: uid,
+        items: cartItems,
+        status: 'pending', // Optional field for tracking request date
+        totalPrice: cartItems.reduce((total, item) => total + parseFloat(item.total), 0).toFixed(2),
+        orderDate: getISTDate(new Date()).toString(), // Store the current date
+      };
+  
+      // Add the order to Firestore
+      const ordersRef = collection(db, 'orders');
+      await addDoc(ordersRef, orderData);
+  
+      // Clear cart after placing order
+      localStorage.removeItem('cart');
+      localStorage.setItem('cartCount', 0);
+      setCartItems([]);
+  
+      alert(`Order placed successfully! Order ID: ${orderId}`);
+    } catch (error) {
+      console.error("Error placing order: ", error);
+      setError("Error placing order. Please try again.");
+    }
+  };
+  
+
   if (error) {
     return <div className="text-center mt-5">{error}</div>;
   }
@@ -71,10 +169,12 @@ const Cart = () => {
     return <div className="text-center mt-5">Your cart is empty</div>;
   }
 
-  const handlePlaceOrder = () => {
-    alert('Order placed successfully!');
-    // Logic for placing the order can be added here
-  };
+  // Calculate total price for all items
+  const totalPrice = cartItems.reduce((total, item) => total + parseFloat(item.total), 0).toFixed(2);
+  
+  // Calculate total discount
+  const totalOriginalPrice = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
+  const totalDiscount = (totalOriginalPrice - totalPrice).toFixed(2);
 
   return (
     <Container className="cart-section mt-5">
@@ -121,7 +221,7 @@ const Cart = () => {
                   </Button>
                 </div>
                 <div className="info-group">
-                  <strong>Original Price:</strong> <span className="original-price">₹{item.price}</span>
+                  <strong>Original Price:</strong> <span className="original-price">₹{item.price} per one</span>
                 </div>
                 <div className="info-group">
                   <strong>Discount:</strong> <span className="discount-price">{item.discountvalue}%</span>
@@ -130,9 +230,6 @@ const Cart = () => {
                   <strong>Total:</strong> <span className="total-price">₹{item.total}</span>
                 </div>
                 <div className="cart-item-actions">
-                  <Button variant="success" onClick={handlePlaceOrder} >
-                    Place Order
-                  </Button>
                   <Button variant="danger" onClick={() => handleRemoveFromCart(index)}>
                     <FaTrash />
                   </Button>
@@ -141,6 +238,27 @@ const Cart = () => {
             </div>
           </Col>
         ))}
+        <Col md={12} className="text-center mt-4">
+          <Card>
+            <Card.Body>
+              <Card.Title>Total Pricing Details</Card.Title>
+              <ListGroup>
+                <ListGroup.Item>
+                  <strong>Total Original Price:</strong> ₹{totalOriginalPrice}
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <strong>Total Discount:</strong> ₹{totalDiscount}
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <strong>Total Price (After Discount):</strong> ₹{totalPrice}
+                </ListGroup.Item>
+              </ListGroup>
+            </Card.Body>
+          </Card>
+          <Button className="btn-gold mt-4 mb-5" onClick={handlePlaceAllOrders} disabled={cartItems.length === 0}>
+            Place Order
+          </Button>
+        </Col>
       </Row>
     </Container>
   );

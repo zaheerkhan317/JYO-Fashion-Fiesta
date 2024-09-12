@@ -38,6 +38,7 @@ const Users = () => {
               <Table striped bordered hover className="text-center">
                 <thead>
                   <tr>
+                    <th>User ID</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Phone</th>
@@ -48,6 +49,7 @@ const Users = () => {
                   {users.length > 0 ? (
                     users.map((user, index) => (
                       <tr key={index}>
+                        <td>{user.uid}</td>
                         <td>{user.firstName} {user.lastName}</td>
                         <td>{user.email}</td>
                         <td>{user.phoneNumber || "Google Account"}</td>

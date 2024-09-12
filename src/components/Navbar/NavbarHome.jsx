@@ -1,4 +1,4 @@
-import React, { useState }from 'react'
+import React, { useState, useEffect }from 'react'
 import { Navbar, Nav, NavDropdown, Container, Button, Spinner } from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import "./Navbar.css";
@@ -14,7 +14,9 @@ const NavbarHome = () => {
   console.log("User firstName", firstName);
   // console.log("user.firstname",user.firstName);
   const navigate = useNavigate();
+  const [cartCount, setCartCount] = useState(0);
   const [loading, setIsLoading] = useState(false);
+  console.log("cart count",cartCount);
   // useEffect(() => {
   //   // Simulate fetching user data from an API or local storage
   //   const fetchUserData = () => {
@@ -41,6 +43,12 @@ const NavbarHome = () => {
   //   }
   // }, [setFirstName]);
 
+  useEffect(() => {
+    // Retrieve the cart count from localStorage when the Navbar is mounted
+    const storedCartCount = localStorage.getItem('cartCount') || 0;
+    setCartCount(Number(storedCartCount));
+  }, []);
+  
 
   const handleLogout = async () => {
     setIsLoading(true);
@@ -96,6 +104,7 @@ const NavbarHome = () => {
                       </Button>
                       <ul className="dropdown-menu" aria-labelledby="profileDropdown">
                         <li><Link className="dropdown-item" to="/profile">Profile</Link></li>
+                        <li><Link className="dropdown-item" as={Link} to="/myorders">My Orders</Link></li>
                         <li><hr className="dropdown-divider" /></li>
                         <li><button className="dropdown-item" type="button" onClick={handleLogout}> 
                           {loading ? <Spinner as="span" animation="border" size="sm" /> : 'Logout'}
@@ -106,9 +115,12 @@ const NavbarHome = () => {
                   </div>
                 </Nav.Item>
             <Nav.Item>
-              <Nav.Link as={Link} to="/cart" className="d-flex justify-content-center align-items-center">
+              <Nav.Link as={Link} to="/cart" className="cart-icon d-flex justify-content-center align-items-center">
                 <Button variant="outline-primary">
                   <i className="fa-solid fa-cart-shopping"></i> {/* Cart icon */}
+                  {cartCount > 0 && (
+                    <span className="cart-count-badge">{cartCount}</span>
+                  )}
                 </Button>
               </Nav.Link>
             </Nav.Item>

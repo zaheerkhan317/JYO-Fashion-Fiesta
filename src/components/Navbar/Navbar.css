@@ -4,6 +4,28 @@
   padding: 0.375rem 0.75rem; 
 }
 
+.cart-icon {
+  position: relative;
+  display: inline-block;
+}
+
+.cart-icon .cart-count-badge {
+  position: absolute;
+  top: 0px; /* Adjust based on the size of your cart icon */
+  right: 0px; /* Adjust to align with the edge of the cart icon */
+  background-color: #dc3545; /* Red background for visibility */
+  color: white; /* White text color */
+  border-radius: 50%; /* Round shape */
+  width: 20px; /* Size of the badge */
+  height: 20px; /* Height of the badge */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px; /* Smaller font for the count */
+  font-weight: bold;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3); /* Optional: adds a shadow for better visibility */
+}
+
 
 @media (max-width: 768px) {
   .custom-button {
