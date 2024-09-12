@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Image, Button } from 'react-bootstrap';
+import { FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
 import './Cart.css'; // Import custom CSS
 
 const Cart = () => {
@@ -15,6 +16,9 @@ const Cart = () => {
         const items = cart[uid] || [];
         console.log('Cart Items:', items); // Debugging line
         console.log("discount price",items.discountValue);
+        items.forEach(item => {
+          item.quantity = item.quantity || 1; // Ensure each item has an initial quantity of 1
+        });
         setCartItems(items);
       } else {
         setError('User not logged in');
@@ -39,6 +43,26 @@ const Cart = () => {
     }
   };
 
+  const handleQuantityChange = (index, change) => {
+    const updatedCartItems = [...cartItems];
+    updatedCartItems[index].quantity += change;
+
+    // Ensure quantity doesn't go below 1
+    if (updatedCartItems[index].quantity < 1) {
+      updatedCartItems[index].quantity = 1;
+    }
+
+    setCartItems(updatedCartItems);
+
+    // Update the cart in localStorage
+    const uid = localStorage.getItem('uid');
+    if (uid) {
+      const cart = JSON.parse(localStorage.getItem('cart')) || {};
+      cart[uid] = updatedCartItems;
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+  };
+
   if (error) {
     return <div className="text-center mt-5">{error}</div>;
   }
@@ -46,6 +70,11 @@ const Cart = () => {
   if (cartItems.length === 0) {
     return <div className="text-center mt-5">Your cart is empty</div>;
   }
+
+  const handlePlaceOrder = () => {
+    alert('Order placed successfully!');
+    // Logic for placing the order can be added here
+  };
 
   return (
     <Container className="cart-section mt-5">
@@ -73,8 +102,23 @@ const Cart = () => {
                 <div className="info-group">
                   <strong>Color:</strong> <span>{item.color}</span>
                 </div>
-                <div className="info-group">
-                  <strong>Quantity:</strong> <span>{item.quantity}</span>
+                <div className="info-group d-flex align-items-center">
+                  <strong>Quantity:</strong>
+                  <Button
+                    variant="outline-secondary"
+                    className="quantity-btn"
+                    onClick={() => handleQuantityChange(index, -1)}
+                  >
+                    <FaMinus />
+                  </Button>
+                  <span className="mx-2">{item.quantity}</span>
+                  <Button
+                    variant="outline-secondary"
+                    className="quantity-btn"
+                    onClick={() => handleQuantityChange(index, 1)}
+                  >
+                    <FaPlus />
+                  </Button>
                 </div>
                 <div className="info-group">
                   <strong>Original Price:</strong> <span className="original-price">₹{item.price}</span>
@@ -86,7 +130,12 @@ const Cart = () => {
                   <strong>Total:</strong> <span className="total-price">₹{item.total}</span>
                 </div>
                 <div className="cart-item-actions">
-                  <Button variant="danger" onClick={() => handleRemoveFromCart(index)}>Remove</Button>
+                  <Button variant="success" onClick={handlePlaceOrder} >
+                    Place Order
+                  </Button>
+                  <Button variant="danger" onClick={() => handleRemoveFromCart(index)}>
+                    <FaTrash />
+                  </Button>
                 </div>
               </div>
             </div>
