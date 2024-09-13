@@ -1,70 +1,248 @@
 /* Custom styling for MyOrders component */
-
 .my-orders-section {
-    padding: 2rem;
-  }
-  
+  padding: 2rem;
+}
+
+.horizontal-card-container {
+  margin-bottom: 1rem;
+}
+
+.horizontal-card {
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.horizontal-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.order-items {
+  flex: 1;
+  padding: 1rem;
+}
+
+.product-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.product-img {
+  width: 100px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.product-info {
+  flex: 1;
+  padding-left: 1rem;
+}
+
+.info-group {
+  margin-bottom: 5px;
+}
+
+.order-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  flex-basis: 40%;
+  padding: 1rem;
+  border-left: 1px solid #ddd;
+}
+
+.order-actions {
+  margin-top: 1rem;
+}
+
+.responsive-modal .modal-dialog {
+  max-width: 70%;
+  width: 80%;
+  margin: 1.75rem auto;
+}
+
+.responsive-iframe {
+  border: none;
+  width: 100%;
+  height: 100vh; /* Adjust height based on your needs */
+}
+
+.modal-content {
+  overflow: hidden;
+}
+
+.modal-body {
+  overflow: auto;
+}
+
+.modal-body iframe {
+  width: 100%;
+  height: 500px; /* Adjust height as needed */
+}
+
+/* Responsive styles for larger phones */
+@media (max-width: 992px) {
   .horizontal-card {
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: row;
-    overflow: hidden;
+    flex-direction: column; /* Stack cards vertically */
   }
-  
-  .order-items {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 1rem;
-  }
-  
-  .product-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-  
+
   .product-img {
-    width: 100px;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 5px;
+    width: 90px;
+    height: 135px; /* Resize for large phones */
   }
-  
-  .product-info {
-    flex: 1;
-    padding-left: 1rem;
-  }
-  
-  .info-group {
-    margin-bottom: 5px;
-  }
-  
+
   .order-details {
-    flex-basis: 40%;
-    padding: 1rem;
-    border-left: 1px solid #ddd;
+    border-left: none;
+    border-top: 1px solid #ddd;
   }
-  
-  .order-actions {
-    margin-top: 1rem;
+}
+
+/* Responsive styles for medium phones */
+@media (max-width: 768px) {
+  .my-orders-section {
+    padding: 1rem; /* Reduce padding for medium phones */
   }
-  
-  /* Responsive styles */
-  @media (max-width: 768px) {
-    .product-img {
-      width: 80px;
-      height: 80px;
-    }
-    
-    .horizontal-card {
-      flex-direction: column;
-    }
-  
-    .order-details {
-      border-left: none;
-      border-top: 1px solid #ddd;
-    }
+
+  .horizontal-card {
+    flex-direction: column; /* Stack for medium phones */
   }
-  
+
+  .product-img {
+    width: 75px;
+    height: 110px; /* Smaller image on medium phones */
+  }
+
+  .order-details {
+    font-size: 0.85rem;
+    padding: 0.75rem; /* Smaller details section */
+    border-left: none;
+    border-top: 1px solid #ddd;
+  }
+
+  .info-group {
+    font-size: 0.9rem; /* Adjust text size for medium phones */
+  }
+
+  .responsive-iframe {
+    height: 75vh; /* Reduce height on smaller screens */
+  }
+
+  .modal-lg {
+    max-width: 90%;
+    width: 90%;
+  }
+}
+
+/* Responsive styles for small phones */
+@media (max-width: 576px) {
+  .my-orders-section {
+    padding: 0.75rem; /* Minimal padding for small phones */
+  }
+
+  .horizontal-card {
+    flex-direction: column; /* Stack for small phones */
+    padding: 0.5rem; /* Less padding inside the card */
+  }
+
+  .product-img {
+    width: 60px;
+    height: 90px; /* Even smaller image size */
+  }
+
+  .info-group {
+    font-size: 0.75rem; /* Adjust font size for small phones */
+  }
+
+  .order-details {
+    font-size: 0.75rem; /* Smaller order details text */
+    padding: 0.5rem;
+    border-left: none;
+    border-top: 1px solid #ddd;
+  }
+
+  .order-actions button {
+    font-size: 0.75rem; /* Smaller buttons for small screens */
+  }
+
+  .horizontal-card-container {
+    margin-bottom: 0.5rem; /* Reduce space between cards */
+  }
+
+  .modal-lg {
+    max-width: 80%;
+    width: 80%;
+  }
+
+  .d-flex {
+    flex-direction: column; /* Stack buttons vertically on very small screens */
+  }
+
+  .d-flex Button{
+    margin-bottom: 10px; /* Stack buttons vertically on very small screens */
+  }
+
+  .mb-2 {
+    margin-bottom: 0.5rem; /* Adjust bottom margin for stacked buttons */
+  }
+
+  .me-sm-2 {
+    margin-right: 0; /* Remove margin-right when stacked */
+  }
+}
+
+/* Responsive styles for very small screens */
+@media (max-width: 320px) {
+  .my-orders-section {
+    padding: 0.5rem; /* Minimal padding for very small screens */
+  }
+
+  .horizontal-card {
+    flex-direction: column; /* Stack cards vertically */
+  }
+
+  .product-img {
+    width: 30px;
+    height: 100px; /* Very small image size for 320px screens */
+  }
+
+  .product-info {
+    padding-left: 0.5rem; /* Less padding */
+  }
+
+  .info-group {
+    font-size: 0.7rem; /* Smaller font size for very small screens */
+  }
+
+  .order-details {
+    font-size: 0.7rem; /* Smaller order details text */
+    padding: 0.5rem;
+    border-left: none;
+    border-top: 1px solid #ddd;
+  }
+
+  .order-actions button {
+    font-size: 0.7rem; /* Smaller buttons */
+  }
+
+  .horizontal-card-container {
+    margin-bottom: 0.25rem; /* Minimal space between cards */
+  }
+
+  .d-flex {
+    flex-direction: column; /* Stack buttons vertically on very small screens */
+  }
+
+  .mb-2 {
+    margin-bottom: 0.5rem; /* Adjust bottom margin for stacked buttons */
+  }
+
+  .me-sm-2 {
+    margin-right: 0; /* Remove margin-right when stacked */
+  }
+}

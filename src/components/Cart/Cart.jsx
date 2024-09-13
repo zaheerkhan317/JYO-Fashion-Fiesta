@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Image, Button, ListGroup, Card } from 'react-bootstrap';
+import { Container, Row, Col, Image, Button, ListGroup, Card, Modal } from 'react-bootstrap';
 import { FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
 import { collection, addDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
+import { useNavigate } from 'react-router-dom';
 import './Cart.css'; // Import custom CSS
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [error, setError] = useState(null);
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [showPlaceOrderModal, setShowPlaceOrderModal] = useState(false);
+  const [itemToRemove, setItemToRemove] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCartItems = () => {
@@ -54,16 +59,20 @@ const Cart = () => {
   
     return generateUniqueId();
   };
-  
 
   const handleRemoveFromCart = (index) => {
+    setItemToRemove(index);
+    setShowRemoveModal(true);
+  };
+
+  const confirmRemoveFromCart = () => {
     const uid = localStorage.getItem('uid');
 
-    if (uid) {
+    if (uid && itemToRemove !== null) {
       const cart = JSON.parse(localStorage.getItem('cart')) || {};
       
       if (cart[uid]) {
-        cart[uid].splice(index, 1);
+        cart[uid].splice(itemToRemove, 1);
         if (cart[uid].length === 0) {
           delete cart[uid];
           localStorage.removeItem('cart');
@@ -77,6 +86,7 @@ const Cart = () => {
       }
     
     }
+    setShowRemoveModal(false);
   };
 
   const handleQuantityChange = (index, change) => {
@@ -122,9 +132,13 @@ const Cart = () => {
     };
     return new Intl.DateTimeFormat('en-IN', options).format(date);
   };
+
+  const handlePlaceAllOrders = () => {
+    setShowPlaceOrderModal(true);
+  };
   
 
-  const handlePlaceAllOrders = async () => {
+  const confirmPlaceAllOrders = async () => {
     try {
       const orderId = await generateOrderId(); // Ensure the order ID is awaited
       const uid = localStorage.getItem('uid');
@@ -154,10 +168,13 @@ const Cart = () => {
       setCartItems([]);
   
       alert(`Order placed successfully! Order ID: ${orderId}`);
+      navigate('/myorders', { replace: true }); // Navigate to /cart
+      window.location.reload();
     } catch (error) {
       console.error("Error placing order: ", error);
       setError("Error placing order. Please try again.");
     }
+    setShowPlaceOrderModal(false);
   };
   
 
@@ -260,6 +277,37 @@ const Cart = () => {
           </Button>
         </Col>
       </Row>
+      {/* Remove Item Modal */}
+      <Modal show={showRemoveModal} onHide={() => setShowRemoveModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Removal</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to remove this item from your cart?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowRemoveModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={confirmRemoveFromCart}>
+            Confirm
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Place Order Modal */}
+      <Modal show={showPlaceOrderModal} onHide={() => setShowPlaceOrderModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Order</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to place the order for all items in your cart?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowPlaceOrderModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={confirmPlaceAllOrders}>
+            Confirm
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

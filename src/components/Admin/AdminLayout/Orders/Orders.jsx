@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Table, Spinner, Alert, Button } from 'react-bootstrap';
-import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
+import { FaTrash } from 'react-icons/fa';
 import { db } from '../../../../firebaseConfig.js'; // Adjust the import path as needed
 
 const Orders = () => {
@@ -52,6 +53,17 @@ const Orders = () => {
     }
   };
 
+  const handleDelete = async (orderId) => {
+    try {
+      const orderRef = doc(db, 'orders', orderId);
+      await deleteDoc(orderRef);
+      setOrders(orders.filter(order => order.id !== orderId));
+    } catch (error) {
+      console.error("Error deleting order: ", error);
+      setError("Failed to delete the order. Please try again later.");
+    }
+  };
+
   if (loading) {
     return (
       <Container className="text-center mt-5">
@@ -100,7 +112,7 @@ const Orders = () => {
                 <td>{order.orderDate}</td>
                 <td>{order.status}</td>
                 <td>
-                  {(order.status === 'pending' || order.status === 'denied' || order.status === 'approved') && (
+                  {(order.status === 'pending' || order.status === 'denied' || order.status === 'approved' || order.status === 'cancelRequested') && (
                     <>
                       <Button
                         variant="success"
@@ -119,6 +131,12 @@ const Orders = () => {
                       </Button>
                     </>
                   )}
+                  <Button
+                    variant="light"
+                    onClick={() => handleDelete(order.id)}
+                  >
+                    <FaTrash />
+                  </Button>
                 </td>
               </tr>
             );
