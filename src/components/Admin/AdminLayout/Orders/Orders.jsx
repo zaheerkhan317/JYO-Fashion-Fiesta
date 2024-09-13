@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Table, Spinner, Alert, Button } from 'react-bootstrap';
+import { Container, Table, Spinner, Alert, Dropdown, Button } from 'react-bootstrap';
 import { collection, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { FaTrash } from 'react-icons/fa';
 import { db } from '../../../../firebaseConfig.js'; // Adjust the import path as needed
@@ -42,6 +42,17 @@ const Orders = () => {
     }
   };
 
+  const handleDelivered = async (orderId) => {
+    try {
+      const orderRef = doc(db, 'orders', orderId);
+      await updateDoc(orderRef, { status: 'delivered' });
+      setOrders(orders.map(order => order.id === orderId ? { ...order, status: 'delivered' } : order));
+    } catch (error) {
+      console.error("Error approving order: ", error);
+      setError("Failed to approve the order. Please try again later.");
+    }
+  };
+
   const handleDeny = async (orderId) => {
     try {
       const orderRef = doc(db, 'orders', orderId);
@@ -62,6 +73,10 @@ const Orders = () => {
       console.error("Error deleting order: ", error);
       setError("Failed to delete the order. Please try again later.");
     }
+  };
+
+  const handleInvoice = async (orderId) => {
+    alert("Invoice");
   };
 
   if (loading) {
@@ -104,6 +119,8 @@ const Orders = () => {
             const totalQuantity = order.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
 
             return (
+              
+              
               <tr key={order.id}>
                 <td>{order.orderId}</td>
                 <td>{order.userId}</td>
@@ -112,33 +129,49 @@ const Orders = () => {
                 <td>{order.orderDate}</td>
                 <td>{order.status}</td>
                 <td>
-                  {(order.status === 'pending' || order.status === 'denied' || order.status === 'approved' || order.status === 'cancelRequested') && (
-                    <>
-                      <Button
-                        variant="success"
-                        className="me-2"
-                        onClick={() => handleApprove(order.id)}
-                        
-                      >
-                        Approve
-                      </Button>
-                      <Button
-                        variant="danger"
-                        onClick={() => handleDeny(order.id)}
-                        
-                      >
-                        Deny
-                      </Button>
-                    </>
-                  )}
-                  <Button
-                    variant="light"
-                    onClick={() => handleDelete(order.id)}
-                  >
-                    <FaTrash />
-                  </Button>
+                  <div className="d-flex align-items-center">
+                    <Dropdown>
+                      <Dropdown.Toggle variant="primary" id={`dropdown-${order.id}`}>
+                        Actions
+                      </Dropdown.Toggle>
+              
+                      <Dropdown.Menu>
+                        {order.status === 'pending' && (
+                          <>
+                            <Dropdown.Item onClick={() => handleApprove(order.id)}>Approve</Dropdown.Item>
+                            <Dropdown.Item onClick={() => handleDeny(order.id)}>Deny</Dropdown.Item>
+                          </>
+                        )}
+                        {order.status === 'approved' && (
+                          <>
+                            <Dropdown.Item onClick={() => handleInvoice(order.id)}>Invoice</Dropdown.Item>
+                            <Dropdown.Item onClick={() => handleDeny(order.id)}>Deny</Dropdown.Item>
+                            <Dropdown.Item onClick={() => handleDelivered(order.id)}>Delivered</Dropdown.Item>
+                          </>
+                        )}
+                        {order.status === 'denied' && (
+                          <Dropdown.Item onClick={() => handleApprove(order.id)}>Approve</Dropdown.Item>
+                        )}
+                        {order.status === 'cancelRequested' && (
+                          <>
+                            <Dropdown.Item onClick={() => handleApprove(order.id)}>Approve</Dropdown.Item>
+                            <Dropdown.Item onClick={() => handleDeny(order.id)}>Deny</Dropdown.Item>
+                          </>
+                        )}
+                      </Dropdown.Menu>
+                    </Dropdown>
+                    <Button
+                      variant="light"
+                      className="ms-2"
+                      onClick={() => handleDelete(order.id)}
+                    >
+                      <FaTrash />
+                    </Button>
+                  </div>
                 </td>
               </tr>
+              
+
             );
           })}
         </tbody>

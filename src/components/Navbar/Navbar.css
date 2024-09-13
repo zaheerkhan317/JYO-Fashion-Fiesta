@@ -6,6 +6,7 @@
 
 .cart-icon {
   position: relative;
+  right: 5px;
   display: inline-block;
 }
 

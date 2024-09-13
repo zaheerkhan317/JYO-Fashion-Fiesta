@@ -114,6 +114,14 @@ const NavbarHome = () => {
                     </div>
                   </div>
                 </Nav.Item>
+                {/* Notification icon */}
+          <Nav.Item className="d-flex justify-content-center align-items-center m-2">
+            <Button variant="outline-primary">
+              <i className="fa-solid fa-bell"></i> {/* Notification icon */}
+              {/* Optional: add a badge for notifications */}
+              {/* <span className="notification-badge">3</span> */}
+            </Button>
+          </Nav.Item>
             <Nav.Item>
               <Nav.Link as={Link} to="/cart" className="cart-icon d-flex justify-content-center align-items-center">
                 <Button variant="outline-primary">
