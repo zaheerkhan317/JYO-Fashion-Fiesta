@@ -87,6 +87,8 @@ const Dashboard = () => {
   const [userCount, setUserCount] = useState(0);
   const [productCount, setProductCount] = useState(0);
   const [productGraph, setProductGraph] = useState([]);
+  const [orderCount, setOrderCount] = useState(0);
+  const [orderGraph, setOrderGraph] = useState([]);
   const [recentActivities, setRecentActivities] = useState([]);
   const [userRegistrations, setUserRegistrations] = useState([]);
   const db = getFirestore();
@@ -97,10 +99,12 @@ const Dashboard = () => {
       const weekDates = getCurrentWeekDates();
       const dayCounts = {};
       const productsDayCounts = {};
-  
+      const ordersDayCounts = {};
+
       weekDates.forEach(date => {
         dayCounts[date] = 0;
         productsDayCounts[date] = 0;
+        ordersDayCounts[date] = 0;
       });
       
       // Fetch all data once
@@ -113,6 +117,9 @@ const Dashboard = () => {
     
       const usersCollection = collection(db, 'users');
       const usersSnapshot = await getDocs(usersCollection);
+
+      const ordersCollection = collection(db, 'orders');
+      const ordersSnapshot = await getDocs(ordersCollection);
     
       activitiesSnapshot.docs.forEach(doc => {
         const data = doc.data();
@@ -144,17 +151,40 @@ const Dashboard = () => {
         console.log(productsDayCounts);
       });
     
+      ordersSnapshot.docs.forEach(doc => {
+        const ordersData = doc.data();
+        const ordersTimestamp = parseTimestamp(ordersData.orderDate);
+        const ordersFormattedDate = ordersTimestamp.toLocaleDateString('en-GB');
+        console.log(`Order Date: ${ordersFormattedDate}`);
+        console.log('Current Day Counts:', ordersDayCounts);
+        if (ordersDayCounts.hasOwnProperty(ordersFormattedDate)) {
+          ordersDayCounts[ordersFormattedDate] += 1;
+        }
+        console.log(ordersDayCounts);
+      });
+
       const productGraphData = weekDates.map(date => ({
         date,
         count: productsDayCounts[date] || 0
       }));
-    
+
       console.log(productsDayCounts);
       setProductGraph(productGraphData);
+
+      const orderGraphData = weekDates.map(date => ({
+        date,
+        count: ordersDayCounts[date] || 0
+      }));
+    
+      console.log(ordersDayCounts);
+      setOrderGraph(orderGraphData);
     
       // Set product and user counts
       const totalProducts = productsSnapshot.size;
       setProductCount(totalProducts);
+
+      const totalOrders = ordersSnapshot.size;
+      setOrderCount(totalOrders);
     
       const totalUsers = usersSnapshot.size;
       setUserCount(totalUsers);
@@ -188,7 +218,8 @@ const Dashboard = () => {
 
   const allLabels = Array.from(new Set([
     ...userRegistrations.map(reg => reg.date),
-    ...productGraph.map(reg1 => reg1.date)
+    ...productGraph.map(reg1 => reg1.date),
+    ...orderGraph.map(reg2=>reg2.date)
   ]));
 
    const chartData = {
@@ -212,6 +243,16 @@ const Dashboard = () => {
         })),
         borderColor: 'rgba(255,99,132,1)', // Different color for the product count dataset
         backgroundColor: 'rgba(255,99,132,0.2)',
+        fill: true,
+      },
+      {
+        label: 'Order Counts',
+        data: orderGraph.map(reg2 => ({
+          x: reg2.date,
+          y: reg2.count
+        })),
+        borderColor: 'rgba(255,159,64,1)', // Distinct color for orders
+        backgroundColor: 'rgba(255,159,64,0.2)', // Distinct background color for orders
         fill: true,
       }
     ]
@@ -270,7 +311,7 @@ const Dashboard = () => {
         <Card.Body>
           <Card.Title>Orders</Card.Title>
           <Card.Text>
-            <h3><FaShoppingCart /> {/* {orderCount} */}</h3>
+            <h3><FaShoppingCart /> {orderCount}</h3>
             Orders placed this month
           </Card.Text>
         </Card.Body>
@@ -313,7 +354,7 @@ const Dashboard = () => {
               <ul>
                 <li><strong>Total Users:</strong> {userCount}</li>
                 <li><strong>Total Products:</strong> {productCount}</li>
-                <li><strong>Total Orders:</strong> {/*{orderCount}*/}</li>
+                <li><strong>Total Orders:</strong> {orderCount}</li>
                 <li><strong>Total Reviews:</strong> {/*{reviewCount}*/}</li>
               </ul>
             </Card.Body>

@@ -1,15 +1,15 @@
-
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Card, Table } from 'react-bootstrap';
-import { collection, getDocs} from 'firebase/firestore';
+import { Row, Col, Card, Table, Form, InputGroup } from 'react-bootstrap';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../../../firebaseConfig';
+import { FaSearch } from 'react-icons/fa'; // Font Awesome search icon
 
 const Users = () => {
   const [userCount, setUserCount] = useState(0);
   const [users, setUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  // Firestore instance
-
+  // Fetch user details from Firestore
   const fetchUserDetails = async () => {
     try {
       const usersCollection = collection(db, 'users');
@@ -17,23 +17,47 @@ const Users = () => {
       const userList = userSnapshot.docs.map(doc => doc.data());
       setUsers(userList);
       setUserCount(userList.length);
-      console.log(userCount);
     } catch (error) {
       console.error("Error fetching user details:", error);
     }
   };
 
   useEffect(() => {
-
     fetchUserDetails();
-  },[]);
+  }, []);
+
+  // Filter users based on the search term
+  const filteredUsers = users.filter(user =>
+    `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.uid.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.phoneNumber?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <Row className="mb-4">
       <Col xs={12}>
         <Card>
-          <Card.Header>User Details</Card.Header>
+          <Card.Header>
+            User Details
+          </Card.Header>
           <Card.Body>
+            {/* Search Input */}
+            <Form.Group className="mb-3 d-flex justify-content-center">
+              <InputGroup style={{ maxWidth: '300px' }}>
+                <Form.Control
+                  type="text"
+                  placeholder="Search by Name, Email, or Phone"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{ borderRadius: '0.25rem' }}
+                />
+                <InputGroup.Text>
+                  <FaSearch /> {/* Font Awesome Search Icon */}
+                </InputGroup.Text>
+              </InputGroup>
+            </Form.Group>
+
             <div className="table-responsive">
               <Table striped bordered hover className="text-center">
                 <thead>
@@ -46,8 +70,8 @@ const Users = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.length > 0 ? (
-                    users.map((user, index) => (
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.map((user, index) => (
                       <tr key={index}>
                         <td>{user.uid}</td>
                         <td>{user.firstName} {user.lastName}</td>
@@ -64,7 +88,7 @@ const Users = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="4">No user details available</td>
+                      <td colSpan="5">No user details available</td>
                     </tr>
                   )}
                 </tbody>

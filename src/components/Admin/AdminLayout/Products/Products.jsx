@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Col, Row, Container, Modal, Table, InputGroup } from 'react-bootstrap';
 import { db, storage } from '../../../../firebaseConfig';
+import { BiSearch } from 'react-icons/bi';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { updateDoc, getDocs, getDoc, setDoc, collection, doc, onSnapshot, deleteDoc} from 'firebase/firestore';
 import './Products.css';
@@ -34,6 +35,16 @@ const generateUniqueId = async () => {
 
 
 const Products = () => {
+
+  const [showModal, setShowModal] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null); // Store the product being edited
+  const [showDiscountInput, setShowDiscountInput] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState('');
+
   const [formData, setFormData] = useState({
     brand: '',
     itemName: '',
@@ -47,19 +58,18 @@ const Products = () => {
     photos: {}
   });
 
-  const [showModal, setShowModal] = useState(false);
-  const [products, setProducts] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(null); // Store the product being edited
-  const [showDiscountInput, setShowDiscountInput] = useState(false);
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);
 
-  const [searchTerm, setSearchTerm] = useState('');
+  
 
-  // Filter products based on the search term
-  const filteredProducts = products.filter(product =>
-    product.id.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter products based on search term and filter type
+  const filteredProducts = products.filter(product => {
+    const matchesSearchTerm = product.itemName.toLowerCase().includes(searchTerm.toLowerCase())
+      || product.description.toLowerCase().includes(searchTerm.toLowerCase()) 
+      || product.id.toLowerCase().includes(searchTerm.toLowerCase()) 
+      || product.brand.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = filterType ? product.type === filterType : true;
+    return matchesSearchTerm && matchesType;
+  });
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -403,6 +413,8 @@ const Products = () => {
     setSelectedProduct(null);
   };
 
+  
+
   return (
     <Container fluid>
   <h1 className="mb-4 text-center">Products</h1>
@@ -426,17 +438,13 @@ const Products = () => {
           <Col xs={12} md={6} className='mb-4'>
             <Form.Group controlId="formBrand">
               <Form.Label>Brand</Form.Label>
-              <Form.Control
-                as="select"
-                name="brand"
-                value={formData.brand}
-                onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-              >
-                <option value="">Select brand</option>
-                <option value="Adidas">Adidas</option>
-                <option value="Puma">Puma</option>
-                <option value="Bata">Bata</option>
-              </Form.Control>
+              <Form.Control as="select" name="brand" value={formData.brand} 
+              onChange={(e) => setFormData({ ...formData, brand: e.target.value })} > 
+              <option value="">Select brand</option> 
+              <option value="Adidas">Adidas</option> 
+              <option value="Puma">Puma</option> 
+              <option value="Bata">Bata</option> 
+              </Form.Control> 
             </Form.Group>
           </Col>
 
@@ -444,25 +452,15 @@ const Products = () => {
           <Col xs={12} md={6} className='mb-4'>
             <Form.Group controlId="formItemName">
               <Form.Label>Item Name</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter item name"
-                name="itemName"
-                value={formData.itemName}
-                onChange={(e) => setFormData({ ...formData, itemName: e.target.value })}
-              />
+              <Form.Control type="text" placeholder="Enter item name" name="itemName" value={formData.itemName} 
+              onChange={(e) => setFormData({ ...formData, itemName: e.target.value })} />
             </Form.Group>
           </Col>
           <Col xs={12} md={6} className='mb-4'>
             <Form.Group controlId="formItemDescription">
               <Form.Label>Description</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter item name"
-                name="itemName"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              />
+              <Form.Control type="text" placeholder="Enter item name" name="itemName" value={formData.description} 
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
             </Form.Group>
           </Col>
 
@@ -470,12 +468,8 @@ const Products = () => {
           <Col xs={12} md={6} className='mb-4'>
             <Form.Group controlId="formType">
               <Form.Label>Type</Form.Label>
-              <Form.Control
-                as="select"
-                name="type"
-                value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-              >
+              <Form.Control as="select" name="type" value={formData.type} 
+              onChange={(e) => setFormData({ ...formData, type: e.target.value })} >
                 <option value="">Select type</option>
                 <option value="Kurtas">Kurtas</option>
                 <option value="Sarees">Sarees</option>
@@ -674,20 +668,46 @@ const Products = () => {
   </Modal>
 
 
-  <Form.Group className="mb-3 d-flex justify-content-center">
-    <InputGroup style={{ maxWidth: '300px' }}>
-      <Form.Control
-        type="text"
-        placeholder="Search by Product ID"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        style={{ borderRadius: '0.25rem' }} // Make it smaller
-      />
-      <InputGroup.Text>
-        <i className="fas fa-search"></i> {/* Font Awesome Search Icon */}
-      </InputGroup.Text>
-    </InputGroup>
-  </Form.Group>
+  {/* Search and Filter */}
+  <Row className="mb-4">
+        <Col xs={12} md={6}>
+          <Form.Group className="mb-3 d-flex justify-content-center">
+            <InputGroup style={{ maxWidth: '300px' }}>
+              <Form.Control
+                type="text"
+                placeholder="Search by Product ID"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{ borderRadius: '0.25rem' }} // Make it smaller
+              />
+              <InputGroup.Text>
+              <i className="fas fa-search"></i> {/* Font Awesome Search Icon */}
+              </InputGroup.Text>
+            </InputGroup>
+          </Form.Group>
+        </Col>
+
+        <Col xs={12} md={6}>
+          <Form.Group className="mb-3 d-flex justify-content-center">
+            <InputGroup style={{ maxWidth: '300px' }}>
+              <Form.Control
+                as="select"
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+                style={{ borderRadius: '0.25rem' }}
+              >
+                <option value="">Filter by Type</option>
+                <option value="Kurtas">Kurtas</option>
+                <option value="Sarees">Sarees</option>
+                <option value="Lounge wear">Lounge wear</option>
+              </Form.Control>
+              <InputGroup.Text>
+                <i className="fas fa-filter"></i> {/* Font Awesome Filter Icon */}
+              </InputGroup.Text>
+            </InputGroup>
+          </Form.Group>
+        </Col>
+      </Row>
 
 
 
