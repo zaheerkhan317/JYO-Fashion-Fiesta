@@ -1,9 +1,11 @@
 import React, { useState, useEffect }from 'react'
 import { Navbar, Nav, NavDropdown, Container, Button, Spinner } from "react-bootstrap";
 import { Link } from 'react-router-dom';
+import Notification from './Notification/Notification';
 import "./Navbar.css";
 import { useNavigate } from 'react-router-dom';
 import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 import { useUser } from '../Context/UserProvider';
 
 const NavbarHome = () => {
@@ -16,6 +18,7 @@ const NavbarHome = () => {
   const navigate = useNavigate();
   const [cartCount, setCartCount] = useState(0);
   const [loading, setIsLoading] = useState(false);
+  const [notifications, setNotifications] = useState([]);
   console.log("cart count",cartCount);
   // useEffect(() => {
   //   // Simulate fetching user data from an API or local storage
@@ -48,6 +51,8 @@ const NavbarHome = () => {
     const storedCartCount = localStorage.getItem('cartCount') || 0;
     setCartCount(Number(storedCartCount));
   }, []);
+  
+  
   
 
   const handleLogout = async () => {
@@ -115,13 +120,7 @@ const NavbarHome = () => {
                   </div>
                 </Nav.Item>
                 {/* Notification icon */}
-          <Nav.Item className="d-flex justify-content-center align-items-center m-2">
-            <Button variant="outline-primary">
-              <i className="fa-solid fa-bell"></i> {/* Notification icon */}
-              {/* Optional: add a badge for notifications */}
-              {/* <span className="notification-badge">3</span> */}
-            </Button>
-          </Nav.Item>
+                <Notification />
             <Nav.Item>
               <Nav.Link as={Link} to="/cart" className="cart-icon d-flex justify-content-center align-items-center">
                 <Button variant="outline-primary">

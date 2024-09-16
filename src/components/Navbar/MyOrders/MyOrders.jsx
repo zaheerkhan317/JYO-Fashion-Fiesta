@@ -134,7 +134,7 @@ const handleViewInvoice = async (orderId) => {
   if (order) {
     // Fetch user details using userId from the order
     const user = await fetchUserDetails(order.userId);
-
+    console.log(user);
     if (user) {
       const doc = new jsPDF();
       
@@ -314,11 +314,22 @@ const handleViewInvoice = async (orderId) => {
                     </Card.Text>
                     <Card.Text>
                       <strong>Status: </strong>
-                      {order.status === 'approved' ? 'Approved. Items are ready to collect' :
+                      <span className={`status-indicator ${
+                        order.status === 'approved' ? 'status-approved' :
+                        order.status === 'cancelRequested' ? 'status-cancelRequested' :
+                        order.status === 'cancelled' ? 'status-cancelled' :
+                        order.status === 'denied' ? 'status-denied' :
+                        order.status === 'delivered' ? 'status-delivered' : 'status-pending'
+                      }`}>
+                        {order.status === 'approved' ? 'Approved. Items are ready to collect' :
                         order.status === 'cancelRequested' ? 'Cancellation Request Sent, Awaiting Admin Approval for Deletion' :
                         order.status === 'cancelled' ? 'Cancelled' :
-                        order.status === 'denied' ? 'Denied' : 'Pending'}
+                        order.status === 'denied' ? 'Denied' :
+                        order.status === 'delivered' ? 'Delivered Successfully' : 'Pending'}
+                      </span>
                     </Card.Text>
+
+
                     {order.status === 'pending' && !order.cancelRequestSent ? (
                       <Button variant="danger" onClick={() => openConfirmationModal('delete', order)}>
                         Cancel Order
@@ -337,6 +348,10 @@ const handleViewInvoice = async (orderId) => {
                         Delete My Order
                       </Button>
                     ) : order.status === 'cancelRequested' ? (
+                      <Button variant="secondary" onClick={() => handleViewInvoice(order.id)} className="me-2">
+                        View Invoice
+                      </Button>
+                    ) : order.status === 'delivered' ? (
                       <Button variant="secondary" onClick={() => handleViewInvoice(order.id)} className="me-2">
                         View Invoice
                       </Button>

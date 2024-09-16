@@ -1,0 +1,17 @@
+/* Blinking animation */
+@keyframes blink-green {
+    0% { background-color: #d4edda; } /* Soft green */
+    50% { background-color: #ffffff; } /* White */
+    100% { background-color: #d4edda; } /* Soft green */
+}
+
+/* Class to apply blinking effect */
+.notification-blink {
+    animation: blink-green 1s infinite;
+    font-weight: bold;
+}
+
+/* Class for updated notifications */
+.notification-updated {
+    color: #28a745; /* Green text */
+}

@@ -61,6 +61,43 @@
   margin-top: 1rem;
 }
 
+.status-indicator {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  font-size: 14px;
+  margin: 2px 0;
+}
+
+.status-approved {
+  background-color: #28a745; /* A more refined green */
+}
+
+.status-cancelRequested {
+  background-color: #ff8c00; /* A softer orange */
+}
+
+.status-cancelled {
+  background-color: #dc3545; /* A brighter red */
+}
+
+.status-denied {
+  background-color: #c82333; /* Darker red for more emphasis */
+}
+
+.status-delivered {
+  background-color: #007bff; /* A brighter blue */
+}
+
+.status-pending {
+  background-color: #6c757d; /* A cooler grey */
+}
+
+
+
 .responsive-modal .modal-dialog {
   max-width: 70%;
   width: 80%;
