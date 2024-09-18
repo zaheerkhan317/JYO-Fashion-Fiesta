@@ -25,6 +25,7 @@ import ProductDetail from './components/Categories/Product Detail/ProductDetail'
 import Categories from './components/Categories/Categories';
 import Cart from './components/Cart/Cart';
 import MyOrders from './components/Navbar/MyOrders/MyOrders';
+import Banners from './components/Admin/AdminLayout/Banners/Banners';
 
 function AppContent() {
   const navigate = useNavigate(); 
@@ -34,7 +35,8 @@ function AppContent() {
                        location.pathname === '/admin/orders' ||
                        location.pathname === '/admin/products' ||
                        location.pathname === '/admin/users' ||
-                       location.pathname === '/adminlogin';
+                       location.pathname === '/adminlogin' ||
+                       location.pathname === '/admin/banners';
   const [user, setUser] = useState();
     useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -84,6 +86,7 @@ function AppContent() {
             <Route path="orders" element={<Orders />} /> {/* Handles /admin/orders */}
             <Route path="products" element={<Products />} /> {/* Handles /admin/products */}
             <Route path="users" element={<Users />} /> {/* Handles /admin/users */}
+            <Route path="banners" element={<Banners />} /> {/* Handles /admin/banners */}
           </Route>
 
 
