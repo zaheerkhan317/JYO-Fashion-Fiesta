@@ -66,10 +66,14 @@ const TopCollections = () => {
     setIsFetching(true);
     const db = getFirestore();
     const productsRef = collection(db, 'products');
-    let q = query(productsRef, where('topCollections', '==', true), limit(5));  // Fetch 5 items initially
+    let q = query(productsRef, where('topCollections', '==', true),
+    where('isOffer', '==', false),
+    limit(5));  // Fetch 5 items initially
 
     if (startAfterDoc) {
-      q = query(productsRef, where('topCollections', '==', true), startAfter(startAfterDoc), limit(5));
+      q = query(productsRef, where('topCollections', '==', true),
+      where('isOffer', '==', false),
+      startAfter(startAfterDoc), limit(5));
     }
 
     try {

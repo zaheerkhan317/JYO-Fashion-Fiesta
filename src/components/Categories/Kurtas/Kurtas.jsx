@@ -15,12 +15,13 @@ const Kurtas = ({ products }) => {
     return <div>Loading...</div>; // Handle loading state
   }
 
+  const filteredProducts = products.filter(product => !product.isOffer);
 
   return (
     <Container className="category-section">
       <h2 className="text-center mb-5 category-title">Kurtas Collection</h2>
       <Row className="grid-container">
-        {products.map(product => {
+        {filteredProducts.map(product => {
           // Determine badge text and variant based on product attributes
           let badgeText = '';
           let badgeVariant = '';
@@ -58,6 +59,7 @@ const Kurtas = ({ products }) => {
                     src={product.photos[Object.keys(product.photos)[0]][0]}
                     alt={product.itemName}
                     className="product-img"
+                    loading="lazy"
                   />
                   
                 </div>

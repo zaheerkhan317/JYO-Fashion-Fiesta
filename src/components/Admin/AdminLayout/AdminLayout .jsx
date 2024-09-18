@@ -7,6 +7,7 @@ import Products from './Products/Products';
 import Users from './Users/Users';
 import Dashboard from './Dashboard/Dashboard';
 import Banners from './Banners/Banners';
+import Offers from './Offers/Offers';
 
 const AdminLayout = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
@@ -29,6 +30,7 @@ const AdminLayout = () => {
                 <Route path="products" element={<Products />} />
                 <Route path="users" element={<Users />} />
                 <Route path="banners" element={<Banners />} />
+                <Route path="offers" element={<Offers />} />
               </Routes>
             </Col>
           </Row>

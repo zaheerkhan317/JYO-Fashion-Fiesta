@@ -66,7 +66,9 @@ const BestSellingProducts = () => {
     setLoading(true);
     const db = getFirestore();
     const productsRef = collection(db, 'products');
-    let q = query(productsRef, where('bestSelling', '==', true), limit(5));
+    let q = query(productsRef, where('bestSelling', '==', true), 
+    where('isOffer', '==', false),
+    limit(5));
 
     if (startAfterDoc) {
       q = query(q, startAfter(startAfterDoc));

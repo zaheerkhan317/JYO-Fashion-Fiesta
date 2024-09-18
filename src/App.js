@@ -26,6 +26,7 @@ import Categories from './components/Categories/Categories';
 import Cart from './components/Cart/Cart';
 import MyOrders from './components/Navbar/MyOrders/MyOrders';
 import Banners from './components/Admin/AdminLayout/Banners/Banners';
+import Offers from './components/Admin/AdminLayout/Offers/Offers';
 
 function AppContent() {
   const navigate = useNavigate(); 
@@ -36,6 +37,7 @@ function AppContent() {
                        location.pathname === '/admin/products' ||
                        location.pathname === '/admin/users' ||
                        location.pathname === '/adminlogin' ||
+                       location.pathname === '/admin/offers' ||
                        location.pathname === '/admin/banners';
   const [user, setUser] = useState();
     useEffect(() => {
@@ -87,6 +89,7 @@ function AppContent() {
             <Route path="products" element={<Products />} /> {/* Handles /admin/products */}
             <Route path="users" element={<Users />} /> {/* Handles /admin/users */}
             <Route path="banners" element={<Banners />} /> {/* Handles /admin/banners */}
+            <Route path="offers" element={<Offers />} /> {/* Handles /admin/banners */}
           </Route>
 
 

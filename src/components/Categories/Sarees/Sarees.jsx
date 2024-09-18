@@ -14,12 +14,14 @@ const Sarees = ({ products }) => {
   if (!Array.isArray(products)) {
     return <div>Loading...</div>; // Handle loading state
   }
+
+  const filteredProducts = products.filter(product => product.isOffer === false);
   
   return (
     <Container className="category-section">
       <h2 className="text-center mb-5 category-title">Sarees Collection</h2>
       <Row className="grid-container">
-        {products.map(product => (
+        {filteredProducts.map(product => (
           <Col key={product.id} md={4} sm={6} xs={12} className="mb-4">
             <Card className="product-card h-100 shadow position-relative">
               <div className="ribbon-wrapper">

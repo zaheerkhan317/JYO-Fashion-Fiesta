@@ -57,7 +57,7 @@ const Home = () => {
       <div className="container mt-5 mb-5">
         <div className="row justify-content-center">
           {/* Good Quality Section */}
-          <div className="col-12 col-md-4 mb-4 d-flex align-items-stretch justify-content-center">
+          <div className="col-12 col-md-4 mb-4 d-flex align-items-center justify-content-center">
             <div className="p-4 d-flex flex-column align-items-center justify-content-center" style={{ height: '250px', maxWidth: '350px' }}>
               <div className="mb-3" style={{ fontSize: '3rem' }}>
                 <FaStar />
@@ -68,7 +68,7 @@ const Home = () => {
           </div>
 
           {/* Cost Saving Section */}
-          <div className="col-12 col-md-4 mb-4 d-flex align-items-stretch justify-content-center">
+          <div className="col-12 col-md-4 mb-4 d-flex align-items-center justify-content-center">
             <div className="p-4 d-flex flex-column align-items-center justify-content-center" style={{ height: '250px', maxWidth: '350px' }}>
               <div className="mb-3" style={{ fontSize: '3rem' }}>
                 <FaMoneyBillWave />
@@ -79,7 +79,7 @@ const Home = () => {
           </div>
 
           {/* Time Saving Section */}
-          <div className="col-12 col-md-4 mb-4 d-flex align-items-stretch justify-content-center">
+          <div className="col-12 col-md-4 mb-4 d-flex align-items-center justify-content-center">
             <div className="p-4 d-flex flex-column align-items-center justify-content-center" style={{ height: '250px', maxWidth: '350px' }}>
               <div className="mb-3" style={{ fontSize: '3rem' }}>
                 <FaClock />

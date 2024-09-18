@@ -316,6 +316,7 @@ const Products = () => {
           sizes: sortedSizes,
           colours: formData.colours,
           photos: { ...photoUrls },
+          isOffer: formData.isOffer || false,
           topCollections: formData.topCollections || false, // Added field
           bestSelling: formData.bestSelling || false,       // Added field
           newArrivals: formData.newArrivals || false,       // Added field
@@ -339,6 +340,7 @@ const Products = () => {
           quantityLeft: formData.quantityLeft,
           sizes: sortedSizes,
           colours: formData.colours,
+          isOffer: formData.isOffer || false,
           photos: photoUrls,
           topCollections: formData.topCollections || false, // Added field
           bestSelling: formData.bestSelling || false,       // Added field
@@ -388,6 +390,7 @@ const Products = () => {
       sizes: product.sizes,
       colours: product.colours,
       photos: product.photos,
+      isOffer: product.isOffer,
       topCollections: product.topCollections, // Added field
       bestSelling: product.bestSelling,       // Added field
       newArrivals: product.newArrivals,       // Added field
@@ -428,6 +431,7 @@ const Products = () => {
       cost: '',
       discountValue: '',
       discountedPrice: '',
+      isOffer:false,
       sizes: [],
       colours: [],
       photos: {}
@@ -671,7 +675,7 @@ const Products = () => {
 
 
         <Form.Group as={Row} className="mb-4">
-  <Col xs={12} md={4}>
+  <Col xs={12} md={3}>
     <Form.Check
       type="checkbox"
       label="Top Collections"
@@ -679,7 +683,7 @@ const Products = () => {
       onChange={(e) => setFormData({ ...formData, topCollections: e.target.checked })}
     />
   </Col>
-  <Col xs={12} md={4}>
+  <Col xs={12} md={3}>
     <Form.Check
       type="checkbox"
       label="Best Selling Product"
@@ -687,12 +691,20 @@ const Products = () => {
       onChange={(e) => setFormData({ ...formData, bestSelling: e.target.checked })}
     />
   </Col>
-  <Col xs={12} md={4}>
+  <Col xs={12} md={3}>
     <Form.Check
       type="checkbox"
       label="New Arrivals"
       checked={formData.newArrivals}
       onChange={(e) => setFormData({ ...formData, newArrivals: e.target.checked })}
+    />
+  </Col>
+  <Col xs={12} md={3}>
+    <Form.Check
+      type="checkbox"
+      label="Add to Offer"
+      checked={formData.newArrivals}
+      onChange={(e) => setFormData({ ...formData, isOffer: e.target.checked })}
     />
   </Col>
 </Form.Group>

@@ -20,7 +20,7 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       const db = getFirestore();
       const productRef = doc(db, 'products', productId);
-
+      
       try {
         const productDoc = await getDoc(productRef);
         if (productDoc.exists()) {
