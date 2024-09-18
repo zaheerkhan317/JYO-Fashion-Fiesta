@@ -59,13 +59,14 @@ const Kurtas = ({ products }) => {
                     alt={product.itemName}
                     className="product-img"
                   />
-                  {/* Discount Badge */}
-                  {product.discountValue && (
+                  
+                </div>
+                {/* Discount Badge */}
+                {product.discountValue && (
                     <Badge bg="success" className="discount-badge">
                       {product.discountValue}% Off
                     </Badge>
                   )}
-                </div>
 
                 <Card.Body className="d-flex flex-column">
                   {/* Product Title */}
@@ -99,15 +100,23 @@ const Kurtas = ({ products }) => {
 
                   {/* Sizes Display */}
                   <Card.Text className="text-muted">
-                    <strong>Sizes:</strong>
-                    <div className="size-list">
-                      {product.sizes.map((size, index) => (
-                        <span key={index} className="size-item">
-                          {size}
-                        </span>
-                      ))}
-                    </div>
-                  </Card.Text>
+                  <strong>Sizes:</strong>
+                  <div className="size-list">
+                    {product.sizes && typeof product.sizes === 'object' ? (
+                      // Define the correct size order
+                      ['S', 'M', 'L', 'XL', 'XXL'].map(size => (
+                        // For each size in the predefined order, get its quantity from the product.sizes object
+                        product.sizes.hasOwnProperty(size) ? (
+                          <div key={size} className="size-item">
+                            <span>{size}</span>
+                          </div>
+                        ) : null
+                      ))
+                    ) : (
+                      <span>No sizes available</span> // Fallback message if sizes are not available
+                    )}
+                  </div>
+                </Card.Text>
 
                   {/* Quantity Left */}
                   <Card.Text className="text-muted">

@@ -285,6 +285,17 @@ const Products = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+      // Define the size order
+  const sizeOrder = ['S', 'M', 'L', 'XL', 'XXL'];
+
+  // Sort sizes based on the predefined order
+  const sortedSizes = Object.keys(formData.sizes)
+    .sort((a, b) => sizeOrder.indexOf(a) - sizeOrder.indexOf(b))
+    .reduce((acc, key) => {
+      acc[key] = formData.sizes[key];
+      return acc;
+    }, {});
+
     try {
       const productId = selectedProduct ? selectedProduct.id : await generateUniqueId();
       console.log(productId);
@@ -302,7 +313,7 @@ const Products = () => {
           discountValue: formData.discountValue, // Store discount percentage
           discountedPrice: formData.discountedPrice,
           quantityLeft: formData.quantityLeft,
-          sizes: formData.sizes,
+          sizes: sortedSizes,
           colours: formData.colours,
           photos: { ...photoUrls },
           topCollections: formData.topCollections || false, // Added field
@@ -326,7 +337,7 @@ const Products = () => {
           discountValue: formData.discountValue,
           discountedPrice: formData.discountedPrice,
           quantityLeft: formData.quantityLeft,
-          sizes: formData.sizes,
+          sizes: sortedSizes,
           colours: formData.colours,
           photos: photoUrls,
           topCollections: formData.topCollections || false, // Added field
@@ -353,6 +364,17 @@ const Products = () => {
   };
 
   const handleEdit = (product) => {
+
+        // Define the size order
+  const sizeOrder = ['S', 'M', 'L', 'XL', 'XXL'];
+
+  // Sort sizes based on the predefined order
+  const sortedSizes = Object.keys(formData.sizes)
+    .sort((a, b) => sizeOrder.indexOf(a) - sizeOrder.indexOf(b))
+    .reduce((acc, key) => {
+      acc[key] = formData.sizes[key];
+      return acc;
+    }, {});
     
     setFormData({
       brand: product.brand,
@@ -538,29 +560,51 @@ const Products = () => {
             </Col>
           </Form.Group>
 
-        {/* Sizes */}
-        <Form.Group controlId="formSizes">
-          <Form.Label>Size</Form.Label>
-          <div className="d-flex flex-wrap mb-4">
-            {['S', 'M', 'L', 'XL'].map(size => (
-              <Form.Check
-                inline
-                key={size}
-                label={size}
-                type="checkbox"
-                name="sizes"
-                value={size}
-                checked={formData.sizes.includes(size)}
-                onChange={(e) => {
-                  const checkedSizes = formData.sizes.includes(size)
-                    ? formData.sizes.filter(s => s !== size)
-                    : [...formData.sizes, size];
-                  setFormData({ ...formData, sizes: checkedSizes });
-                }}
-              />
-            ))}
-          </div>
-        </Form.Group>
+        {/* Sizes with Quantity */} 
+<Form.Group controlId="formSizes"> 
+  <Form.Label>Sizes</Form.Label> 
+  <div className="d-flex flex-wrap mb-4"> 
+    {['S', 'M', 'L', 'XL', 'XXL'].map(size => ( 
+      <div key={size} className="d-flex flex-column me-3"> 
+        <Form.Check 
+          inline 
+          label={size} 
+          type="checkbox" 
+          name="sizes" 
+          value={size} 
+          checked={formData.sizes.hasOwnProperty(size)} 
+          onChange={(e) => { 
+            const updatedSizes = { ...formData.sizes }; 
+            if (e.target.checked) { 
+              // Add the size with an initial quantity of 0
+              updatedSizes[size] = ''; 
+            } else { 
+              // Remove the size if unchecked
+              delete updatedSizes[size]; 
+            } 
+            setFormData({ ...formData, sizes: updatedSizes }); 
+          }} 
+        /> 
+
+        {/* Show quantity input if size is selected */} 
+        {formData.sizes.hasOwnProperty(size) && ( 
+          <Form.Control 
+            type="number" 
+            placeholder={`Quantity Left for ${size}`} 
+            min="0" 
+            value={formData.sizes[size]} 
+            onChange={(e) => { 
+              const updatedSizes = { ...formData.sizes }; 
+              updatedSizes[size] = e.target.value; 
+              setFormData({ ...formData, sizes: updatedSizes }); 
+            }} 
+          /> 
+        )} 
+      </div> 
+    ))} 
+  </div> 
+</Form.Group>
+
 
         {/* Colours */}
         {/* Colours */}

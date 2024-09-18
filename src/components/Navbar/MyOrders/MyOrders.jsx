@@ -195,6 +195,7 @@ const handleViewInvoice = async (orderId) => {
         `#${item.id}`,
         item.name,
         item.quantity,
+        item.size,
         `Rs. ${item.price}`,
         `${item.discountvalue}%`,
         `Rs. ${item.total}`,
@@ -202,13 +203,13 @@ const handleViewInvoice = async (orderId) => {
 
       // Add product details in a table format
       doc.autoTable({
-        head: [['S.No', 'Product ID', 'Item Name', 'Qty', 'Price', 'Discount', 'Total']],
+        head: [['S.No', 'Product ID', 'Item Name', 'Qty', 'Size', 'Price', 'Disc.', 'Total']],
         body: itemTable,
         startY: doc.autoTable.previous.finalY + 10,
-        margin: { left: 10, right: 10 },
+        margin: { left: 13, right: 10 },
         theme: 'striped',
         styles: {
-          fontSize: 10,
+          fontSize: 8,
           cellPadding: 5,
           lineColor: [44, 62, 80],
           lineWidth: 0.5,
@@ -216,7 +217,7 @@ const handleViewInvoice = async (orderId) => {
         headStyles: {
           fillColor: [52, 73, 94],
           textColor: [255, 255, 255],
-          fontSize: 12,
+          fontSize: 10,
           fontStyle: 'bold',
         },
         bodyStyles: {
@@ -224,13 +225,14 @@ const handleViewInvoice = async (orderId) => {
           textColor: [0, 0, 0],
         },
         columnStyles: {
-          0: { cellWidth: 25 }, // Narrow width for S.No
-          1: { cellWidth: 35 }, // Narrow width for Product ID
-          2: { cellWidth: 30 }, // Narrow width for Item Name
-          3: { cellWidth: 20 }, // Narrow width for Brand
-          4: { cellWidth: 25 }, // Narrow width for Qty
-          5: { cellWidth: 20 }, // Narrow width for Price
-          6: { cellWidth: 30 }, // Narrow width for Total
+          0: { cellWidth: 19 }, // Narrow width for S.No
+          1: { cellWidth: 30 }, // Narrow width for Product ID
+          2: { cellWidth: 27 }, // Narrow width for Item Name
+          3: { cellWidth: 17 }, // Narrow width for Brand
+          4: { cellWidth: 17 }, // Narrow width for Qty
+          5: { cellWidth: 25 }, // Narrow width for Price
+          6: { cellWidth: 20 }, // Narrow width for Total
+          7: { cellWidth: 25 }, // Narrow width for Total
         },
         pageBreak: 'avoid', // Avoid page breaks within tables
       });
@@ -293,6 +295,9 @@ const handleViewInvoice = async (orderId) => {
                           </div>
                           <div className="info-group">
                             <strong>Quantity:</strong> {item.quantity}
+                          </div>
+                          <div className="info-group">
+                            <strong>Size:</strong> {item.size}
                           </div>
                           <div className="info-group">
                             <strong>Original Price:</strong> ₹{item.price}/- per piece

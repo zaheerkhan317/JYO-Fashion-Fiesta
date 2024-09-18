@@ -35,6 +35,7 @@ function LoginForm() {
           });
           setFirstName(userData.firstName);
           localStorage.setItem('firstName', userData.firstName);
+          localStorage.setItem('uid', userData.uid);
           console.log("firstname in loginform : ", userData.firstName);
 
           navigate('/home');

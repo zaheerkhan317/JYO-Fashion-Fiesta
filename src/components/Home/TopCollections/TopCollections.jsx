@@ -114,7 +114,20 @@ const TopCollections = () => {
     return 'placeholder.jpg';
   };
 
-  const formatSizes = sizes => sizes && sizes.length ? sizes.join(', ') : 'No sizes available';
+  const SIZE_ORDER = {
+    S: 1,
+    M: 2,
+    L: 3,
+    XL: 4,
+    XXL: 5,
+  };
+
+  const formatSizes = sizes => {
+    if (!sizes || typeof sizes !== 'object') return 'No sizes available';
+    const sortedSizes = Object.keys(sizes).sort((a, b) => SIZE_ORDER[a] - SIZE_ORDER[b]);
+    return sortedSizes.map(size => `${size}`).join(', ');
+  };
+  
   const formatColours = colours => colours && colours.length === 1 ? colours[0] : 'Multicolour';
 
   if (loading && collections.length === 0) {

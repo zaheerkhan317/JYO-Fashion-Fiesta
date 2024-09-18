@@ -166,20 +166,38 @@ const ProductDetail = () => {
 
             <div className="product-attributes">
               {/* Size Selection */}
-              <div className="size-selection">
-                <strong>Sizes : </strong>
-                <div className="size-options">
-                  {product.sizes.map((size, index) => (
-                    <div
-                      key={index}
-                      className={`size-box ${size === selectedSize ? 'selected-size' : ''}`}
-                      onClick={() => setSelectedSize(size)}
-                    >
-                      {size}
-                    </div>
-                  ))}
+                <div className="size-selection">
+                  <strong>Sizes:</strong>
+                  <div className="size-options">
+                    {Array.isArray(product.sizes) ? (
+                      product.sizes
+                        .sort((a, b) => ["S", "M", "L", "XL", "XXL"].indexOf(a) - ["S", "M", "L", "XL", "XXL"].indexOf(b))
+                        .map((size, index) => (
+                          <div
+                            key={index}
+                            className={`size-box ${size === selectedSize ? 'selected-size' : ''}`}
+                            onClick={() => setSelectedSize(size)}
+                          >
+                            {size}
+                          </div>
+                        ))
+                    ) : (
+                      Object.keys(product.sizes)
+                        .sort((a, b) => ["S", "M", "L", "XL", "XXL"].indexOf(a) - ["S", "M", "L", "XL", "XXL"].indexOf(b))
+                        .map((size, index) => (
+                          <div
+                            key={index}
+                            className={`size-box ${size === selectedSize ? 'selected-size' : ''}`}
+                            onClick={() => setSelectedSize(size)}
+                          >
+                            {size}
+                          </div>
+                        ))
+                    )}
+                  </div>
                 </div>
-              </div>
+
+
 
               {/* Color Selection */}
               <div className="color-selection mb-3">

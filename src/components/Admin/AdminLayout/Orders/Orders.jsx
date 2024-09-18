@@ -123,6 +123,22 @@ const Orders = () => {
     );
   }
 
+  const aggregateSizes = (items) => {
+    const sizeQuantities = {};
+  
+    items.forEach(item => {
+      if (item.size) {
+        if (!sizeQuantities[item.size]) {
+          sizeQuantities[item.size] = 0;
+        }
+        sizeQuantities[item.size] += item.quantity || 0;
+      }
+    });
+  
+    return sizeQuantities;
+  };
+  
+
   return (
     <Container className="mt-5">
       <h1>Orders</h1>
@@ -155,7 +171,7 @@ const Orders = () => {
             <th>Order ID</th>
             <th>User ID</th>
             <th>User Details</th>
-            <th>Quantity</th>
+            <th>Quantity & Size</th>
             <th>Total Price</th>
             <th>Order Date</th>
             <th>Status</th>
@@ -163,14 +179,18 @@ const Orders = () => {
           </tr>
         </thead>
         <tbody>
+          
           {filteredOrders.map(order => {
-            // Calculate total quantity
-            const totalQuantity = order.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
-
+            // Aggregate sizes and quantities for the current order
+            const sizeQuantities = aggregateSizes(order.items);
+            // Sort sizes
+    const sortedSizes = Object.entries(sizeQuantities).sort(([sizeA], [sizeB]) => {
+      const sizeOrder = ['S', 'M', 'L', 'XL', 'XXL'];
+      return sizeOrder.indexOf(sizeA) - sizeOrder.indexOf(sizeB);
+    });
              // Get user details from users state
              const userDetails = users[order.userId] || {};
             return (
-              
               
               <tr key={order.id}>
                 <td>{order.orderId}</td>
@@ -180,7 +200,13 @@ const Orders = () => {
                   {userDetails.phoneNumber || 'N/A'}<br />
                   {userDetails.email || 'N/A'}
                 </td>
-                <td>{totalQuantity}</td>
+                <td>
+                {sortedSizes.map(([size, quantity], index) => (
+                  <div key={index}>
+                    {size}: {quantity}
+                  </div>
+                ))}
+                </td>
                 <td>₹{order.totalPrice}</td>
                 <td>{order.orderDate}</td>
                 <td>{order.status}</td>
