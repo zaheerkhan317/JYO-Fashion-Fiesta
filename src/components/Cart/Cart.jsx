@@ -157,6 +157,7 @@ const Cart = () => {
         orderId: orderId,
         userId: uid,
         items: cartItems,
+        paid: false,
         status: 'pending', // Optional field for tracking request date
         totalPrice: cartItems.reduce((total, item) => total + parseFloat(item.total), 0).toFixed(2),
         orderDate: getISTDate(new Date()).toString(), // Store the current date

@@ -236,13 +236,28 @@ const handleViewInvoice = async (orderId) => {
         pageBreak: 'avoid', // Avoid page breaks within tables
       });
 
-      // Add Total Amount to Pay
+      // Calculate the total saved amount
+      const totalSaved = (order.items || []).reduce((sum, item) => {
+        return sum + (item.price - item.total);
+    }, 0);
+
+      // Add Saved Amount
       doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text(
+          `Saved Amount: Rs. ${totalSaved.toFixed(2)}`,
+          doc.internal.pageSize.getWidth() / 2,
+          doc.autoTable.previous.finalY + 20,
+          { align: 'center' }
+      );
+
+      // Add Total Amount to Pay
+      doc.setFontSize(15);
       doc.setFont('helvetica', 'bold');
       doc.text(
         `Total Amount: Rs. ${order.totalPrice}`,
         doc.internal.pageSize.getWidth() / 2,
-        doc.autoTable.previous.finalY + 20,
+        doc.autoTable.previous.finalY + 30,
         { align: 'center' }
       );
 
