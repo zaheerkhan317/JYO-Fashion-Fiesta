@@ -82,6 +82,7 @@ const ProductDetail = () => {
         size: selectedSize,
         color: selectedColor,
         image: selectedImage,
+        isOffer: product.isOffer,
         discountvalue: product.discountValue,
         price: product.cost,
         total: (product.cost - (product.cost * (product.discountValue / 100))).toFixed(2),

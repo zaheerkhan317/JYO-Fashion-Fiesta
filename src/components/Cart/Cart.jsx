@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Image, Button, ListGroup, Card, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Image, Button, ListGroup, Card, Modal, Form } from 'react-bootstrap';
 import { FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
-import { collection, addDoc, doc, getDoc } from "firebase/firestore";
+import { collection, addDoc, doc, getDoc, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import { useNavigate } from 'react-router-dom';
 import './Cart.css'; // Import custom CSS
@@ -12,6 +12,10 @@ const Cart = () => {
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [showPlaceOrderModal, setShowPlaceOrderModal] = useState(false);
   const [itemToRemove, setItemToRemove] = useState(null);
+  const [couponCode, setCouponCode] = useState({});
+  const [discount, setDiscount] = useState({}); // New state for discount
+  const [couponError, setCouponError] = useState({}); // New state for coupon error
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -186,6 +190,72 @@ const Cart = () => {
     return <div className="text-center mt-5">Your cart is empty</div>;
   }
 
+  const updateLocalStorage = (updatedCartItems) => {
+    const uid = localStorage.getItem('uid');
+    if (uid) {
+      const cart = JSON.parse(localStorage.getItem('cart')) || {};
+      cart[uid] = updatedCartItems;
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+  };
+
+  const handleApplyCoupon = async (index, code) => {
+    try {
+        const couponRef = collection(db, 'FestivalOffers');
+        const q = query(couponRef, where('couponCode', '==', code));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            setCouponError(prevErrors => ({ ...prevErrors, [index]: 'Invalid coupon code' }));
+            return;
+        }
+
+        const couponData = querySnapshot.docs[0].data();
+        const discountPercentage = couponData.discountPercentage;
+
+        const product = cartItems[index];
+        if (!product.isOffer) {
+            setCouponError(prevErrors => ({ ...prevErrors, [index]: 'Product is not eligible for discount' }));
+            return;
+        }
+
+        const originalPrice = product.price * product.quantity;
+        const discountedPrice = (originalPrice * (1 - discountPercentage / 100)).toFixed(2);
+
+        // Update the cart item with the new discount value and total price
+        const updatedCartItems = [...cartItems];
+        updatedCartItems[index].total = discountedPrice;
+        updatedCartItems[index].discountvalue = discountPercentage; // Update the discount value of the item
+        updatedCartItems[index].discountApplied = true; // Mark as discount applied
+
+        setCartItems(updatedCartItems);
+
+        // Update localStorage
+        updateLocalStorage(updatedCartItems);
+
+        // Save the discount info in localStorage
+        localStorage.setItem('cartItems', JSON.stringify(updatedCartItems));
+
+        // Clear any previous coupon error
+        setCouponError(prevErrors => ({ ...prevErrors, [index]: '' }));
+    } catch (error) {
+        console.error("Error applying coupon: ", error);
+        setCouponError(prevErrors => ({ ...prevErrors, [index]: 'Error applying coupon. Please try again.' }));
+    }
+};
+
+  
+
+  const handleCouponCodeChange = (index, e) => {
+    const code = e.target.value;
+    setCouponCode(prevCodes => ({ ...prevCodes, [index]: code }));
+    if (code.trim() === '') {
+      setCouponError(prevErrors => ({ ...prevErrors, [index]: '' }));
+      setDiscount(prevDiscounts => ({ ...prevDiscounts, [index]: 0 }));
+      return;
+    }
+  };
+
   // Calculate total price for all items
   const totalPrice = cartItems.reduce((total, item) => total + parseFloat(item.total), 0).toFixed(2);
   
@@ -241,15 +311,50 @@ const Cart = () => {
                   <strong>Original Price:</strong> <span className="original-price">₹{item.price} per one</span>
                 </div>
                 <div className="info-group">
-                  <strong>Discount:</strong> <span className="discount-price">{item.discountvalue}%</span>
+                  <strong>Discount:</strong> 
+                  {item.discountApplied ? (
+                    <span className="discount-price">
+                      {item.discountvalue}% - Discount Applied
+                    </span>
+                  ) : (
+                    <span className="discount-price">{item.discountvalue}%</span>
+                  )}
                 </div>
+
                 <div className="info-group">
                   <strong>Total:</strong> <span className="total-price">₹{item.total}</span>
                 </div>
-                <div className="cart-item-actions">
-                  <Button variant="danger" onClick={() => handleRemoveFromCart(index)}>
-                    <FaTrash />
-                  </Button>
+                <div className="cart-item-actions mt-3 mb-3">
+                  <Form.Group controlId={`formCouponCode${index}`}>
+                    <Row className="align-items-center">
+                      <Col xs={12} md={6} className="mb-2">
+                        <Form.Control
+                          type="text"
+                          placeholder="Enter coupon code"
+                          value={couponCode[index] || ''}
+                          onChange={(e) => handleCouponCodeChange(index, e)}
+                        />
+                      </Col>
+                      <Col xs={12} md={4} className="mb-2">
+                        <Button
+                          variant="primary"
+                          className="w-100"
+                          onClick={() => handleApplyCoupon(index, couponCode[index])}
+                        >
+                          Apply Code
+                        </Button>
+                      </Col>
+                      <Col xs={12} md={2} className="d-flex align-items-center justify-content-start">
+                        <Button variant="danger" onClick={() => handleRemoveFromCart(index)}>
+                          <FaTrash />
+                        </Button>
+                      </Col>
+                    </Row>
+                    {couponError[index] && <p className="error-message">{couponError[index]}</p>}
+                    {discount[index] > 0 && cartItems[index].isOffer && (
+                      <p>Discount Applied: {discount[index]}%</p>
+                    )}
+                  </Form.Group>
                 </div>
               </div>
             </div>
@@ -308,6 +413,9 @@ const Cart = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+       
+      {error && <div className="alert alert-danger mt-3">{error}</div>}
     </Container>
   );
 };

@@ -703,7 +703,7 @@ const Products = () => {
     <Form.Check
       type="checkbox"
       label="Add to Offer"
-      checked={formData.newArrivals}
+      checked={formData.isOffer}
       onChange={(e) => setFormData({ ...formData, isOffer: e.target.checked })}
     />
   </Col>

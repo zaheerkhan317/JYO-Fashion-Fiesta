@@ -150,7 +150,6 @@ const handleViewInvoice = async (orderId) => {
 
       // User Information and Order Summary
       const userInfo = [
-        ['Field', 'Details'],
         ['First Name', user.firstName],
         ['Last Name', user.lastName],
         ['Phone', user.phoneNumber],
