@@ -167,36 +167,24 @@ const ProductDetail = () => {
 
             <div className="product-attributes">
               {/* Size Selection */}
-                <div className="size-selection">
-                  <strong>Sizes:</strong>
-                  <div className="size-options">
-                    {Array.isArray(product.sizes) ? (
-                      product.sizes
-                        .sort((a, b) => ["S", "M", "L", "XL", "XXL"].indexOf(a) - ["S", "M", "L", "XL", "XXL"].indexOf(b))
-                        .map((size, index) => (
-                          <div
-                            key={index}
-                            className={`size-box ${size === selectedSize ? 'selected-size' : ''}`}
-                            onClick={() => setSelectedSize(size)}
-                          >
-                            {size}
-                          </div>
-                        ))
-                    ) : (
-                      Object.keys(product.sizes)
-                        .sort((a, b) => ["S", "M", "L", "XL", "XXL"].indexOf(a) - ["S", "M", "L", "XL", "XXL"].indexOf(b))
-                        .map((size, index) => (
-                          <div
-                            key={index}
-                            className={`size-box ${size === selectedSize ? 'selected-size' : ''}`}
-                            onClick={() => setSelectedSize(size)}
-                          >
-                            {size}
-                          </div>
-                        ))
-                    )}
-                  </div>
-                </div>
+              <div className="size-selection">
+  <strong>Sizes:</strong>
+  <div className="size-options">
+    {Object.keys(product.sizes)
+      .sort((a, b) => ["S", "M", "L", "XL", "XXL"].indexOf(a) - ["S", "M", "L", "XL", "XXL"].indexOf(b))
+      .map((size, index) => (
+        <div
+          key={index}
+          className={`size-box ${size === selectedSize ? 'selected-size' : ''}`}
+          onClick={() => setSelectedSize(size)}
+        >
+          {size}
+        </div>
+      ))
+    }
+  </div>
+</div>
+
 
 
 
@@ -217,7 +205,14 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            <p><strong>Quantity Left : </strong> {product.quantityLeft}</p>
+            <p>
+              {/* Display the quantity for the selected size */}
+              {selectedSize && (
+                <div className="size-quantity">
+                  <strong>Quantity left for Size {selectedSize}:</strong> {product.sizes[selectedSize]}
+                </div>
+              )}
+            </p>
             <Button variant="primary" onClick={handleAddToCart}>Add to Cart</Button>
           </div>
         </Col>
