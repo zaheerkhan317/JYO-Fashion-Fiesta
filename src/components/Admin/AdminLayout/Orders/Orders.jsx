@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
 import { Container, Table, Spinner, Alert, Dropdown, Button, Form, Modal } from 'react-bootstrap';
 import { collection, getDocs, getDoc, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { FaTrash } from 'react-icons/fa';
@@ -18,6 +19,8 @@ const Orders = () => {
   const [paidStatus, setPaidStatus] = useState(''); // State for status filter
   const [showModal, setShowModal] = useState(false);
   const [pdfUrl, setPdfUrl] = useState(''); // For holding the PDF blob URL
+  const [notification, setNotification] = useState(null);
+  const [notificationType, setNotificationType] = useState('');
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -51,49 +54,256 @@ const Orders = () => {
   }, []);
 
   const handleApprove = async (orderId) => {
+    // Find the order by orderId
+    const order = orders.find(order => order.id === orderId);
+    console.log("Order object:", order); // Log the order object
+  
+    // Check if order and items exist
+    if (!order || !Array.isArray(order.items)) {
+      setNotification("Order or items array not found");
+      setNotificationType('error');
+      console.error("Order or items array not found");
+      // Set timeout to automatically clear notification after 3 seconds
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+      return;
+    }
+  
+    // Get items to update
+    const itemsToUpdate = order.items; // This should work correctly
+    console.log("Items to update:", itemsToUpdate); // Correct logging
+  
+    // Create a flag to determine if the update should be applied
+    let updateSuccessful = true;
+  
+    // Update order status
+    const orderRef = doc(db, 'orders', orderId);
     try {
-      const orderRef = doc(db, 'orders', orderId);
       await updateDoc(orderRef, { status: 'approved' });
-      setOrders(orders.map(order => order.id === orderId ? { ...order, status: 'approved' } : order));
     } catch (error) {
-      console.error("Error approving order: ", error);
-      setError("Failed to approve the order. Please try again later.");
+      console.error("Failed to update order status: ", error);
+      setNotification("Failed to update order status. Please try again later.");
+      setNotificationType('error');
+            // Set timeout to automatically clear notification after 3 seconds
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+      updateSuccessful = false; // Set flag to false
+    }
+  
+    // Update product quantities based on order items
+    for (const item of itemsToUpdate) {
+      const productRef = doc(db, 'products', item.id);
+      const productSnapshot = await getDoc(productRef);
+  
+      if (productSnapshot.exists()) {
+        const productData = productSnapshot.data();
+        const size = item.size; // Get the size from the order item
+        const currentQuantity = parseInt(productData.sizes[size]) || 0; // Get the current quantity for the size
+        const newQuantity = currentQuantity - (parseInt(item.quantity) || 0); // Deduct the ordered quantity
+  
+        if (newQuantity >= 0) {
+          try {
+            await updateDoc(productRef, { [`sizes.${size}`]: newQuantity }); // Update the specific size in the sizes map
+            console.log(`Updated product ${item.id} size ${size} quantity to ${newQuantity}`);
+          } catch (error) {
+            setNotification(`Failed to update stock for product ${item.id} size ${size}`);
+            setNotificationType('error');
+            console.error(`Failed to update stock for product ${item.id} size ${size}`, error);
+            updateSuccessful = false; // Set flag to false
+            break; // Stop processing if stock update fails
+          }
+        } else {
+          setNotification(`Not enough stock for product ${item.id} size ${size}`);
+          setNotificationType('error');
+          console.error(`Not enough stock for product ${item.id} size ${size}`);
+              // Set timeout to automatically clear notification after 3 seconds
+          setTimeout(() => {
+            setNotification(null);
+          }, 3000);
+          updateSuccessful = false; // Set flag to false
+          break; // Stop processing if stock is insufficient
+        }
+      } else {
+        setNotification(`Product ${item.id} does not exist`);
+        setNotificationType('error');
+        console.error(`Product ${item.id} does not exist`);
+            // Set timeout to automatically clear notification after 3 seconds
+        setTimeout(() => {
+          setNotification(null);
+        }, 3000);
+        updateSuccessful = false; // Set flag to false
+        break; // Stop processing if product does not exist
+      }
+    }
+  
+    // If all updates were successful, update the local orders state
+    if (updateSuccessful) {
+      setOrders(orders.map(order => order.id === orderId ? { ...order, status: 'approved' } : order));
+      // Show success notification
+      setNotification("Order approved successfully!");
+      setNotificationType('success');
+
+      // Set timeout to automatically clear notification after 3 seconds
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+    } else {
+      // Revert order status if any errors occurred
+      await updateDoc(orderRef, { status: 'pending' }); // Assuming 'pending' is the previous status
     }
   };
+  
+
 
   const handleDelivered = async (orderId) => {
     try {
       const orderRef = doc(db, 'orders', orderId);
       await updateDoc(orderRef, { status: 'delivered' });
       setOrders(orders.map(order => order.id === orderId ? { ...order, status: 'delivered' } : order));
+  
+      // Show success notification for delivery update
+      setNotification("Order marked as delivered.");
+      setNotificationType('success');
+  
+      // Automatically dismiss notification after 3 seconds
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
     } catch (error) {
-      console.error("Error approving order: ", error);
-      setError("Failed to approve the order. Please try again later.");
+      console.error("Error updating order to delivered: ", error);
+  
+      // Show error notification
+      setNotification("Failed to mark the order as delivered. Please try again later.");
+      setNotificationType('error');
+      
+      // Automatically dismiss notification after 3 seconds
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
     }
   };
+  
 
   const handleDeny = async (orderId) => {
+    // Find the order by orderId
+    const orderRef = doc(db, 'orders', orderId);
+    const orderSnapshot = await getDoc(orderRef);
+  
+    if (!orderSnapshot.exists()) {
+      console.error("Order not found");
+      setNotification("Order not found");
+      setNotificationType('error');
+          // Set timeout to automatically clear notification after 3 seconds
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+      return;
+    }
+  
+    const order = orderSnapshot.data();
+    const itemsToUpdate = order.items || [];
+    let updateSuccessful = true; // Flag to track success
+  
+    // Update order status to denied
     try {
-      const orderRef = doc(db, 'orders', orderId);
       await updateDoc(orderRef, { status: 'denied' });
-      setOrders(orders.map(order => order.id === orderId ? { ...order, status: 'denied' } : order));
     } catch (error) {
-      console.error("Error denying order: ", error);
-      setError("Failed to deny the order. Please try again later.");
+      console.error("Failed to update order status: ", error);
+      setNotification("Failed to update order status. Please try again later.");
+      setNotificationType('error');
+          // Set timeout to automatically clear notification after 3 seconds
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+      updateSuccessful = false; // Set flag to false
+    }
+  
+    // Restore product quantities based on order items
+    for (const item of itemsToUpdate) {
+      const productRef = doc(db, 'products', item.id);
+      const productSnapshot = await getDoc(productRef);
+  
+      if (productSnapshot.exists()) {
+        const productData = productSnapshot.data();
+        const size = item.size; // Get the size from the order item
+        const currentQuantity = parseInt(productData.sizes[size]) || 0; // Get current quantity for the size
+        const restoredQuantity = currentQuantity + (parseInt(item.quantity) || 0); // Restore the ordered quantity
+  
+        try {
+          await updateDoc(productRef, { [`sizes.${size}`]: restoredQuantity }); // Update the specific size in the sizes map
+          console.log(`Restored product ${item.id} size ${size} quantity to ${restoredQuantity}`);
+        } catch (error) {
+          setNotification(`Failed to restore stock for product ${item.id} size ${size}`);
+          setNotificationType('error');
+          console.error(`Failed to restore stock for product ${item.id} size ${size}`, error);
+              // Set timeout to automatically clear notification after 3 seconds
+          setTimeout(() => {
+            setNotification(null);
+          }, 3000);
+          updateSuccessful = false; // Set flag to false
+          break; // Stop processing if stock update fails
+        }
+      } else {
+        setNotification(`Product ${item.id} does not exist`);
+        setNotificationType('error');
+        console.error(`Product ${item.id} does not exist`);
+            // Set timeout to automatically clear notification after 3 seconds
+        setTimeout(() => {
+          setNotification(null);
+        }, 3000);
+        updateSuccessful = false; // Set flag to false
+        break; // Stop processing if product does not exist
+      }
+    }
+  
+    // If all updates were successful, update the local orders state
+    if (updateSuccessful) {
+      setOrders(orders.map(order => order.id === orderId ? { ...order, status: 'denied' } : order));
+      // Show success notification
+      setNotification("Order denied successfully!");
+      setNotificationType('success');
+          // Set timeout to automatically clear notification after 3 seconds
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+    } else {
+      // Optionally, revert order status if any errors occurred (if applicable)
+      await updateDoc(orderRef, { status: 'pending' }); // Assuming 'pending' is the previous status
     }
   };
+  
+  
 
   const handleDelete = async (orderId) => {
     try {
       const orderRef = doc(db, 'orders', orderId);
       await deleteDoc(orderRef);
       setOrders(orders.filter(order => order.id !== orderId));
+  
+      // Show success notification for deletion
+      setNotification("Order deleted successfully.");
+      setNotificationType('success');
+      
+      // Automatically dismiss notification after 3 seconds
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
     } catch (error) {
       console.error("Error deleting order: ", error);
-      setError("Failed to delete the order. Please try again later.");
+  
+      // Show error notification
+      setNotification("Failed to delete the order. Please try again later.");
+      setNotificationType('error');
+      
+      // Automatically dismiss notification after 3 seconds
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
     }
   };
-
+  
   const handleInvoice = (orderId) => {
     // Find the order by ID
     const order = orders.find(order => order.id === orderId);
@@ -370,6 +580,15 @@ const Orders = () => {
 
   return (
     <Container className="mt-5">
+    {notification && (
+      <div className={`notification ${notificationType}`}>
+      <span className="notification-message">{notification}</span>
+      <button className="notification-close" onClick={() => setNotification(null)}>
+        &times;
+      </button>
+    </div>
+    )}
+
       <h1>Orders</h1>
       {/* Search and Filter Bar */}
       <div className="d-flex justify-content-between mb-3">
