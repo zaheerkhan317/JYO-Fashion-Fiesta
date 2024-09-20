@@ -189,16 +189,23 @@ const handleViewInvoice = async (orderId) => {
       });
 
       // Prepare data for the items table
-      const itemTable = order.items.map((item, index) => [
-        index + 1,
-        `#${item.id}`,
-        item.name,
-        item.quantity,
-        item.size,
-        `Rs. ${item.price}`,
-        `${item.discountvalue}%`,
-        `Rs. ${item.total}`,
-      ]);
+      const itemTable = order.items.map((item, index) => {
+        const discountDisplay = item.discountApplied 
+            ? `${item.couponDiscount || 0}%` // Assuming couponDiscount is the applied coupon's discount percentage
+            : `${item.discountvalue}%`;
+
+        return [
+            index + 1,
+            `#${item.id}`,
+            item.name,
+            item.quantity,
+            item.size,
+            `Rs. ${item.price}`,
+            discountDisplay, // Display either coupon discount or regular discount
+            `Rs. ${item.total}`,
+        ];
+      });
+
 
       // Add product details in a table format
       doc.autoTable({

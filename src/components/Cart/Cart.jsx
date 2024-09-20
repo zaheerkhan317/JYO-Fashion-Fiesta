@@ -80,6 +80,7 @@ const Cart = () => {
         if (cart[uid].length === 0) {
           delete cart[uid];
           localStorage.removeItem('cart');
+          localStorage.removeItem('discounts');
           localStorage.setItem('cartCount', 0); 
           setCartItems([]);// Set cart count to 0 if empty
         } else {
@@ -152,15 +153,19 @@ const Cart = () => {
         return;
       }
   
-      // Create order object
-      const orderData = {
-        orderId: orderId,
-        userId: uid,
-        items: cartItems,
-        paid: false,
-        status: 'pending', // Optional field for tracking request date
-        totalPrice: cartItems.reduce((total, item) => total + parseFloat(item.total), 0).toFixed(2),
-        orderDate: getISTDate(new Date()).toString(), // Store the current date
+       // Create order object
+       const orderData = {
+          orderId: orderId,
+          userId: uid,
+          items: cartItems.map(item => ({
+              ...item, // Spread existing item properties
+              discountApplied: item.discountApplied || false, // Include discountApplied
+              couponDiscount: item.couponDiscount || 0, // Include couponDiscount (default to 0 if not present)
+          })),
+          paid: false,
+          status: 'pending', // Optional field for tracking request date
+          totalPrice: cartItems.reduce((total, item) => total + parseFloat(item.total), 0).toFixed(2),
+          orderDate: getISTDate(new Date()).toString(), // Store the current date
       };
   
       // Add the order to Firestore
@@ -223,10 +228,10 @@ const Cart = () => {
         const originalPrice = product.price * product.quantity;
         const discountedPrice = (originalPrice * (1 - discountPercentage / 100)).toFixed(2);
 
-        // Update the cart item with the new discount value and total price
+        // Update the cart item with the coupon discount
         const updatedCartItems = [...cartItems];
         updatedCartItems[index].total = discountedPrice;
-        updatedCartItems[index].discountvalue = discountPercentage; // Update the discount value of the item
+        updatedCartItems[index].couponDiscount = discountPercentage; // Store the coupon discount
         updatedCartItems[index].discountApplied = true; // Mark as discount applied
 
         setCartItems(updatedCartItems);
@@ -256,6 +261,28 @@ const Cart = () => {
       return;
     }
   };
+
+  const handleRemoveDiscount = (index) => {
+    const updatedCartItems = [...cartItems];
+    
+    // Reset the coupon discount
+    updatedCartItems[index].couponDiscount = 0;
+    updatedCartItems[index].discountApplied = false;
+
+    // Recalculate the total price with the product discount
+    const productDiscount = updatedCartItems[index].discountvalue; // Assuming you have a productDiscount property
+    console.log("discount:",productDiscount);
+    const originalPrice = updatedCartItems[index].price * updatedCartItems[index].quantity;
+    console.log("original price:",originalPrice);
+    const discountedPrice = (originalPrice * (1 - productDiscount / 100)).toFixed(2);
+    console.log("discount price:",discountedPrice);
+    updatedCartItems[index].total = discountedPrice; // Update the total price with product discount
+
+    setCartItems(updatedCartItems);
+    updateLocalStorage(updatedCartItems);
+    localStorage.setItem('cartItems', JSON.stringify(updatedCartItems));
+};
+
 
   // Calculate total price for all items
   const totalPrice = cartItems.reduce((total, item) => total + parseFloat(item.total), 0).toFixed(2);
@@ -312,16 +339,24 @@ const Cart = () => {
                   <strong>Original Price:</strong> <span className="original-price">₹{item.price} per one</span>
                 </div>
                 <div className="info-group">
-                  <strong>Discount:</strong> 
-                  {item.discountApplied ? (
-                    <span className="discount-price">
-                      {item.discountvalue}% - Discount Applied
-                    </span>
-                  ) : (
-                    <span className="discount-price">{item.discountvalue}%</span>
-                  )}
-                </div>
-
+    <strong>Discount:</strong> 
+    {item.discountApplied ? (
+        <div className="d-flex align-items-center">
+            <span className="discount-price">
+                {item.couponDiscount}% - Coupon Code Discount
+            </span>
+            <Button
+                variant="link"
+                className="remove-discount-btn ms-2"
+                onClick={() => handleRemoveDiscount(index)}
+            >
+                X
+            </Button>
+        </div>
+    ) : (
+        <span className="discount-price">{item.discountvalue}%</span>
+    )}
+</div>
                 <div className="info-group">
                   <strong>Total:</strong> <span className="total-price">₹{item.total}</span>
                 </div>

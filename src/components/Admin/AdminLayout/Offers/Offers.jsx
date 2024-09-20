@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Button, Row, Col, Form, Container } from 'react-bootstrap';
+import { Card, Row, Col, Form, Button, Container } from 'react-bootstrap';
 import { db } from '../../../../firebaseConfig';
-import { collection, getDocs, updateDoc, doc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, doc, getDoc, setDoc } from 'firebase/firestore';
 import './Offers.css';
 
 const Offers = () => {
@@ -38,26 +38,20 @@ const Offers = () => {
     fetchFestivalOffers();
   }, []);
 
-  const handleOfferSelection = (productId) => {
-    const updatedProducts = products.map((product) => {
-      if (product.id === productId) {
-        product.isOffer = !product.isOffer;
-      }
-      return product;
-    });
-    setProducts(updatedProducts);
-  };
+  const handleOfferToggle = async (productId, currentIsOffer) => {
+    try {
+      const productRef = doc(db, 'products', productId);
+      await updateDoc(productRef, { isOffer: !currentIsOffer });
 
-  const handleSaveOffers = async () => {
-    await Promise.all(
-      products.map(async (product) => {
-        if (product.isOffer !== undefined) {
-          const productRef = doc(db, 'products', product.id);
-          await updateDoc(productRef, { isOffer: product.isOffer });
-        }
-      })
-    );
-    alert('Offers Updated!');
+      // Update local state for the toggled product
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product.id === productId ? { ...product, isOffer: !currentIsOffer } : product
+        )
+      );
+    } catch (error) {
+      console.error('Error updating offer status:', error);
+    }
   };
 
   const handleSaveFestivalOffers = async () => {
@@ -97,7 +91,11 @@ const Offers = () => {
         <Col xs={12}>
           {festivalOffers && (
             <div className="festival-banner text-white text-center">
-              <p><strong>{festivalOffers.festivalName} Special</strong> Use this coupon code <strong>{festivalOffers.couponCode}</strong> to get a discount of <strong>{festivalOffers.discountPercentage}%</strong> on your item!</p>
+              <p>
+                <strong>{festivalOffers.festivalName} Special</strong> Use this coupon code{' '}
+                <strong>{festivalOffers.couponCode}</strong> to get a discount of{' '}
+                <strong>{festivalOffers.discountPercentage}%</strong> on your item!
+              </p>
             </div>
           )}
         </Col>
@@ -140,46 +138,40 @@ const Offers = () => {
       {/* Festival Offers Section */}
       <Row className="mb-4">
         <Col xs={12} md={4}>
-          <Form>
-            <Form.Group controlId="festivalName">
-              <Form.Label>Festival Name</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter festival name"
-                value={festivalName}
-                onChange={(e) => setFestivalName(e.target.value)}
-              />
-            </Form.Group>
-          </Form>
+          <Form.Group controlId="festivalName">
+            <Form.Label>Festival Name</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter festival name"
+              value={festivalName}
+              onChange={(e) => setFestivalName(e.target.value)}
+            />
+          </Form.Group>
         </Col>
 
         <Col xs={12} md={4}>
-          <Form>
-            <Form.Group controlId="couponCode">
-              <Form.Label>Coupon Code</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter coupon code"
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value)}
-              />
-            </Form.Group>
-          </Form>
+          <Form.Group controlId="couponCode">
+            <Form.Label>Coupon Code</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter coupon code"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value)}
+            />
+          </Form.Group>
         </Col>
 
         <Col xs={12} md={4}>
-          <Form>
-            <Form.Group controlId="discountPercentage">
-              <Form.Label>Discount Percentage</Form.Label>
-              <Form.Control
-                type="number"
-                step="0.01"
-                placeholder="Enter discount percentage"
-                value={discountPercentage}
-                onChange={(e) => setDiscountPercentage(e.target.value)}
-              />
-            </Form.Group>
-          </Form>
+          <Form.Group controlId="discountPercentage">
+            <Form.Label>Discount Percentage</Form.Label>
+            <Form.Control
+              type="number"
+              step="0.01"
+              placeholder="Enter discount percentage"
+              value={discountPercentage}
+              onChange={(e) => setDiscountPercentage(e.target.value)}
+            />
+          </Form.Group>
         </Col>
       </Row>
 
@@ -212,21 +204,18 @@ const Offers = () => {
               <Card.Body className="d-flex flex-column align-items-center">
                 <Card.Title className="text-center">{product.itemName}</Card.Title>
                 <Card.Text className="text-center text-muted">#{product.id}</Card.Text>
-
                 <Card.Text className="text-center text-muted description">
                   {product.description.length > 50
                     ? product.description.slice(0, 50) + '...'
                     : product.description}
                 </Card.Text>
-
                 <Card.Text className="text-center text-muted">
                   <strong>Brand:</strong> {product.brand}
                 </Card.Text>
-
                 <Card.Text className="text-center text-muted">
-                  <strong>Colors:</strong> {product.colours.length === 1 ? <span>{product.colours[0]}</span> : 'Multi Color'}
+                  <strong>Colors:</strong>{' '}
+                  {product.colours.length === 1 ? <span>{product.colours[0]}</span> : 'Multi Color'}
                 </Card.Text>
-
                 <Card.Text className="text-center text-muted">
                   <strong>Sizes:</strong>
                   <div className="size-list">
@@ -243,13 +232,13 @@ const Offers = () => {
                     )}
                   </div>
                 </Card.Text>
-
-                <Button
-                  variant={product.isOffer ? 'danger' : 'primary'}
-                  onClick={() => handleOfferSelection(product.id)}
-                >
-                  {product.isOffer ? 'Remove Offer' : 'Add Offer'}
-                </Button>
+                <Form.Check
+                  type="switch"
+                  id={`offer-switch-${product.id}`}
+                  label="Festival Offer"
+                  checked={product.isOffer || false}
+                  onChange={() => handleOfferToggle(product.id, product.isOffer)}
+                />
               </Card.Body>
             </Card>
           </Col>

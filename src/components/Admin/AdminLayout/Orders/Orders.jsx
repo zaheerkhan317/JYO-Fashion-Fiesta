@@ -164,9 +164,10 @@ const Orders = () => {
           item.quantity || 1,
           item.size || 'N/A',
           `Rs. ${item.price || 0}`,
-          `${item.discountvalue || 0}%`,
+          item.discountApplied ? `${item.couponDiscount || 0}%` : `${item.discountvalue || 0}%`, // Display coupon discount if applied
           `Rs. ${item.total || 0}`,
         ]);
+
   
         // Add product details in a table format
         doc.autoTable({
