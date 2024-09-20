@@ -123,6 +123,18 @@
   height: 500px; /* Adjust height as needed */
 }
 
+.star {
+  font-size: 24px; /* Adjust size as needed */
+}
+
+.star.filled {
+  color: #FFD700; /* Gold color for filled stars */
+}
+
+.star:not(.filled) {
+  color: #ccc; /* Gray color for empty stars */
+}
+
 /* Responsive styles for larger phones */
 @media (max-width: 992px) {
   .horizontal-card {

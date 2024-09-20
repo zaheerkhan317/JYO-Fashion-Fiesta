@@ -90,9 +90,9 @@ const NavbarHome = () => {
 
   return (
     <>
-      {/* Festival Offer Banner */}
+     {/* Festival Offer Banner */}
       <div className="festival-banner-container">
-        {festivalOffer && (
+        {festivalOffer && festivalOffer.festivalName && festivalOffer.couponCode && festivalOffer.discountPercentage && (
           <div className="festival-banner text-white text-center">
             <p>
               <strong>{festivalOffer.festivalName} Special:</strong> Use this coupon code <strong>{festivalOffer.couponCode}</strong> to get a discount of <strong>{festivalOffer.discountPercentage}%</strong> on your item!
@@ -100,6 +100,7 @@ const NavbarHome = () => {
           </div>
         )}
       </div>
+
 
 
       

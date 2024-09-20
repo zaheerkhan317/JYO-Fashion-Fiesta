@@ -89,7 +89,7 @@ const Offers = () => {
       {/* Festival Offer Banner */}
       <Row className="mb-4">
         <Col xs={12}>
-          {festivalOffers && (
+          {festivalOffers && Object.keys(festivalOffers).length > 0 && (
             <div className="festival-banner text-white text-center">
               <p>
                 <strong>{festivalOffers.festivalName} Special</strong> Use this coupon code{' '}
@@ -98,6 +98,7 @@ const Offers = () => {
               </p>
             </div>
           )}
+
         </Col>
       </Row>
 

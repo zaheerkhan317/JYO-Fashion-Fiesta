@@ -176,7 +176,7 @@ const Cart = () => {
       localStorage.removeItem('cart');
       localStorage.setItem('cartCount', 0);
       setCartItems([]);
-  
+      
       alert(`Order placed successfully! Order ID: ${orderId}`);
       navigate('/myorders', { replace: true }); // Navigate to /cart
       window.location.reload();
