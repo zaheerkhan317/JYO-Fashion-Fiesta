@@ -346,6 +346,7 @@ const MyOrders = () => {
         rating,
         comment,
         timestamp: getISTDate(new Date()).toString(),
+        isVisible: false,
       };
   
       // Store the review for each product in the order

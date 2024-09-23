@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Nav, Button } from 'react-bootstrap';
-import { FaTachometerAlt, FaUsers, FaCartPlus, FaSignOutAlt, FaChevronLeft, FaChevronRight, FaBoxOpen, FaImage, FaTags } from 'react-icons/fa';
+import { FaTachometerAlt, FaUsers, FaCartPlus, FaSignOutAlt, FaChevronLeft, FaChevronRight, FaBoxOpen, FaImage, FaTags, FaStar } from 'react-icons/fa';
 import './Sidebar.css'; // Import custom styles
 
 const Sidebar = ({ isSidebarOpen, setSidebarOpen }) => {
@@ -43,6 +43,10 @@ const Sidebar = ({ isSidebarOpen, setSidebarOpen }) => {
           <Nav.Link as={Link} to="/admin/offers" className="text-light d-flex align-items-center">
             <FaTags />
             <span className={`d-sm-inline ${isSidebarOpen ? '' : 'text-collapse'}`}>Offers</span>
+          </Nav.Link>
+          <Nav.Link as={Link} to="/admin/reviews" className="text-light d-flex align-items-center">
+            <FaStar />
+            <span className={`d-sm-inline ${isSidebarOpen ? '' : 'text-collapse'}`}>Reviews</span>
           </Nav.Link>
           <Nav.Link className="text-light d-flex align-items-center" onClick={handleLogout}>
             <FaSignOutAlt />
