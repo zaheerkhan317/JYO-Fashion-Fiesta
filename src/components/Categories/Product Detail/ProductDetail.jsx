@@ -213,7 +213,17 @@ const ProductDetail = () => {
                 </div>
               )}
             </p>
-            <Button variant="primary" onClick={handleAddToCart}>Add to Cart</Button>
+            {/* Disable button if the quantity for the selected size is less than 1 */}
+              <Button
+                variant="primary"
+                onClick={handleAddToCart}
+                disabled={selectedSize && product.sizes[selectedSize] < 1}
+              >
+                Add to Cart
+              </Button>
+              {selectedSize && product.sizes[selectedSize] < 1 && (
+                <p className="text-danger mt-2">Sorry, this size is out of stock.</p>
+              )}
           </div>
         </Col>
       </Row>
