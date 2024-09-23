@@ -1,0 +1,40 @@
+.card {
+    width: 100%;
+    max-width: 300px; /* Max width for larger screens */
+    border-radius: 30px; /* Smooth rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+    background-color: #fff; /* White background for contrast */
+    overflow: hidden; /* Ensure child elements stay within the card */
+}
+
+.card:hover {
+    transform: scale(1.05); /* Slightly enlarge on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Deeper shadow on hover */
+}
+
+.card-body {
+    padding: 20px; /* Comfortable padding */
+}
+
+.card-title {
+    font-size: 1.25rem; /* Bootstrap primary color */
+}
+
+.card-subtitle {
+    font-size: 0.9rem; /* Subtitle size */
+    color: #6c757d; /* Bootstrap secondary color */
+}
+
+.card-text {
+    font-size: 0.875rem; /* Text size */
+    color: #343a40; /* Dark text color */
+}
+
+/* Responsive Styles */
+@media (max-width: 576px) {
+    .card {
+        max-width: 100%; /* Full width on small screens */
+        margin: 10px; /* Margin to prevent touching the edges */
+    }
+}
