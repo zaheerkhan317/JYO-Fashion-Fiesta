@@ -23,6 +23,7 @@ const Notification = () => {
   });
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [activeNotifications, setActiveNotifications] = useState([]);
 
   // Fetch notifications from Firebase
   const fetchNotifications = async () => {
@@ -96,24 +97,35 @@ const Notification = () => {
     setUnreadCount(0); // Reset unread count
   };
 
+    // Handle notification click
+    const handleNotificationClick = (id) => {
+      if (activeNotifications.includes(id)) {
+        setActiveNotifications(activeNotifications.filter(activeId => activeId !== id)); // Remove if already active
+      } else {
+        setActiveNotifications([...activeNotifications, id]); // Add to active
+      }
+    };
+
   useEffect(() => {
     fetchNotifications();
   }, []);
 
   return (
-    <Nav.Item className="d-flex justify-content-center align-items-center m-2">
+    <Nav.Item className="d-flex justify-content-center align-items-center nav-dropdown m-2">
       <Dropdown onToggle={handleDropdownToggle}>
-        <Dropdown.Toggle variant="outline-primary" id="notification-dropdown">
-          <i className="fa-solid fa-bell"></i>
-          {unreadCount > 0 && <Badge bg="danger" className="ms-1">{unreadCount}</Badge>}
+        <Dropdown.Toggle id="notification-dropdown" className="custom-notification-toggle border-dark bg-black text-white">
+        <i className={`fa-solid fa-bell ${dropdownOpen ? 'text-gold' : ''}`}></i>
+          {unreadCount > 0 && <Badge bg="danger" className="ms-1 custom-badge">{unreadCount}</Badge>}
         </Dropdown.Toggle>
 
-        <Dropdown.Menu align="end">
+
+        <Dropdown.Menu align="end" className="notification-dropdown">
           {notifications.length > 0 ? (
             notifications.map((notification, index) => (
               <Dropdown.Item
                 key={index}
-                className={`notification-item ${notification.updated ? 'notification-blink' : ''}`}
+                className={`notification-item ${activeNotifications.includes(notification.id) ? 'active-notification' : ''}`}
+                onClick={() => handleNotificationClick(notification.id)}
               >
                 {notification.message}
               </Dropdown.Item>

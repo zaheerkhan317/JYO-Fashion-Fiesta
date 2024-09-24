@@ -1,4 +1,4 @@
-import React, { useState, useEffect }from 'react'
+import React, { useState, useEffect, useRef }from 'react'
 import { Navbar, Nav, NavDropdown, Container, Button, Spinner, Row, Col } from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import Notification from './Notification/Notification';
@@ -20,6 +20,9 @@ const NavbarHome = () => {
   const [loading, setIsLoading] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [festivalOffer, setFestivalOffer] = useState(null);
+  const [activeLink, setActiveLink] = useState('home'); // Set a default active link
+  const [isCategoriesActive, setIsCategoriesActive] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   console.log("cart count",cartCount);
   // useEffect(() => {
   //   // Simulate fetching user data from an API or local storage
@@ -86,7 +89,40 @@ const NavbarHome = () => {
       setIsLoading(false);
     }
   };
-  
+
+  // Function to handle category selection
+  const handleCategoryClick = (category) => {
+    setIsCategoriesActive(true); // Keep categories active
+    setActiveLink(category); // Set active link to the selected category
+  };
+ 
+
+  const handleLinkClick = (link) => {
+    setActiveLink(link);
+    // If a category link is clicked, set isCategoriesActive to true
+    if (link.startsWith('categories/')) {
+      setIsCategoriesActive(true);
+    } else {
+      setIsCategoriesActive(false);
+    }
+  };
+
+  const dropdownRef = useRef(null);
+
+  const handleMyOrdersClick = () => {
+    setActiveLink('myorders');
+
+    // Close the dropdown programmatically
+    if (dropdownRef.current) {
+      dropdownRef.current.classList.remove('show'); // Hide the dropdown menu
+      const parent = dropdownRef.current.parentElement;
+      parent.querySelector('[data-bs-toggle="dropdown"]').setAttribute('aria-expanded', 'false');
+    }
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
 
   return (
     <>
@@ -109,42 +145,81 @@ const NavbarHome = () => {
       <Navbar className="sticky-top navbar-glossy" expand="lg">
         <Container>
           {/* Logo */}
-          <Navbar.Brand as={Link} to="/home">Logo</Navbar.Brand>
+          <Navbar.Brand as={Link} to="/home" className={`navbar-link ${activeLink === '' ? 'active' : ''}`} onClick={() => handleLinkClick('')}>Logo</Navbar.Brand>
 
-          {/* Toggler for mobile view */}
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Toggle aria-controls="basic-navbar-nav" onClick={toggleDropdown}>
+            {/* Custom toggle button */}
+            <span className="navbar-toggler-icon">
+              {isDropdownOpen ? (
+                <i className="fa-solid fa-xmark text-white"></i> // Font Awesome X icon
+              ) : (
+                <i className="fa-solid fa-bars text-white"></i> // Font Awesome Hamburger icon
+              )}
+            </span>
+          </Navbar.Toggle>
+
 
           {/* Navbar Links and Dropdown */}
           <Navbar.Collapse id="basic-navbar-nav" className='text-center'>
             <Nav className="mx-auto">
-              <Nav.Link as={Link} to="/home" className="mx-3">Home</Nav.Link>
-              <NavDropdown title="Categories" id="basic-nav-dropdown" className="text-center mx-3">
-                <NavDropdown.Item as={Link} to="/categories/kurtas" className="navbar-glossy-glass">Kurtas</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/categories/sarees" className="navbar-glossy-glass">Sarees</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/categories/loungewear" className="navbar-glossy-glass">Lounge wear</NavDropdown.Item>
-              </NavDropdown>
-              <Nav.Link as={Link} to="/offers" className="mx-3">Offers Zone</Nav.Link>
-              <Nav.Link as={Link} to="/about" className="mx-3">About Us</Nav.Link>
-              <Nav.Link as={Link} to="/contact" className="mx-3">Contact Us</Nav.Link>
+              <Nav.Link as={Link} to="/home" className={`mx-3 navbar-link ${activeLink === 'home' ? 'active' : ''}`} onClick={() => handleLinkClick('home')}>Home</Nav.Link>
+
+
+              <NavDropdown  title={<span className={`text-center mx-3 nav-dropdown ${isCategoriesActive  ? 'active-title' : ''}`}>Categories</span>}
+               id="basic-nav-dropdown" className="text-center mx-3 nav-dropdown">
+              <NavDropdown.Item 
+                as={Link} 
+                to="/categories/kurtas" 
+                className={`navbar-glossy-glass navbar-link ${activeLink === 'categories/kurtas' ? 'active' : ''} text-center`} 
+                onClick={() => handleCategoryClick('categories/kurtas')}
+              >
+                Kurtas
+              </NavDropdown.Item>
+              <NavDropdown.Item 
+                as={Link} 
+                to="/categories/sarees" 
+                className={`navbar-glossy-glass navbar-link ${activeLink === 'categories/sarees' ? 'active' : ''} text-center`} 
+                onClick={() => handleCategoryClick('categories/sarees')}
+              >
+                Sarees
+              </NavDropdown.Item>
+              <NavDropdown.Item 
+                as={Link} 
+                to="/categories/loungewear" 
+                className={`navbar-glossy-glass navbar-link ${activeLink === 'categories/loungewear' ? 'active' : ''} text-center`} 
+                onClick={() => handleCategoryClick('categories/loungewear')}
+              >
+                Lounge wear
+              </NavDropdown.Item>
+            </NavDropdown>
+
+
+              <Nav.Link as={Link} to="/offers" className={`mx-3 navbar-glossy-glass navbar-link ${activeLink === 'offers' ? 'active' : ''}`} onClick={() => handleLinkClick('offers')}>Offers Zone</Nav.Link>
+              <Nav.Link as={Link} to="/about" className={`mx-3 navbar-glossy-glass navbar-link ${activeLink === 'aboutus' ? 'active' : ''}`} onClick={() => handleLinkClick('aboutus')}>About Us</Nav.Link>
+              <Nav.Link as={Link} to="/contact" className={`mx-3 navbar-glossy-glass navbar-link ${activeLink === 'contactus' ? 'active' : ''}`} onClick={() => handleLinkClick('contactus')}>Contact Us</Nav.Link>
             </Nav>
 
             {/* Buttons with responsive sizing */}
             <Nav className="d-flex justify-content-center align-items-center">
               {(user || firstName) ? (
                 <>
-                  <Nav.Item className="d-flex flex-column flex-sm-row align-items-center">
-                    <div className="d-flex align-items-center me-0">
+                  <Nav.Item className="d-flex flex-column flex-sm-row align-items-center nav-item">
+                    <div className="d-flex flex-column flex-sm-row align-items-center me-0">
                       <span className="me-3">Hi, {firstName || displayName}</span>
                       <div className="dropdown">
-                        <Button variant="outline-primary" id="profileDropdown" className="d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
+                        <Button variant="outline-primary" id="profileDropdown" 
+                        className={`d-flex justify-content-center align-items-center ${activeLink === 'myorders' ? 'active-profile' : ''}`} // Add a class if My Orders is active
+                        data-bs-toggle="dropdown" aria-expanded="false">
                           <i className="fa-solid fa-user"></i> {/* Profile icon */}
                         </Button>
-                        <ul className="dropdown-menu" aria-labelledby="profileDropdown">
-                          <li><Link className="dropdown-item" to="/profile">Profile</Link></li>
-                          <li><Link className="dropdown-item" as={Link} to="/myorders">My Orders</Link></li>
+                        <ul className="dropdown-menu text-center dropdown-menu-end" ref={dropdownRef} aria-labelledby="profileDropdown">
+                          <li><Link as={Link} to="/myorders" 
+                          className={`navbar-glossy-glass navbar-link ${activeLink === 'myorders' ? 'active' : ''}`} 
+                          onClick={handleMyOrdersClick}
+                          >My Orders</Link></li>
                           <li><hr className="dropdown-divider" /></li>
                           <li>
-                            <button className="dropdown-item" type="button" onClick={handleLogout}>
+                            <button className="dropdown-item text-white" type="button" onClick={handleLogout}>
                               {loading ? <Spinner as="span" animation="border" size="sm" /> : 'Logout'}
                             </button>
                           </li>
@@ -155,15 +230,24 @@ const NavbarHome = () => {
                   {/* Notification icon */}
                   <Notification />
                   <Nav.Item>
-                    <Nav.Link as={Link} to="/cart" className="cart-icon d-flex justify-content-center align-items-center">
-                      <Button variant="outline-primary">
-                        <i className="fa-solid fa-cart-shopping"></i> {/* Cart icon */}
-                        {cartCount > 0 && (
-                          <span className="cart-count-badge">{cartCount}</span>
-                        )}
-                      </Button>
-                    </Nav.Link>
-                  </Nav.Item>
+  <Nav.Link
+    as={Link}
+    to="/cart"
+    className={`cart-icon d-flex justify-content-center align-items-center ${activeLink === 'cart' ? 'active' : ''}`}
+    onClick={() => setActiveLink('cart')} // Set active link when clicked
+  >
+<Button id="cartButton" className="custom-cart-button border-dark bg-black text-white">
+  <i className="fa-solid fa-cart-shopping"></i> {/* Cart icon */}
+  {cartCount > 0 && (
+    <span className="cart-count-badge">{cartCount}</span>
+  )}
+</Button>
+
+
+
+  </Nav.Link>
+</Nav.Item>
+
                 </>
               ) : (
                 <Nav.Item>

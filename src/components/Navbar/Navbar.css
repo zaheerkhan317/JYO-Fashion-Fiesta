@@ -27,13 +27,11 @@
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.3); /* Optional: adds a shadow for better visibility */
 }
 
-
 @media (max-width: 768px) {
   .custom-button {
     width: 150px; 
   }
 }
-
 
 .navbar-collapse {
   display: inline-block;
@@ -47,6 +45,102 @@
   .navbar-collapse {
     justify-content: center;
   }
+}
+
+/* Style for the active title */
+.nav-dropdown.active-title {
+  color: #ffd700; /* Gold color for active title */
+  font-weight: bold; /* Make active title bold */
+}
+
+/* Underline effect for active title */
+.nav-dropdown.active-title::after {
+  content: '';
+  position: absolute; /* Position it below the text */
+  left: 0; /* Align to the left */
+  bottom: 0px; /* Adjust as needed to position under the text */
+  width: 100%; /* Full width */
+  height: 2px; /* Thickness of the underline */
+  background: #ffd700; /* Gold color for the underline */
+  transition: transform 0.3s ease; /* Smooth transition for the underline */
+  transform: scaleX(1); /* Scale to full width */
+}
+
+/* Ensure the underline is hidden when not active */
+.nav-dropdown::after {
+  display: none; /* Hide by default */
+}
+
+/* Show underline when title is active */
+.nav-dropdown.active-title::after {
+  display: block; /* Show the underline */
+}
+
+/* Keep the previous styles */
+.navbar-glossy {
+  background-color: #000000; /* Black background */
+  color: #ffffff; /* White text */
+}
+
+.navbar-glossy a {
+  color: #ffffff; /* White text */
+  position: relative; /* Required for the pseudo-element */
+  text-decoration: none; /* Remove default underline */
+  padding: 10px 15px; /* Padding for clickable area */
+  transition: color 0.3s; /* Smooth color transition */
+  display: inline-block; /* Ensure padding applies correctly */
+}
+
+/* Hover effect */
+.navbar-glossy a:hover {
+  color: #ffd700; /* Change text color to gold on hover */
+}
+
+/* Underline effect */
+.navbar-glossy a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0; /* Position it below the text */
+  width: 100%; /* Full width */
+  height: 2px; /* Thickness of the underline */
+  background: transparent; /* Initially transparent */
+  transition:#ffd700 0.3s ease, transform 0.3s ease; /* Smooth transition for underline */
+  transform: scaleX(0); /* Initially scale to 0 */
+}
+
+/* Scale the underline on hover */
+.navbar-glossy a:hover::after {
+  background: #ffd700; /* Gold underline on hover */
+  transform: scaleX(1); /* Scale to full width */
+}
+
+/* Style for the active link */
+.navbar-glossy .active {
+  font-weight: bold; /* Make active link bold */
+  color: #ffd700; /* Gold color for active link */
+  background: none; /* Ensure no background color fills when active */
+}
+
+/* Ensure underline is also present for active links */
+.navbar-glossy .active::after {
+  background: #ffd700; /* Gold underline for active link */
+  transform: scaleX(1); /* Ensure it is visible */
+}
+
+/* Additional styles for link behavior */
+.navbar-link .active {
+  background-color: transparent; /* or a desired color */
+  color:#ffd700; /* or another color */
+}
+
+.navbar-nav .nav-link.active,
+.navbar-nav .nav-link.show {
+  color: gold !important; /* Gold color for active links */
+}
+
+.navbar-nav .nav-link:hover {
+  color: gold; /* Optional: Gold color on hover */
 }
 
 /* 
@@ -94,10 +188,219 @@
   }
 }
 
-.nav-item-center .dropdown {
+/* Custom styles for the dropdown */
+.nav-dropdown .dropdown-menu {
+  background-color: #000000 !important; /* Dark background */
+  border: none; /* Remove border if needed */
+}
+
+/* Set text color for dropdown items */
+.nav-dropdown .dropdown-item {
+  color: #ffffff; /* White text for dropdown items */
+  position: relative; /* Required for the pseudo-element */
+  padding: 10px 15px; /* Padding for clickable area */
+  transition: color 0.3s; /* Smooth color transition */ /* White text color */
+}
+
+/* Set active item color */
+.nav-dropdown .dropdown-item.active, 
+.nav-dropdown .dropdown-item:focus {
+  background-color: #000000 !important; /* Light background for active items */
+  color:#ffd700 !important; /* Ensure text remains white */
+}
+
+/* Change text color on hover for dropdown items */
+.nav-dropdown .dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important; /* Slightly lighter background on hover */
+  color: white !important; /* Ensure text color remains white on hover */
+}
+
+
+.nav-item-center {
   margin-right: 1rem; /* Adjust as needed */
 }
 
-.nav-item-center .dropdown-menu {
+.nav-item-center{
   min-width: 150px; /* Adjust as needed */
+}
+
+.dropdown-menu {
+  background-color: #000000!important; /* Black background */
+  border: none; /* Remove border */
+}
+
+/* Dropdown item styles */
+.dropdown-item {
+  color: #ffffff; /* White text for dropdown items */
+  position: relative; /* Required for the pseudo-element */
+  padding: 10px 15px; /* Padding for clickable area */
+  transition: color 0.3s; /* Smooth color transition */
+}
+
+/* Active item style */
+.dropdown-item.active {
+  font-weight: bold; /* Make active link bold */
+  color: #ffd700; /* Gold color for active link */
+}
+
+/* Underline effect for active dropdown item */
+.dropdown-item.active::after {
+  content: '';
+  position: absolute; /* Position it below the text */
+  left: 0; /* Align to the left */
+  bottom: 0; /* Position it below the text */
+  width: 100%; /* Full width */
+  height: 2px; /* Thickness of the underline */
+  background: #ffd700; /* Gold color for the underline */
+  transition: transform 0.3s ease; /* Smooth transition for the underline */
+  transform: scaleX(1); /* Scale to full width */
+}
+
+/* Ensure the underline is hidden by default */
+.dropdown-item::after {
+  display: none; /* Hide by default */
+}
+
+/* Show underline when dropdown item is active */
+.dropdown-item.active::after {
+  display: block; /* Show the underline */
+}
+
+/* Change background color on hover for dropdown items */
+.dropdown-item:hover {
+  background-color: #333333; /* Dark gray background on hover */
+  color: #ffd700; /* Change text color to gold on hover */
+}
+
+/* Underline effect on hover */
+.dropdown-item:hover::after {
+  background: #ffd700; /* Gold underline on hover */
+  transform: scaleX(1); /* Scale to full width */
+}
+
+#profileDropdown {
+  background-color: black; /* Set button background to black */
+  color: white; /* Set text/icon color to white */
+  border: none; /* Remove default border */
+}
+
+#profileDropdown:hover {
+  background-color: #333; /* Darker shade on hover */
+  color: white; /* Ensure text/icon remains white on hover */
+}
+
+/* Profile icon styling when "My Orders" is active */
+.active-profile {
+  color: #ffd700 !important; /* Gold color for the profile icon */
+  background-color: #444;
+  border-bottom: 2px solid #ffd700; /* Underline in gold */
+  position: relative; /* Ensure relative positioning for ::after */
+}
+
+/* Ensure the icon itself is gold */
+.active-profile i {
+  color: #ffd700; /* Gold color for the icon */
+}
+
+/* For the underline effect under the profile icon */
+.active-profile::after {
+  content: '';
+  position: absolute; /* Position it below the icon */
+  width: 100%; /* Full width */
+  height: 2px; /* Thickness of the underline */
+  background-color: #ffd700; /* Gold underline color */
+  bottom: -10px; /* Positioned below the icon */
+  left: 0; /* Align to the left */
+}
+
+/* Ensure that the underline is hidden by default */
+.dropdown .dropdown-toggle:not(.active-profile)::after {
+  display: none; /* Hide underline for non-active state */
+}
+
+
+/* Active cart icon styling */
+.cart-icon.active {
+  color: #ffd700; /* Gold color for active cart */
+}
+
+/* Cart icon when active */
+.cart-icon.active .btn i{
+  color: #ffd700; /* Gold color for the button text */
+}
+
+.cart-icon.active::after {
+  content: '';
+  position: absolute; /* Position it below the text */
+  left: 0; /* Align to the left */
+  bottom: 0; /* Position it below the text */
+  width: 100%; /* Full width */
+  height: 2px; /* Thickness of the underline */
+  background: #ffd700; /* Gold color for the underline */
+  transition: transform 0.3s ease; /* Smooth transition for the underline */
+  transform: scaleX(1); /* Scale to full width */
+}
+
+/* Initially hide the underline */
+.cart-icon::after {
+  display: none; /* Hide by default */
+}
+
+/* Show underline when the cart link is active */
+.cart-icon.active::after {
+  display: block; /* Show the underline */
+}
+
+.custom-toggler {
+  border: none; /* Remove default border */
+  background: transparent; /* Make the background transparent */
+}
+
+.custom-toggler .navbar-toggler-icon {
+  background-color: transparent; /* Make the default icon background transparent */
+}
+
+.custom-toggler .navbar-toggler-icon i {
+  color: white; /* Set the icon color to white */
+}
+
+.custom-cart-button {
+  background-color: black; /* Black background */
+  color: white; /* White text and icon color */
+  border: none; /* No border */
+  padding: 0.5em 1em; /* Padding for button */
+  position: relative; /* For badge positioning */
+}
+
+.custom-cart-button:hover {
+  background-color: #333; /* Darker on hover */
+  color: white; /* Ensure text/icon stays white on hover */
+}
+
+.cart-count-badge {
+  background-color: white; /* White background for badge */
+  color: black; /* Black text for badge */
+  border-radius: 50%; /* Circular badge */
+  padding: 0.25em 0.5em; /* Padding for badge */
+  position: absolute; /* Positioning */
+  top: -5px; /* Vertical positioning */
+  right: -10px; /* Horizontal positioning */
+  font-size: 0.75em; /* Font size for badge */
+  border: 1px solid black; /* Optional border */
+}
+
+
+
+@media (max-width: 576px) {
+  .nav-item {
+    flex-direction: column; /* Stack items vertically */
+    align-items: flex-start; /* Align items to the left */
+  }
+
+  .dropdown-menu {
+    position: absolute; /* Ensure dropdown is positioned correctly */
+    top: 100%; /* Position below the button */
+    left: 0; /* Align with the button */
+    right: 0; /* Align with the button */
+  }
 }
