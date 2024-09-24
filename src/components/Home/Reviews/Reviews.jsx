@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { db } from '../../../firebaseConfig'; // Adjust the path according to your project structure
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { Card, Container, Row, Col } from 'react-bootstrap';
-import logo1  from '../../../img/logo1.png';
-import './Reviews.css'
+import logo1 from '../../../img/logo1.png';
+import './Reviews.css';
 
 const ReviewCard = ({ name, review, rating, productid, time }) => {
   const generateStars = (rating) => {
@@ -28,43 +28,33 @@ const ReviewCard = ({ name, review, rating, productid, time }) => {
   const formattedDate = time.split(',')[0];
 
   return (
-    <Card className="text-center d-flex flex-column justify-content-between border-light position-relative" style={{ overflow: 'visible' }}>
+    <Card className="review-card text-center justify-content-between border-light position-relative" style={{ overflow: 'visible' }}>
       {/* Image at the top, partially outside the card */}
       <Card.Img 
         variant="top" 
         src={logo1} 
         alt={`Image of ${name}`} 
-        style={{ 
-          position: 'absolute', 
-          top: '-40px',  // Slightly higher for more overlap
-          left: '50%', 
-          transform: 'translateX(-50%)', 
-          height: '70px',  // Larger size for better visibility
-          width: '70px', 
-          borderRadius: '50%',  // Fully circular image
-          border: '4px solid white',  // Thicker white border for emphasis
-          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',  // Adds a slight shadow for depth
-          backgroundColor: '#fff', // To ensure a clean background
-          zIndex: '1' 
-        }} 
+        className="review-card-img"
       />
 
-      <Card.Body style={{ paddingTop: '40px' }}> {/* Add padding to prevent text overlap */}
-        <Card.Title className="fw-bold">{name}</Card.Title>
-        <Card.Subtitle className="mb-2 text-muted">
+      <Card.Body className="review-card-body">
+        <Card.Title className="review-card-title fw-bold">{name}</Card.Title>
+        <Card.Subtitle className="review-card-subtitle mb-2 text-muted">
           Product ID: <span>{productid}</span>
         </Card.Subtitle>
-        <Card.Text className="text-center">{review}</Card.Text>
-        <Card.Text className="text-muted"><small>Submitted on: {formattedDate}</small></Card.Text>
+        <Card.Text className="review-card-text">{review}</Card.Text>
+        <Card.Text className="review-card-date text-muted"><small>Submitted on: {formattedDate}</small></Card.Text>
         
-        <div className="d-flex justify-content-center mt-2">
+        <div className="review-card-stars justify-content-center mt-2" style={{ flexWrap: 'nowrap' }}>
           {stars.map((star, index) => (
-            <span key={index} className="text-warning fs-5">{star}</span>
+            <span key={index} className="text-warning mx-1" style={{ fontSize: '1.5rem' }}>
+              {star}
+            </span>
           ))}
         </div>
+
       </Card.Body>
     </Card>
-
   );
 };
 
@@ -106,8 +96,8 @@ const Reviews = () => {
 
   return (
     <Container>
-      <h2 className="my-5 text-center mb-5">User Reviews</h2>
-      <Row className="pt-4">
+      <h2 className="reviews-heading text-center mb-5">User Reviews</h2>
+      <Row className="reviews-row">
         {reviews.map((review) => (
           <Col md={6} lg={4} key={review.id} className="d-flex align-items-stretch mb-5">
             <ReviewCard

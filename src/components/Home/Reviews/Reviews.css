@@ -1,41 +1,221 @@
-.card {
+/* Styles for the reviews section */
+.reviews-heading {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-top: 4rem;
+    margin-bottom: 3rem;
+    text-align: center;
+    color: #333;
+  }
+  
+  .reviews-row {
+    padding-top: 4rem;
+  }
+  
+  /* Review card */
+  .review-card {
     width: 100%;
-    max-width: 300px; /* Max width for larger screens */
-    border-radius: 30px; /* Smooth rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
-    background-color: #fff; /* White background for contrast */
-    overflow: hidden; /* Ensure child elements stay within the card */
+    max-width: 450px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    position: relative;
+    padding-top: 4.5rem;
+    margin-bottom: 2rem;
+    background-color: #fff;
+  }
+  
+  .review-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Review card image */
+  .review-card-img {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 90px;
+    width: 90px;
+    border-radius: 50%;
+    border: 5px solid #f8f9fa;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    z-index: 1;
+    object-fit: contain;
+  }
+  
+  /* Review card body */
+  .review-card-body {
+    padding-top: 70px;
+    padding-left: 20px;
+    padding-right: 20px;
+    text-align: center;
+  }
+  
+  /* Review card title */
+  .review-card-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Review card subtitle */
+  .review-card-subtitle {
+    color: #6c757d;
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Review card text */
+  .review-card-text {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+  }
+  
+  /* Review card date */
+  .review-card-date {
+    font-size: 0.85rem;
+    color: #868e96;
+    margin-bottom: 1rem;
+  }
+  
+  
+  .review-card-stars {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 4px; /* Space between stars */
+    margin-top: 1rem;
+    font-size: 1.5rem;
+    color: #ffc107;
+    flex-wrap: nowrap; /* Prevents wrapping to new lines */
+  }
+
+  .review-card-stars span {
+    display: inline-flex; /* Ensure each star is inline-flex */
+    align-items: center; /* Center items within the span */
 }
+  
 
+@media (max-width: 320px) { /* For devices with a maximum width of 320px */
+    .review-card {
+        max-width: 100%; /* Full width on very small devices */
+        margin-bottom: 1rem; /* Reduce space between cards */
+    }
 
-.card:hover {
-    transform: scale(1.05); /* Slightly enlarge on hover */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Deeper shadow on hover */
-}
+    .review-card-img {
+        height: 60px; /* Smaller image size for very small screens */
+        width: 60px; /* Smaller image width */
+        top: -30px; /* Adjust positioning */
+    }
 
-.card-body {
-    padding: 20px; /* Comfortable padding */
-}
+    .review-card-title {
+        font-size: 1rem; /* Smaller title font for better fit */
+    }
 
-.card-title {
-    font-size: 1.25rem; /* Bootstrap primary color */
-}
+    .review-card-text {
+        font-size: 0.85rem; /* Smaller text size for readability */
+    }
 
-.card-subtitle {
-    font-size: 0.9rem; /* Subtitle size */
-    color: #6c757d; /* Bootstrap secondary color */
-}
+    .review-card-body {
+        padding-top: 50px; /* Adjust space for the smaller image */
+        padding-left: 10px; /* Reduce padding for small screens */
+        padding-right: 10px; /* Reduce padding for small screens */
+    }
 
-.card-text {
-    font-size: 0.875rem; /* Text size */
-    color: #343a40; /* Dark text color */
-}
-
-/* Responsive Styles */
-@media (max-width: 576px) {
-    .card {
-        max-width: 100%; /* Full width on small screens */
-        margin: 10px; /* Margin to prevent touching the edges */
+    .review-card-stars {
+        font-size: 1.2rem; /* Smaller star size */
     }
 }
+
+  
+  /* Responsive design tweaks for mobile devices */
+  @media (min-width: 318px) and (max-width: 576px) { /* For very small phones */
+    .review-card {
+      max-width: 100%; /* Full width on small phones */
+      margin-bottom: 1.5rem; /* Reduce space between cards */
+    }
+  
+    .review-card-img {
+      height: 70px; /* Smaller image size */
+      width: 70px;
+      top: -40px; /* Adjust positioning */
+    }
+  
+    .review-card-title {
+      font-size: 1.2rem; /* Smaller title font */
+    }
+  
+    .review-card-text {
+      font-size: 0.95rem; /* Adjusted text size for readability */
+    }
+  
+    .review-card-body {
+      padding-top: 60px; /* Adjust space for the smaller image */
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+
+    .review-card-stars {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 4px; /* Space between stars */
+        margin-top: 1rem;
+        font-size: rem;
+        color: #ffc107;
+        flex-wrap: nowrap; /* Prevents wrapping to new lines */
+      }
+      
+    
+    .review-card-stars span {
+        display: inline-flex !important;        /* Ensure each star is inline-flex */
+        align-items: center;                    /* Center items within the span */
+    }
+    
+   
+  }
+  
+  @media (min-width: 576px) and (max-width: 768px) { /* For phones and smaller tablets */
+    .review-card {
+      max-width: 90%; /* Occupy 90% of the width */
+      margin-bottom: 2rem;
+    }
+  
+    .review-card-img {
+      height: 80px;
+      width: 80px;
+      top: -45px;
+    }
+  
+    .review-card-title {
+      font-size: 1.3rem; /* Slightly smaller than larger screens */
+    }
+  
+    .review-card-body {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+  }
+  
+  /* Larger tablet and desktop responsiveness */
+  @media (min-width: 768px) { /* Larger screens and tablets */
+    .review-card {
+      max-width: 400px;
+      margin-bottom: 2.5rem;
+    }
+  }
+  
+  @media (min-width: 1200px) { /* Very large screens */
+    .review-card {
+      max-width: 380px;
+    }
+  }
+  
