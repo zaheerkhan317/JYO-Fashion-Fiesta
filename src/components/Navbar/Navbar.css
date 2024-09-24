@@ -1,3 +1,6 @@
+.navbar-link img { /* Space between logo and text (if any) */
+  border-radius: 50px;
+}
 
 .custom-button {
   width: 90px; 
@@ -247,9 +250,9 @@
 .dropdown-item.active::after {
   content: '';
   position: absolute; /* Position it below the text */
-  left: 0; /* Align to the left */
+  left: 25%; /* Align to the left */
   bottom: 0; /* Position it below the text */
-  width: 100%; /* Full width */
+  width: 50%; /* Full width */
   height: 2px; /* Thickness of the underline */
   background: #ffd700; /* Gold color for the underline */
   transition: transform 0.3s ease; /* Smooth transition for the underline */
@@ -391,6 +394,24 @@
 
 
 
+
+/* Responsive adjustments */
+@media (max-width: 320px) {
+  .navbar-glossy a::after {
+      width: 30%; /* Increase width for small screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-glossy a::after {
+      width: 25%; /* Adjust width for medium screens */
+  }
+
+  
+}
+
+
+
 @media (max-width: 576px) {
   .nav-item {
     flex-direction: column; /* Stack items vertically */
@@ -402,5 +423,93 @@
     top: 100%; /* Position below the button */
     left: 0; /* Align with the button */
     right: 0; /* Align with the button */
+  }
+
+  .navbar-glossy a::after {
+    content: '';
+    position: absolute;
+    left: 40%;
+    bottom: 0; /* Position it below the text */
+    width: 100%; /* Full width */
+    height: 2px; /* Thickness of the underline */
+    background: transparent; /* Initially transparent */
+    transition:#ffd700 0.3s ease, transform 0.3s ease; /* Smooth transition for underline */
+    transform: translateX(-50%) scaleX(0); /* Initially scale to 0 */
+  }
+
+  .dropdown-item.active::after {
+    content: '';
+    position: absolute; /* Position it below the text */
+    left: 40%; /* Align to the left */
+    bottom: 0; /* Position it below the text */
+    width: 20%; /* Full width */
+    height: 2px; /* Thickness of the underline */
+    background: #ffd700; /* Gold color for the underline */
+    transition: transform 0.3s ease; /* Smooth transition for the underline */
+    transform: scaleX(1); /* Scale to full width */
+  }
+  
+}
+
+
+@media (max-width: 768px) {
+  .navbar-glossy a::after {
+      width: 20%; /* Maintain the original width for larger screens */
+  }
+
+  .navbar-glossy a::after {
+    content: '';
+    position: absolute;
+    left: 40%;
+    bottom: 0; /* Position it below the text */
+    width: 20%; /* Full width */
+    height: 2px; /* Thickness of the underline */
+    background: transparent; /* Initially transparent */
+    transition:#ffd700 0.3s ease, transform 0.3s ease; /* Smooth transition for underline */
+    transform: translateX(-50%) scaleX(0); /* Initially scale to 0 */
+  }
+
+  .dropdown-item.active::after {
+    content: '';
+    position: absolute; /* Position it below the text */
+    left: 40%; /* Align to the left */
+    bottom: 0; /* Position it below the text */
+    width: 20%; /* Full width */
+    height: 2px; /* Thickness of the underline */
+    background: #ffd700; /* Gold color for the underline */
+    transition: transform 0.3s ease; /* Smooth transition for the underline */
+    transform: scaleX(1); /* Scale to full width */
+  }
+
+}
+
+
+@media (max-width: 990px) {
+  .navbar-glossy a::after {
+      width: 20%; /* Maintain the original width for larger screens */
+  }
+
+  .navbar-glossy a::after {
+    content: '';
+    position: absolute;
+    left: 43%;
+    bottom: 0; /* Position it below the text */
+    width: 15%; /* Full width */
+    height: 2px; /* Thickness of the underline */
+    background: transparent; /* Initially transparent */
+    transition:#ffd700 0.3s ease, transform 0.3s ease; /* Smooth transition for underline */
+    transform: translateX(-50%) scaleX(0); /* Initially scale to 0 */
+  }
+
+  .dropdown-item.active::after {
+    content: '';
+    position: absolute; /* Position it below the text */
+    left: 40%; /* Align to the left */
+    bottom: 0; /* Position it below the text */
+    width: 20%; /* Full width */
+    height: 2px; /* Thickness of the underline */
+    background: #ffd700; /* Gold color for the underline */
+    transition: transform 0.3s ease; /* Smooth transition for the underline */
+    transform: scaleX(1); /* Scale to full width */
   }
 }

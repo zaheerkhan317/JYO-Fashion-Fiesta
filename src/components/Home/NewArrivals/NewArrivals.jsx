@@ -141,8 +141,8 @@ const NewArrivals = () => {
 
   return (
     <div className="container mt-5 new-arrivals-container">
-      <h2 className="text-center mb-4">New Arrivals</h2>
-      <div className="scroll-container" ref={scrollRef}>
+      <h2 className="new-arrivals-heading text-center mb-5">New Arrivals</h2>
+      <div className="scroll-container pt-5" ref={scrollRef}>
         {newArrivals.map(arrival => (
           <Card key={arrival.id} className="new-arrival-card">
             <Card.Img variant="top" className="card-img" src={getFirstImageUrl(arrival.photos)} alt={arrival.itemName} />
@@ -153,9 +153,24 @@ const NewArrivals = () => {
               <Card.Text className="text-center mb-1"><strong>Size:</strong> {formatSizes(arrival.sizes)}</Card.Text>
               <Card.Text className="text-center mb-2"><strong>Colors:</strong> {formatColours(arrival.colours)}</Card.Text>
               {/* Call to Action Button */}
-              <Button variant="primary" className="mt-3" onClick={() => handleAddToCart(arrival.id)}>
-                View Product
-              </Button>
+              <Button
+  variant="primary"
+  className="mt-3"
+  style={{
+    backgroundColor: '#ffd700', // Gold color
+    color: 'black', // Text color
+    border: 'none', // No border
+    transition: 'background-color 0.3s ease', // Smooth transition
+  }}
+  onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#e6c200')} // Darker shade on hover
+  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#ffd700')} // Reset to gold color
+  onClick={() => handleAddToCart(arrival.id)}
+>
+  View Product
+</Button>
+
+
+
             </Card.Body>
           </Card>
         ))}

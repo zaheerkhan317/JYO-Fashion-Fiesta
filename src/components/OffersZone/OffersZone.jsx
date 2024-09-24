@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { Card, Badge, Container, Row, Col, Button } from 'react-bootstrap';
+import { Card, Badge, Container, Row, Col, Button, Spinner } from 'react-bootstrap';
 import { db } from '../../firebaseConfig'; // Adjust the import according to your file structure
 import './OffersZone.css'; // Import custom CSS for additional styling
 
 const OffersZone = () => {
   const [offerProducts, setOfferProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false); // Stop loading after 2 seconds
+    }, 2000);
+
+    return () => clearTimeout(timer); // Cleanup the timer
+  }, []);
 
   useEffect(() => {
     const fetchOfferProducts = async () => {
@@ -36,13 +45,16 @@ const OffersZone = () => {
     navigate(`/product/${productId}`); // Navigate to the product detail page
   };
 
-  if (!Array.isArray(offerProducts) || offerProducts.length === 0) {
-    return <div>No offers available at the moment.</div>; // Handle empty state
-  }
-
   return (
-    <Container className="offers-zone-container">
+    <Container className="offers-zone-container mt-5 mb-5">
       <h2 className="text-center mb-5 category-title">Offers Zone</h2>
+      {loading ? ( // Show spinner if loading
+        <div className="text-center">
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        </div>
+      ) : (
       <Row className="grid-container">
         {offerProducts.map(product => {
           // Determine badge text and variant based on product attributes
@@ -166,6 +178,7 @@ const OffersZone = () => {
           );
         })}
       </Row>
+      )}
     </Container>
   );
 };

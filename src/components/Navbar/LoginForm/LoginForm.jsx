@@ -12,9 +12,33 @@ function LoginForm() {
   const navigate = useNavigate();
   const { setFirstName, setUser } = useUser();
 
+  // Email validation function
+  const isEmailValid = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Handle login with validation checks
   const handleLogin = async (e) => {
     e.preventDefault();
-    
+    setError(''); // Reset error message
+
+    // Trim the input values
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
+    // Validate email format
+    if (!isEmailValid(trimmedEmail)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    // Validate password length
+    if (trimmedPassword.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+
     try {
       const db = getFirestore();
       const usersCollection = collection(db, 'users');
@@ -24,7 +48,7 @@ function LoginForm() {
 
       userSnapshot.forEach((doc) => {
         const userData = doc.data();
-        if (userData.email === email.trim() && userData.password === password.trim()) {
+        if (userData.email === trimmedEmail && userData.password === trimmedPassword) {
           userFound = true;
           setUser({
             email: userData.email,

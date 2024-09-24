@@ -4,6 +4,8 @@ import { getFirestore, collection, query, updateDoc, getDocs, getDoc, doc, delet
 import { FaStar } from 'react-icons/fa';
 import logo from '../../../img/logo.jpg'
 import { jsPDF } from 'jspdf';
+import { auth } from '../../../firebaseConfig';
+import { useMediaQuery } from 'react-responsive';
 import 'jspdf-autotable';
 import './MyOrders.css'; // Custom CSS for styling
 
@@ -22,7 +24,7 @@ const MyOrders = () => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [reviews, setReviews] = useState({}); // { productId: reviewData }
-
+  const isSmallScreen = useMediaQuery({ query: '(max-width: 768px)' }); // Define the breakpoint for small screens
   const db = getFirestore();
 
   useEffect(() => {
@@ -146,10 +148,19 @@ const MyOrders = () => {
     if (order) {
       // Fetch user details using userId from the order
       const user = await fetchUserDetails(order.userId);
-      console.log(user);
-      if (user) {
+      const authUser = auth.currentUser; // Get the currently authenticated user
+      const userDetails = user || {
+        firstName: authUser ? authUser.displayName.split(' ')[0] : 'N/A',
+        lastName: authUser ? authUser.displayName.split(' ')[1] : 'N/A',
+        phoneNumber: authUser ? authUser.phoneNumber : 'N/A',
+        email: authUser ? authUser.email : 'N/A',
+      };
+
+      console.log(userDetails); // This will show either Firestore user or authenticated user details
+
+      if (userDetails) {
         const doc = new jsPDF();
-        
+
         // Add Logo (Optimized for size and quality)
         if (logo) {
           doc.addImage(logo, 'PNG', 10, 10, 40, 15); // Adjust size for space
@@ -162,10 +173,10 @@ const MyOrders = () => {
 
         // User Information and Order Summary
         const userInfo = [
-          ['First Name', user.firstName],
-          ['Last Name', user.lastName],
-          ['Phone', user.phoneNumber],
-          ['Email', user.email],
+          ['First Name', userDetails.firstName],
+          ['Last Name', userDetails.lastName],
+          ['Phone', userDetails.phoneNumber],
+          ['Email', userDetails.email],
           ['Order ID', `#${order.orderId}`],
           ['Order Date', order.orderDate],
         ];
@@ -218,7 +229,6 @@ const MyOrders = () => {
           ];
         });
 
-
         // Add product details in a table format
         doc.autoTable({
           head: [['S.No', 'Product ID', 'Item Name', 'Qty', 'Size', 'Price', 'Disc.', 'Total']],
@@ -249,7 +259,7 @@ const MyOrders = () => {
             3: { cellWidth: 17 }, // Narrow width for Brand
             4: { cellWidth: 17 }, // Narrow width for Qty
             5: { cellWidth: 25 }, // Narrow width for Price
-            6: { cellWidth: 20 }, // Narrow width for Total
+            6: { cellWidth: 20 }, // Narrow width for Discount
             7: { cellWidth: 25 }, // Narrow width for Total
           },
           pageBreak: 'avoid', // Avoid page breaks within tables
@@ -258,7 +268,7 @@ const MyOrders = () => {
         // Calculate the total saved amount
         const totalSaved = (order.items || []).reduce((sum, item) => {
           return sum + (item.price - item.total);
-      }, 0);
+        }, 0);
 
         // Add Saved Amount
         doc.setFontSize(12);
@@ -305,6 +315,7 @@ const MyOrders = () => {
       }
     }
   };
+
 
   // Review Modal Handlers
   const openReviewModal = (order) => {
@@ -381,9 +392,10 @@ const MyOrders = () => {
 
 
   return (
-    <Container className="my-orders-section mt-5 mb-5">
-      <h1 className="text-center mb-4">My Orders</h1>
-      <Row>
+    <Container className="my-orders-section mb-5">
+      <h2 className="my-orders-heading text-center mb-5">My Orders</h2>
+      
+      <Row className="mt-5">
         {orders.length > 0 ? (
           orders.map((order) => (
             <Col key={order.id} xs={12} className="horizontal-card-container">
@@ -520,14 +532,25 @@ const MyOrders = () => {
           <Modal.Title>Invoice</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {pdfUrl ? (
-            <iframe
-              src={pdfUrl}
-              title="Invoice PDF"
-              className="responsive-iframe"
-            ></iframe>
+          {isSmallScreen ? (
+            // For small screens, provide a download link
+            <div>
+              <p>Your invoice is ready for download:</p>
+              <a href={pdfUrl} download="invoice.pdf">
+                <Button variant="primary">Download Invoice</Button>
+              </a>
+            </div>
           ) : (
-            <p>Loading invoice...</p>
+            // For larger screens, display the PDF in an iframe
+            pdfUrl ? (
+              <iframe
+                src={pdfUrl}
+                title="Invoice PDF"
+                className="responsive-iframe"
+              ></iframe>
+            ) : (
+              <p>Loading invoice...</p>
+            )
           )}
         </Modal.Body>
         <Modal.Footer>

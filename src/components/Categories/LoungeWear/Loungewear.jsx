@@ -1,24 +1,38 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Badge, Container, Row, Col, Button } from 'react-bootstrap';
+import { Card, Badge, Container, Row, Col, Button, Spinner } from 'react-bootstrap';
 import '../Categories.css'; // Ensure the custom CSS is applied here
 
 const Loungewear = ({ products }) => {
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(true);
+
   const handleAddToCart = (productId) => {
     navigate(`/product/${productId}`); // Navigate to the product detail page
   };
 
-  if (!Array.isArray(products)) {
-    return <div>Loading...</div>; // Handle loading state
-  }
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false); // Stop loading after 2 seconds
+    }, 2000);
+
+    return () => clearTimeout(timer); // Cleanup the timer
+  }, []);
+
 
   const filteredProducts = products.filter(product => product.isOffer === false);
 
   return (
-    <Container className="category-section">
+    <Container className="category-section mt-5">
       <h2 className="text-center mb-5 category-title">Loungewear Collection</h2>
+      {loading ? ( // Show spinner if loading
+        <div className="text-center">
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        </div>
+      ) : (
       <Row className="grid-container">
         {filteredProducts.map(product => {
           // Determine badge text and variant based on product attributes
@@ -151,6 +165,7 @@ const Loungewear = ({ products }) => {
           );
         })}
       </Row>
+      )}
     </Container>
   );
 };

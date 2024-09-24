@@ -144,8 +144,8 @@ const TopCollections = () => {
 
   return (
     <div className="container mt-5 top-collections-container">
-      <h2 className="text-center mb-4">Top Collections</h2>
-      <div className="scroll-container" ref={scrollRef}>
+      <h2 className="top-collections-heading text-center mb-5">Top Collections</h2>
+      <div className="scroll-container pt-5" ref={scrollRef}>
         {collections.map(collection => (
           <Card key={collection.id} className="top-collection-card">
             <Card.Img variant="top" className="card-img" src={getFirstImageUrl(collection.photos)} alt={collection.itemName} />
@@ -156,9 +156,22 @@ const TopCollections = () => {
               <Card.Text className="text-center mb-1"><strong>Size:</strong> {formatSizes(collection.sizes)}</Card.Text>
               <Card.Text className="text-center mb-2"><strong>Colors:</strong> {formatColours(collection.colours)}</Card.Text>
               {/* Call to Action Button */}
-              <Button variant="primary" className="mt-3" onClick={() => handleAddToCart(collection.id)}>
-                View Product
-              </Button>
+              <Button
+  variant="primary"
+  className="mt-3"
+  style={{
+    backgroundColor: '#ffd700', // Gold color
+    color: 'black', // Text color
+    border: 'none', // No border
+    transition: 'background-color 0.3s ease', // Smooth transition
+  }}
+  onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#e6c200')} // Darker shade on hover
+  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#ffd700')} // Reset to gold color
+  onClick={() => handleAddToCart(collection.id)}
+>
+  View Product
+</Button>
+
             </Card.Body>
           </Card>
         ))}

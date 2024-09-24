@@ -317,24 +317,31 @@ const Cart = () => {
                 <div className="info-group">
                   <strong>Color:</strong> <span>{item.color}</span>
                 </div>
-                <div className="info-group d-flex align-items-center">
-                  <strong>Quantity:</strong>
-                  <Button
-                    variant="outline-secondary"
-                    className="quantity-btn"
-                    onClick={() => handleQuantityChange(index, -1)}
-                  >
-                    <FaMinus />
-                  </Button>
-                  <span className="mx-2">{item.quantity}</span>
-                  <Button
-                    variant="outline-secondary"
-                    className="quantity-btn"
-                    onClick={() => handleQuantityChange(index, 1)}
-                  >
-                    <FaPlus />
-                  </Button>
-                </div>
+                <div className="info-group d-flex flex-row align-items-center">
+  <strong>Quantity:</strong>
+  <div className="d-flex flex-row align-items-center mt-2 mt-sm-0 ms-2">
+    <Button
+      variant="outline-secondary"
+      className="quantity-btn"
+      onClick={() => handleQuantityChange(index, -1)}
+      
+    >
+      <FaMinus />
+    </Button>
+    <span className="quantity-span mx-2" >
+      {item.quantity}
+    </span>
+    <Button
+      variant="outline-secondary"
+      className="quantity-btn"
+      onClick={() => handleQuantityChange(index, 1)}
+      
+    >
+      <FaPlus />
+    </Button>
+  </div>
+</div>
+
                 <div className="info-group">
                   <strong>Original Price:</strong> <span className="original-price">₹{item.price} per one</span>
                 </div>

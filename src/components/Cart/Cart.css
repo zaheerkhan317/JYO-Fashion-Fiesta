@@ -117,14 +117,12 @@
   line-height: 1; /* Ensure the icons are vertically centered */
 }
 
+
 .quantity-btn .fa {
   font-size: 14px; /* Control the size of the icon */
 }
 
-.quantity-span {
-  font-size: 14px; /* Adjust the quantity number size */
-  font-weight: bold; /* Optional, to make the number stand out */
-}
+
 
 .cart-item-actions .btn-danger {
   padding: 5px; /* Smaller padding for the icon button */
@@ -226,6 +224,13 @@
 
   .total-price {
     font-size: 0.9rem; /* Smaller font size for total price on mobile phones */
+  }
+  
+  .quantity-span {
+    font-size: 14px; /* Adjust the quantity number size */
+    font-weight: bold; /* Optional, to make the number stand out */
+    margin-bottom: 10px;
+    
   }
 }
 

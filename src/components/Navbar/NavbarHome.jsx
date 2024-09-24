@@ -6,7 +6,9 @@ import "./Navbar.css";
 import { useNavigate } from 'react-router-dom';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
+import { FiUser } from 'react-icons/fi';
 import { useUser } from '../Context/UserProvider';
+import logo from '../../img/logo.jpg';
 
 const NavbarHome = () => {
   const { user, setUser, firstName, setFirstName, displayName, uid, setUid } = useUser();
@@ -80,15 +82,24 @@ const NavbarHome = () => {
       setUser(null);
       setFirstName(''); 
       localStorage.removeItem('firstName');
+      localStorage.removeItem('adminUser'); // Remove admin user data
+      localStorage.removeItem('cartCount'); // Remove cart count
+      localStorage.removeItem('cartItems'); // Remove cart items
+      localStorage.removeItem('notifications'); // Remove notifications
+      localStorage.removeItem('orderStatus'); // Remove order status
+      localStorage.removeItem('uid'); // Remove order status
+      // Add any other items that need to be cleared from local storage
+  
       navigate('/home');
       window.location.reload();
     } catch (error) {
       console.error("Logout error:", error);
       // Handle any errors if necessary
-    }finally{
+    } finally {
       setIsLoading(false);
     }
   };
+  
 
   // Function to handle category selection
   const handleCategoryClick = (category) => {
@@ -145,7 +156,9 @@ const NavbarHome = () => {
       <Navbar className="sticky-top navbar-glossy" expand="lg">
         <Container>
           {/* Logo */}
-          <Navbar.Brand as={Link} to="/home" className={`navbar-link ${activeLink === '' ? 'active' : ''}`} onClick={() => handleLinkClick('')}>Logo</Navbar.Brand>
+          <Navbar.Brand as={Link} to="/home" className={`navbar-link ${activeLink === '' ? 'active' : ''}`} onClick={() => handleLinkClick('')}>
+              <img src={logo} alt="Logo" style={{ height: '30px', width:'50px'}} /> {/* Adjust height as needed */}
+          </Navbar.Brand>
 
           <Navbar.Toggle aria-controls="basic-navbar-nav" onClick={toggleDropdown}>
             {/* Custom toggle button */}
@@ -251,10 +264,14 @@ const NavbarHome = () => {
                 </>
               ) : (
                 <Nav.Item>
-                  <Link to="/signup">
-                    <Button variant="primary">Login / Signup</Button>
-                  </Link>
-                </Nav.Item>
+                <Link to="/signup" 
+                className={`nav-link ${activeLink === 'signup' ? 'active' : ''}`}
+                onClick={() => setActiveLink('signup')}>
+                  <FiUser size={30} style={{
+                    color: activeLink === 'signup' ? 'gold' : 'white', // Change color dynamically
+                  }} /> {/* Feather User Icon */}
+                </Link>
+              </Nav.Item>
               )}
             </Nav>
 

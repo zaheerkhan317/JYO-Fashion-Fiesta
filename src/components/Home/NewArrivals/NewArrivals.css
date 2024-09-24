@@ -4,6 +4,15 @@
   overflow: hidden;
 }
 
+.new-arrivals-heading{
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-top: 4rem;
+  margin-bottom: 3rem;
+  text-align: center;
+  color: #333;
+}
+
 /* Scrollable wrapper styles */
 .scroll-container {
   display: flex;
@@ -90,6 +99,8 @@
   font-size: 1rem;
   padding: 10px 20px;
 }
+
+
 
 /* Responsive Design */
 @media (min-width: 1200px) {

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { getFirestore, doc, setDoc, addDoc, collection, Timestamp } from "firebase/firestore";
+import { getFirestore, doc, setDoc, addDoc, getDocs, query, where, collection, Timestamp } from "firebase/firestore";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import * as firebaseui from "firebaseui";
 import "firebaseui/dist/firebaseui.css";
+import { db } from "../../../firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import './PhoneVerify.css';
 import { useUser } from '../../Context/UserProvider';
@@ -25,6 +26,7 @@ const PhoneVerify = ({ auth }) => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [error, setError] = useState('');
+  const [formErrors, setFormErrors] = useState({});
   const { setUid, setFirstName, setUser } = useUser();
 
 
@@ -77,7 +79,21 @@ const PhoneVerify = ({ auth }) => {
   }, [auth, navigate, setError]);
 
 
- 
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.firstName) errors.firstName = "First Name is required";
+    if (!formData.lastName) errors.lastName = "Last Name is required";
+    if (!formData.email) errors.email = "Email is required";
+    if (!formData.password) errors.password = "Password is required";
+    if (formData.password !== formData.confirmPassword) {
+      errors.confirmPassword = "Passwords do not match";
+    }
+    if (!formData.phoneNumber) errors.phoneNumber = "Phone number is required";
+    if (!formData.countryCode) errors.countryCode = "Country code is required";
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
   
 
   const handleInputChange = (e) => {
@@ -89,23 +105,35 @@ const PhoneVerify = ({ auth }) => {
     }));
   };
 
-  const handleSendOtp = () => {
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match.");
-      return;
-    }
 
-    if(!formData.phoneNumber){
-      alert("please enter your phone number");
-      return;
-    }
+  
+  const checkUserExists = async () => {
+    const { email, countryCode, phoneNumber } = formData;
+    const userRef = collection(db, 'users');
 
-    if (!formData.countryCode) {
-      alert("please select the country code");
-      return;
+    // Check for existing email
+    const emailQuery = query(userRef, where('email', '==', email));
+    const emailSnapshot = await getDocs(emailQuery);
+    
+    // Check for existing phone number
+    const phoneQuery = query(userRef, where('phoneNumber', '==', `${countryCode} ${phoneNumber}`));
+    const phoneSnapshot = await getDocs(phoneQuery);
+
+    if (!emailSnapshot.empty || !phoneSnapshot.empty) {
+      setError('User email and phone number already exists');
+      return true; // User exists
     }
+    return false; // User does not exist
+  };
+
+  const handleSendOtp = async () => {
+    if (!validateForm()) return; // If form is invalid, stop OTP process
 
     setIsLoading(true);
+    setError('');
+    console.log('phone number',`${formData.countryCode} ${formData.phoneNumber}`);
+    const userExists = await checkUserExists();
+    if (!userExists) {
 
     const appVerifier = window.recaptchaVerifier;
     if (!appVerifier) {
@@ -116,34 +144,23 @@ const PhoneVerify = ({ auth }) => {
 
     const completePhone = `${formData.countryCode} ${formData.phoneNumber}`;
 
-    // firebase.auth().signInWithPhoneNumber(completePhone, appVerifier)
-    //   .then((confirmationResult) => {
-    //     setConfirmResult(confirmationResult);
-    //     setShowForm(false); // Hide form after OTP is sent
-    //   })
-    //   .catch((error) => {
-    //     console.error("Error during signInWithPhoneNumber:", error);
-    //     setError("Error during OTP request. Please try again.");
-    //   });
-
     firebase.auth().signInWithPhoneNumber(completePhone, appVerifier)
-    .then((confirmationResult) => {
-      setConfirmResult(confirmationResult);
-      setShowForm(false); // Hide form after OTP is sent
-    })
-    .catch((error) => {
-      console.error("Error during signInWithPhoneNumber:", error);
-
-      if (error.code === 'auth/billing-not-enabled' || error.code === 'auth/too-many-requests') {
-        console.log("Billing is not enabled. Storing user data in Firebase Firestore.");
-        storeUserInFirestore().then(() => {
+      .then((confirmationResult) => {
+        setConfirmResult(confirmationResult);
+        setShowForm(false);
+      })
+      .catch((error) => {
+        console.error("Error during signInWithPhoneNumber:", error);
+        if (error.code === 'auth/billing-not-enabled' || error.code === 'auth/too-many-requests') {
+          storeUserInFirestore().then(() => setIsLoading(false));
+        } else {
+          setError("Error during OTP request. Please try again.");
           setIsLoading(false);
-        });
-      } else {
-        setError("Error during OTP request. Please try again.");
-        setIsLoading(false);
-      }
-    });
+        }
+      });
+    }else {
+      setIsLoading(false); // Stop loading if user exists
+    }
   };
   
   // Function to store user data in Firebase Realtime Database
@@ -231,6 +248,8 @@ const PhoneVerify = ({ auth }) => {
       setError("An error occurred while saving data.");
     }
   };
+
+
 
 
   const handleOtpSubmit = (e) => {
@@ -321,19 +340,22 @@ const PhoneVerify = ({ auth }) => {
         <div className="col-md-4">
           <div className="form-group">
             <label htmlFor="firstName">First Name</label>
-            <input type="text" className="form-control" id="firstName" name="firstName" placeholder="First Name" value={formData.firstName} onChange={handleInputChange} required />
+            <input type="text"  className={`form-control ${formErrors.firstName ? 'is-invalid' : ''}`} id="firstName" name="firstName" placeholder="First Name" value={formData.firstName} onChange={handleInputChange} required />
+            {formErrors.firstName && <div className="invalid-feedback">{formErrors.firstName}</div>}
           </div>
         </div>
         <div className="col-md-4">
           <div className="form-group">
             <label htmlFor="lastName">Last Name</label>
-            <input type="text" className="form-control" id="lastName" name="lastName" placeholder="Last Name" value={formData.lastName} onChange={handleInputChange} required />
+            <input type="text" className={`form-control ${formErrors.lastName ? 'is-invalid' : ''}`} id="lastName" name="lastName" placeholder="Last Name" value={formData.lastName} onChange={handleInputChange} required />
+            {formErrors.lastName && <div className="invalid-feedback">{formErrors.lastName}</div>}
           </div>
         </div>
         <div className="col-md-4">
           <div className="form-group">
           <label htmlFor="email">Email</label>
-          <input type="email" className="form-control" id="email" name="email" placeholder="Email" value={formData.email} onChange={handleInputChange} />
+          <input type="email" className={`form-control ${formErrors.email ? 'is-invalid' : ''}`} id="email" name="email" placeholder="Email" value={formData.email} onChange={handleInputChange} />
+          {formErrors.email && <div className="invalid-feedback">{formErrors.email}</div>}
           </div>
         </div>
       </div>
@@ -341,13 +363,15 @@ const PhoneVerify = ({ auth }) => {
         <div className="col-md-6 mx-auto">
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input type="password" className="form-control" id="password" name="password" placeholder="Password" value={formData.password} onChange={handleInputChange} required />
+            <input type="password" className={`form-control ${formErrors.password ? 'is-invalid' : ''}`} id="password" name="password" placeholder="Password" value={formData.password} onChange={handleInputChange} required />
+            {formErrors.password && <div className="invalid-feedback">{formErrors.password}</div>}
           </div>
         </div>
         <div className="col-md-6 mx-auto">
           <div className="form-group">
             <label htmlFor="confirmPassword">Confirm Password</label>
-            <input type="password" className="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleInputChange} required />
+            <input type="password" className={`form-control ${formErrors.confirmPassword ? 'is-invalid' : ''}`} id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleInputChange} required />
+            {formErrors.confirmPassword && <div className="invalid-feedback">{formErrors.confirmPassword}</div>}
           </div>
         </div>
       </div>
@@ -355,7 +379,7 @@ const PhoneVerify = ({ auth }) => {
         <label htmlFor="phoneNumber">Phone Number</label>
         <div className="input-group">
           <div className="input-group-prepend">
-            <select className="custom-select form-control" id="countryCode" name="countryCode" value={formData.countryCode} onChange={handleInputChange} required>
+            <select  className={`form-control ${formErrors.countryCode ? 'is-invalid' : ''}`} id="countryCode" name="countryCode" value={formData.countryCode} onChange={handleInputChange} required>
               <option value="+91">+91 (India)</option>
               <option value="+1">+1 (USA)</option>
               <option value="+44">+44 (UK)</option>
@@ -384,10 +408,13 @@ const PhoneVerify = ({ auth }) => {
               <option value="+91">+91 (India)</option>
               <option value="+977">+977 (Nepal)</option>
             </select>
+            {formErrors.countryCode && <div className="invalid-feedback">{formErrors.countryCode}</div>}
           </div>
-          <input type="tel" className="form-control" id="phoneNumber" name="phoneNumber" placeholder="Phone Number" value={formData.phoneNumber} onChange={handleInputChange} required />
+          <input type="tel"  className={`form-control ${formErrors.phoneNumber ? 'is-invalid' : ''}`} id="phoneNumber" name="phoneNumber" placeholder="Phone Number" value={formData.phoneNumber} onChange={handleInputChange} required />
+          {formErrors.phoneNumber && <div className="invalid-feedback">{formErrors.phoneNumber}</div>}
         </div>
       </div>
+      {error && <div className="text-danger mb-3">{error}</div>}
       <button type="button" className={`btn btn-send ${isLoading ? 'loading' : ''}`} id="send-otp-button" onClick={handleSendOtp} disabled={isLoading} > {isLoading && ( <div className="spinner"></div> )} {!isLoading && 'Submit'} </button>
       
     </form>
@@ -397,6 +424,8 @@ const PhoneVerify = ({ auth }) => {
       <label htmlFor="otp">Enter OTP</label>
       <input type="text" className="form-control" id="otp" name="otp" placeholder="Enter OTP" value={otp} onChange={(e) => setOtp(e.target.value)} required />
     </div>
+
+    {error && <div className="text-danger mb-3">{error}</div>} 
     <button type="submit" className={`btn btn-success btn-block ${isVerified ? 'verified' : ''}`} disabled={isVerifying} >
       {isVerified ? (
         <>
@@ -408,7 +437,7 @@ const PhoneVerify = ({ auth }) => {
         'Verify OTP'
       )}
     </button>
-      {error && <div className="alert alert-danger mt-3">{error}</div>} 
+      
       </form>
   )}
 </div>

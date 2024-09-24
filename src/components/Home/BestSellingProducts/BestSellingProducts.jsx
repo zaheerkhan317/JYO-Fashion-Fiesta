@@ -142,8 +142,8 @@ const BestSellingProducts = () => {
 
   return (
     <div className="container mt-5 best-selling-products-container">
-      <h2 className="text-center mb-4">Best Selling Products</h2>
-      <div className="scroll-container" ref={scrollRef}>
+      <h2 className="best-selling-heading text-center mb-5">Best Selling Products</h2>
+      <div className="scroll-container mt-5 pt-5" ref={scrollRef}>
         {bestSellingProducts.map(product => (
           <Card key={product.id} className="best-selling-product-card">
             <Card.Img variant="top" className="card-img" src={getFirstImageUrl(product.photos)} alt={product.itemName} />
@@ -154,9 +154,22 @@ const BestSellingProducts = () => {
               <Card.Text className="text-center mb-1"><strong>Size:</strong> {formatSizes(product.sizes)}</Card.Text>
               <Card.Text className="text-center mb-2"><strong>Colors:</strong> {formatColours(product.colours)}</Card.Text>
               {/* Call to Action Button */}
-              <Button variant="primary" className="mt-3" onClick={() => handleAddToCart(product.id)}>
-                View Product
-              </Button>
+              <Button
+  variant="primary"
+  className="mt-3"
+  style={{
+    backgroundColor: '#ffd700', // Gold color
+    color: 'black', // Text color
+    border: 'none', // No border
+    transition: 'background-color 0.3s ease', // Smooth transition
+  }}
+  onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#e6c200')} // Darker shade on hover
+  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#ffd700')} // Reset to gold color
+  onClick={() => handleAddToCart(product.id)}
+>
+  View Product
+</Button>
+
             </Card.Body>
           </Card>
         ))}
