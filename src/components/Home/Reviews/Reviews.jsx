@@ -36,13 +36,16 @@ const ReviewCard = ({ name, review, rating, productid, time }) => {
         alt={`Image of ${name}`} 
         style={{ 
           position: 'absolute', 
-          top: '-30px', // Adjust based on how much you want it to overlap
+          top: '-40px',  // Slightly higher for more overlap
           left: '50%', 
           transform: 'translateX(-50%)', 
-          height: '64px', // Adjust the size as needed
-          width: '64px', 
-          borderRadius: '50%', // Optional: makes it circular
-          border: '2px solid white', // Optional: adds a white border
+          height: '70px',  // Larger size for better visibility
+          width: '70px', 
+          borderRadius: '50%',  // Fully circular image
+          border: '4px solid white',  // Thicker white border for emphasis
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',  // Adds a slight shadow for depth
+          backgroundColor: '#fff', // To ensure a clean background
+          zIndex: '1' 
         }} 
       />
 
