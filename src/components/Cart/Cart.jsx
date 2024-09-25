@@ -10,9 +10,12 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [error, setError] = useState(null);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
   const [showPlaceOrderModal, setShowPlaceOrderModal] = useState(false);
   const [itemToRemove, setItemToRemove] = useState(null);
   const [couponCode, setCouponCode] = useState({});
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [countryCode, setCountryCode] = useState(''); // State for country code
   const [discount, setDiscount] = useState({}); // New state for discount
   const [couponError, setCouponError] = useState({}); // New state for coupon error
   
@@ -139,11 +142,23 @@ const Cart = () => {
   };
 
   const handlePlaceAllOrders = () => {
-    setShowPlaceOrderModal(true);
+    setShowPhoneModal(true);
   };
+
+
+  const handlePhoneSubmit = () => {
+    // Validate phone number (add any validation if necessary)
+    if (!phoneNumber || !countryCode) {
+        alert("Please enter a valid phone number.");
+        return;
+    }
+    setShowPhoneModal(false); // Close phone modal
+    setShowPlaceOrderModal(true); // Show confirmation modal
+};
   
 
   const confirmPlaceAllOrders = async () => {
+    console.log("phone number:",`${countryCode}${phoneNumber}`);
     try {
       const orderId = await generateOrderId(); // Ensure the order ID is awaited
       const uid = localStorage.getItem('uid');
@@ -158,10 +173,11 @@ const Cart = () => {
           orderId: orderId,
           userId: uid,
           items: cartItems.map(item => ({
-              ...item, // Spread existing item properties
+              ...item, 
               discountApplied: item.discountApplied || false, // Include discountApplied
               couponDiscount: item.couponDiscount || 0, // Include couponDiscount (default to 0 if not present)
           })),
+          contactPhoneNumber: `${countryCode}${phoneNumber}`,
           paid: false,
           status: 'pending', // Optional field for tracking request date
           totalPrice: cartItems.reduce((total, item) => total + parseFloat(item.total), 0).toFixed(2),
@@ -441,21 +457,87 @@ const Cart = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Place Order Modal */}
-      <Modal show={showPlaceOrderModal} onHide={() => setShowPlaceOrderModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm Order</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Are you sure you want to place the order for all items in your cart?</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowPlaceOrderModal(false)}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={confirmPlaceAllOrders}>
-            Confirm
-          </Button>
-        </Modal.Footer>
-      </Modal>
+       {/* Phone Number Modal */}
+       <Modal show={showPhoneModal} onHide={() => setShowPhoneModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Enter Phone Number to Contact</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                <Form>
+                        <Form.Group controlId="formCountryCode">
+                            <Form.Label>Country Code</Form.Label>
+                            <Form.Control 
+                                as="select" 
+                                value={countryCode} 
+                                onChange={(e) => setCountryCode(e.target.value)}
+                            >
+                                <option value="">Select Country Code</option>
+                                <option value="+91">+91 (India)</option>
+                                <option value="+1">+1 (USA)</option>
+                                <option value="+44">+44 (UK)</option>
+                                <option value="+61">+61 (Australia)</option>
+                                <option value="+81">+81 (Japan)</option>
+                                <option value="+33">+33 (France)</option>
+                                <option value="+49">+49 (Germany)</option>
+                                <option value="+39">+39 (Italy)</option>
+                                <option value="+55">+55 (Brazil)</option>
+                                <option value="+86">+86 (China)</option>
+                                <option value="+7">+7 (Russia)</option>
+                                <option value="+27">+27 (South Africa)</option>
+                                <option value="+82">+82 (South Korea)</option>
+                                <option value="+20">+20 (Egypt)</option>
+                                <option value="+34">+34 (Spain)</option>
+                                <option value="+31">+31 (Netherlands)</option>
+                                <option value="+52">+52 (Mexico)</option>
+                                <option value="+60">+60 (Malaysia)</option>
+                                <option value="+63">+63 (Philippines)</option>
+                                <option value="+62">+62 (Indonesia)</option>
+                                <option value="+90">+90 (Turkey)</option>
+                                <option value="+41">+41 (Switzerland)</option>
+                                <option value="+48">+48 (Poland)</option>
+                                <option value="+30">+30 (Greece)</option>
+                                <option value="+94">+94 (Sri Lanka)</option>
+                                <option value="+91">+91 (India)</option>
+                                <option value="+977">+977 (Nepal)</option>
+                                {/* Add more country codes as needed */}
+                            </Form.Control>
+                        </Form.Group>
+                        <Form.Group controlId="formPhoneNumber">
+                            <Form.Label>Phone Number</Form.Label>
+                            <Form.Control 
+                                type="text" 
+                                placeholder="Enter your phone number" 
+                                value={phoneNumber} 
+                                onChange={(e) => setPhoneNumber(e.target.value)} 
+                            />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowPhoneModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="primary" onClick={handlePhoneSubmit}>
+                        Next
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Place Order Confirmation Modal */}
+            <Modal show={showPlaceOrderModal} onHide={() => setShowPlaceOrderModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Order</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Are you sure you want to place the order for all items in your cart?</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowPlaceOrderModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="primary" onClick={confirmPlaceAllOrders}>
+                        Confirm
+                    </Button>
+                </Modal.Footer>
+            </Modal>
 
        
       {error && <div className="alert alert-danger mt-3">{error}</div>}

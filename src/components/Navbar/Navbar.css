@@ -215,7 +215,7 @@
 /* Change text color on hover for dropdown items */
 .nav-dropdown .dropdown-item:hover {
   background-color: rgba(255, 255, 255, 0.2) !important; /* Slightly lighter background on hover */
-  color: white !important; /* Ensure text color remains white on hover */
+  color: #ffd700 !important; /* Ensure text color remains white on hover */
 }
 
 
@@ -271,8 +271,8 @@
 
 /* Change background color on hover for dropdown items */
 .dropdown-item:hover {
-  background-color: #333333; /* Dark gray background on hover */
-  color: #ffd700; /* Change text color to gold on hover */
+  background-color: #ffd700; /* Dark gray background on hover */
+  color: #000000; /* Change text color to gold on hover */
 }
 
 /* Underline effect on hover */

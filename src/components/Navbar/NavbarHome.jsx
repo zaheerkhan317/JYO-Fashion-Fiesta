@@ -232,10 +232,28 @@ const NavbarHome = () => {
                           >My Orders</Link></li>
                           <li><hr className="dropdown-divider" /></li>
                           <li>
-                            <button className="dropdown-item text-white" type="button" onClick={handleLogout}>
-                              {loading ? <Spinner as="span" animation="border" size="sm" /> : 'Logout'}
+                            <button 
+                                className="dropdown-item" 
+                                type="button" 
+                                onClick={handleLogout} 
+                                style={{ 
+                                    backgroundColor: 'transparent', 
+                                    color: 'white', // Default text color
+                                    transition: 'background-color 0.3s ease, color 0.3s ease' 
+                                }} 
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'gold';
+                                    e.currentTarget.style.color = 'black'; // Change text color on hover
+                                }} 
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                    e.currentTarget.style.color = 'white'; // Reset text color on leave
+                                }}
+                            >
+                                {loading ? <Spinner as="span" animation="border" size="sm" /> : 'Logout'}
                             </button>
-                          </li>
+                        </li>
+
                         </ul>
                       </div>
                     </div>

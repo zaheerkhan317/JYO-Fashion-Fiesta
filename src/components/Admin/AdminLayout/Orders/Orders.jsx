@@ -41,6 +41,8 @@ const Orders = () => {
           acc[doc.id] = doc.data(); // Use user ID as key
           return acc;
         }, {});
+
+        
         setUsers(usersData);
       } catch (error) {
         console.error("Error fetching orders: ", error);
@@ -329,11 +331,10 @@ const Orders = () => {
         const userInfo = [
           ['First Name', user.firstName || 'N/A'],
           ['Last Name', user.lastName || 'N/A'],
-          ['Phone', user.phoneNumber || 'N/A'],
+          ['Phone', user.phoneNumber || order.contactPhoneNumber],
           ['Email', user.email || 'N/A'],
           ['Order ID', `#${order.orderId || 'N/A'}`],
           ['Order Date', order.orderDate || 'N/A'],
-          ['Payment Status', order.paid ? 'Paid' : 'Not Paid']
         ];
   
         // Use autoTable to create the user info table
@@ -626,6 +627,7 @@ const Orders = () => {
           <tr>
             <th>Order ID</th>
             <th>User Details</th>
+            <th>Contact Number</th>
             <th>Product IDs, <br />sizes & Quantity</th>
             <th>Total Price</th>
             <th>Order Date</th>
@@ -652,9 +654,10 @@ const Orders = () => {
                 <td>{order.orderId}</td>
                 <td>
                   {userDetails.firstName} {userDetails.lastName}<br/>
-                  {userDetails.phoneNumber || 'N/A'}<br />
+                  {userDetails.phoneNumber || 'Google SignIn User'}<br />
                   {userDetails.email || 'N/A'}
                 </td>
+                <td>{order.contactPhoneNumber}</td>
                 <td>
                   {order.items.map((item, index) => (
                     <div key={index}>

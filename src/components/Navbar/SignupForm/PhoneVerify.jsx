@@ -81,20 +81,26 @@ const PhoneVerify = ({ auth }) => {
 
   const validateForm = () => {
     const errors = {};
+    
+    // Check required fields
     if (!formData.firstName) errors.firstName = "First Name is required";
     if (!formData.lastName) errors.lastName = "Last Name is required";
     if (!formData.email) errors.email = "Email is required";
-    if (!formData.password) errors.password = "Password is required";
+    if (!formData.password) {
+        errors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+        errors.password = "Password must be at least 6 characters";
+    }
     if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = "Passwords do not match";
+        errors.confirmPassword = "Passwords do not match";
     }
     if (!formData.phoneNumber) errors.phoneNumber = "Phone number is required";
     if (!formData.countryCode) errors.countryCode = "Country code is required";
     
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
-  };
-  
+};
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

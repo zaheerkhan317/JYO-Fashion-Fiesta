@@ -145,20 +145,9 @@ const MyOrders = () => {
   const handleViewInvoice = async (orderId) => {
     const order = orders.find((order) => order.id === orderId);
 
-    if (order) {
       // Fetch user details using userId from the order
       const user = await fetchUserDetails(order.userId);
-      const authUser = auth.currentUser; // Get the currently authenticated user
-      const userDetails = user || {
-        firstName: authUser ? authUser.displayName.split(' ')[0] : 'N/A',
-        lastName: authUser ? authUser.displayName.split(' ')[1] : 'N/A',
-        phoneNumber: authUser ? authUser.phoneNumber : 'N/A',
-        email: authUser ? authUser.email : 'N/A',
-      };
-
-      console.log(userDetails); // This will show either Firestore user or authenticated user details
-
-      if (userDetails) {
+      if (user) {
         const doc = new jsPDF();
 
         // Add Logo (Optimized for size and quality)
@@ -173,12 +162,13 @@ const MyOrders = () => {
 
         // User Information and Order Summary
         const userInfo = [
-          ['First Name', userDetails.firstName],
-          ['Last Name', userDetails.lastName],
-          ['Phone', userDetails.phoneNumber],
-          ['Email', userDetails.email],
+          ['First Name', user.firstName],
+          ['Last Name', user.lastName],
+          ['Phone', user.phoneNumber || order.contactPhoneNumber],
+          ['Email', user.email],
           ['Order ID', `#${order.orderId}`],
           ['Order Date', order.orderDate],
+          ['Payment Status', order.paid ? 'Paid' : 'Not Paid']
         ];
 
         // Use autoTable to create the user info table
@@ -313,7 +303,7 @@ const MyOrders = () => {
       } else {
         console.error("User not found!!!");
       }
-    }
+    
   };
 
 
