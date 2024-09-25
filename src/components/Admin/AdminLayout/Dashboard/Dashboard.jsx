@@ -335,7 +335,7 @@ const Dashboard = () => {
     <Col xs={12} md={8} className="mb-4">
       <Card>
         <Card.Header>User Registrations This Week</Card.Header>
-        <Card.Body>
+        <Card.Body className='mb-4'>
           <div className="chart-container">
             <Line data={chartData} options={chartOptions} />
           </div>

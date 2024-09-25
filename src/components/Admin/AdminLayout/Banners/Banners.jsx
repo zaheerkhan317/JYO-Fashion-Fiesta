@@ -122,7 +122,7 @@ const Banners = () => {
                     />
                 </Form.Group>
                 <Button
-                    variant="primary"
+                    variant="warning"
                     onClick={handleUpload}
                     disabled={uploading}
                     className="w-100"
@@ -136,7 +136,7 @@ const Banners = () => {
 
 
       {/* Existing Banners Section */}
-      <h3 className="mb-4">Existing Banners</h3>
+      <h2 className="m-4 p-5">Existing Banners</h2>
       {banners.length > 0 ? (
         <Row xs={1} sm={2} md={3} lg={4} className="g-4">
           {banners.map((banner) => (

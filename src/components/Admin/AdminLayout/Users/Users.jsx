@@ -3,6 +3,7 @@ import { Row, Col, Card, Table, Form, InputGroup } from 'react-bootstrap';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../../../firebaseConfig';
 import { FaSearch } from 'react-icons/fa'; // Font Awesome search icon
+import './Users.css';
 
 const Users = () => {
   const [userCount, setUserCount] = useState(0);
@@ -38,9 +39,7 @@ const Users = () => {
     <Row className="mb-4">
       <Col xs={12}>
         <Card>
-          <Card.Header>
-            User Details
-          </Card.Header>
+          <h2 className='mt-4'>User Details</h2>
           <Card.Body>
             {/* Search Input */}
             <Form.Group className="mb-3 d-flex justify-content-center">
@@ -58,42 +57,42 @@ const Users = () => {
               </InputGroup>
             </Form.Group>
 
-            <div className="table-responsive">
-              <Table striped bordered hover className="text-center">
-                <thead>
-                  <tr>
-                    <th>User ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Registered Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredUsers.length > 0 ? (
-                    filteredUsers.map((user, index) => (
-                      <tr key={index}>
-                        <td>{user.uid}</td>
-                        <td>{user.firstName} {user.lastName}</td>
-                        <td>{user.email}</td>
-                        <td>{user.phoneNumber || "Google Account"}</td>
-                        <td>
-                          {user.registeredDate 
-                            ? new Date(user.registeredDate.seconds * 1000).toLocaleString()
-                            : user.createdAt
-                              ? new Date(user.createdAt).toLocaleString()
-                              : "No Date Available"}
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="5">No user details available</td>
-                    </tr>
-                  )}
-                </tbody>
-              </Table>
-            </div>
+            <div className="table-responsive mt-4">
+  <Table className="table table-hover text-center">
+    <thead className="bg-light">
+      <tr>
+        <th>User ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Registered Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {filteredUsers.length > 0 ? (
+        filteredUsers.map((user, index) => (
+          <tr key={index} className="align-middle">
+            <td>{user.uid}</td>
+            <td>{user.firstName} {user.lastName}</td>
+            <td>{user.email}</td>
+            <td>{user.phoneNumber || "Google Account"}</td>
+            <td>
+              {user.registeredDate 
+                ? new Date(user.registeredDate.seconds * 1000).toLocaleString()
+                : user.createdAt
+                }
+            </td>
+          </tr>
+        ))
+      ) : (
+        <tr>
+          <td colSpan="5" className="text-muted">No user details available</td>
+        </tr>
+      )}
+    </tbody>
+  </Table>
+</div>
+
           </Card.Body>
         </Card>
       </Col>

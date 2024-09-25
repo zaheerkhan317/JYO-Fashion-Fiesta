@@ -1,8 +1,10 @@
 .card {
-    transition: transform 0.2s;
-  }
-  
-  .card:hover {
-    transform: scale(1.02);
-  }
-  
+  transition: transform 0.2s, box-shadow 0.2s; /* Add transition for box shadow */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Default shadow */
+  border-radius: 0.5rem; /* Optional: Rounded corners for the card */
+}
+
+.card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* More prominent shadow on hover */
+}

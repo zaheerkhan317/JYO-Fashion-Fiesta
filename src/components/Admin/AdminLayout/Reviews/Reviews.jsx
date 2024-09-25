@@ -53,11 +53,11 @@ const Reviews = () => {
 
   return (
     <Container className="mt-4">
-      <h1 className="text-center mb-4">User Reviews</h1>
+      <h2 className="text-center mb-4">User Reviews</h2>
       <Row className="justify-content-center align-items-center text-center g-4">
         {reviews.map((review) => (
           <Col key={review.id} md={6} lg={4}>
-            <Card className="shadow-sm border-light">
+            <Card className="shadow-lg border-light">
               <Card.Body>
                 <Card.Title className="fw-bold">Order ID: {review.orderId}</Card.Title>
                 <Card.Subtitle className="mb-2 text-muted">Product ID: {review.productId}</Card.Subtitle>

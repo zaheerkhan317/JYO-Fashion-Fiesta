@@ -25,10 +25,15 @@
 .sidebar-header {
   padding: 20px;
   border-bottom: 1px solid #495057;
+  transition: color 0.2s;
 }
 
 .sidebar .text-light {
   color: #ffffff;
+}
+
+.sidebar .text-light:hover {
+  color: gold!important;
 }
 
 .sidebar .nav-link {
@@ -40,8 +45,22 @@
   transition: background-color 0.2s;
 }
 
-.sidebar .nav-link:hover {
-  background-color: #495057;
+
+
+.sidebar .nav-link:hover svg, /* Change icon color to gold on hover */
+.sidebar .nav-link:hover span { /* Change span color to gold on hover */
+    color: gold; /* Change color to gold */
+}
+
+.sidebar .nav-link span {
+  margin-left: 10px;
+  white-space: nowrap;
+  transition: color 0.2s; /* Smooth transition for text color */
+}
+
+
+.sidebar .nav-link:hover .react-icons {
+  color: gold; /* Change icon color to gold on hover */
 }
 
 .sidebar .nav-link span {
@@ -70,6 +89,7 @@
   z-index: 1000;
 }
 
+
 .text-collapse {
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -82,4 +102,22 @@
 
 .sidebar.collapsed ~ .sidebar-toggle {
   left: 80px; /* Adjust when collapsed */
+}
+
+/* Keep icons default color, you can define a default if needed */
+.sidebar .nav-link svg {
+  color: white; /* Default icon color */
+  transition: color 0.2s; /* Smooth transition for color change */
+}
+
+/* Ensure icons change color on hover */
+.sidebar .nav-link:hover svg {
+  color: gold; /* Change icon color to gold on hover */
+}
+
+
+/* Change sidebar-toggle color and h2 color on sidebar hover */
+.sidebar-toggle:hover {
+  background-color: #343a40;
+    color: gold; /* Change color to gold */
 }

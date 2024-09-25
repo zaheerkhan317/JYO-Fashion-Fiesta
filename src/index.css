@@ -13,3 +13,22 @@
     border-radius: 8px;
     background-color: #363636;
 }
+
+::-webkit-scrollbar:horizontal {
+    height: 5px; /* Height of horizontal scrollbar */
+}
+
+/* Horizontal scrollbar thumb */
+::-webkit-scrollbar-thumb:horizontal {
+    border-radius: 8px;
+    background-color: #363636; /* Same color as vertical thumb */
+}
+
+/* Optional: Change hover effect for scrollbar thumb */
+::-webkit-scrollbar-thumb:hover {
+    background-color: #575757; /* Slightly lighter on hover */
+}
+
+::-webkit-scrollbar-thumb:horizontal:hover {
+    background-color: #575757; /* Slightly lighter on hover for horizontal scrollbar */
+}

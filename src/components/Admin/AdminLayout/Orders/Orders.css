@@ -57,4 +57,32 @@
   .notification-close:hover {
     color: #ccc;
   }
-  
+
+  .custom-dropdown .dropdown-toggle {
+    background-color: #343a40; /* Black background for the toggle */
+    color: #fff; /* White text */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 5px 10px; /* Add padding */
+    transition: background-color 0.3s; /* Smooth transition for hover */
+}
+
+.custom-dropdown .dropdown-toggle:hover {
+    background-color: #495057; /* Darker shade on hover */
+}
+
+.dropdown-menu-custom {
+    background-color: #000; /* Black background for dropdown menu */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+}
+
+.dropdown-menu-custom .dropdown-item {
+    color: #fff; /* White text for dropdown items */
+    transition: background-color 0.3s; /* Smooth transition for hover */
+}
+
+.dropdown-menu-custom .dropdown-item:hover {
+    background-color: gold; /* Gold background on hover */
+    color: #000; /* Black text on hover */
+}

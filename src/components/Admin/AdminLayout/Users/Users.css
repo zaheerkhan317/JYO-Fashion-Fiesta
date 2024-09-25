@@ -1,0 +1,61 @@
+.table-responsive {
+    margin-top: 20px; /* Spacing above the table */
+    overflow: auto; /* Allow for scrolling */
+    position: relative; /* Needed for pseudo-element positioning */
+    max-height: 500px; /* Optional: Limit the height of the table for better UX */
+    padding-right: 20px;
+}
+
+h2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    color: #333;
+    font-size: 2rem;
+    padding-bottom: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+.table {
+    border-collapse: separate; /* Make table borders look cleaner */
+    border-spacing: 0 10px; /* Add space between rows */
+}
+
+.table th {
+    background-color: #000 !important; /* Black background for header */
+    color: #f8f8f8 !important; /* Light gray text color for contrast */
+    font-weight: bold; /* Bold header text */
+}
+
+/* Striped rows */
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f2f2f2 !important; /* Light gray for odd rows */
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: #687480 !important; /* Dark gray for even rows */
+}
+
+/* Hover effect for rows */
+.table-striped tbody tr:hover {
+    background-color: #e9ecef; /* Light gray on hover for rows */
+}
+
+/* Row transition effects */
+.table tbody tr {
+    transition: transform 0.2s; /* Smooth transition for hover effects */
+}
+
+.table tbody tr:hover {
+    transform: scale(1.01); /* Slightly scale row on hover */
+}
+
+.table td {
+    background-color: #ffffff; /* White background for cells */
+    border: 1px solid #dee2e6; /* Border color for cells */
+    color: #495057; /* Dark text color for table cells */
+}
+
+.text-muted {
+    color: #6c757d; /* Muted text for "No data" message */
+}

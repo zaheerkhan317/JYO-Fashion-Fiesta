@@ -590,9 +590,9 @@ const Orders = () => {
     </div>
     )}
 
-      <h1>Orders</h1>
+      <h2 className='mb-4'>Orders</h2>
       {/* Search and Filter Bar */}
-      <div className="d-flex justify-content-between mb-3">
+      <div className="d-flex justify-content-center mb-3">
         <Form.Control
           type="text"
           placeholder="Search..."
@@ -600,13 +600,13 @@ const Orders = () => {
           onChange={(e) => setSearch(e.target.value)}
           className="w-50"
         />
-        <Dropdown className="ms-2">
+        <Dropdown className="custom-dropdown ms-2">
           <Dropdown.Toggle variant="secondary" id="dropdown-filter">
             {(filterStatus || paidStatus) ? 
               `${filterStatus || 'All Status'} - ${paidStatus || 'All Payment Status'}` :
               'Filter Options'}
           </Dropdown.Toggle>
-          <Dropdown.Menu>
+          <Dropdown.Menu className="dropdown-menu-custom">
             <Dropdown.Item onClick={() => handleFilterChange('', '')}>All</Dropdown.Item>
 
             <Dropdown.Header>Status</Dropdown.Header>
@@ -684,48 +684,50 @@ const Orders = () => {
                 </td>
 
                 <td>
-                  <div className="d-flex align-items-center">
-                    <Dropdown>
-                      <Dropdown.Toggle variant="primary" id={`dropdown-${order.id}`}>
-                        Actions
-                      </Dropdown.Toggle>
-              
-                      <Dropdown.Menu>
-                        {order.status === 'pending' && (
-                          <>
-                            <Dropdown.Item onClick={() => handleApprove(order.id)}>Approve</Dropdown.Item>
-                            <Dropdown.Item onClick={() => handleDeny(order.id)}>Deny</Dropdown.Item>
-                          </>
-                        )}
-                        {order.status === 'approved' && (
-                          <>
-                            <Dropdown.Item onClick={() => handleInvoice(order.id)}>Invoice</Dropdown.Item>
-                            <Dropdown.Item onClick={() => handleDeny(order.id)}>Deny</Dropdown.Item>
-                            <Dropdown.Item onClick={() => handleDelivered(order.id)}>Delivered</Dropdown.Item>
-                          </>
-                        )}
-                        {order.status === 'denied' && (
-                          <Dropdown.Item onClick={() => handleApprove(order.id)}>Approve</Dropdown.Item>
-                        )}
-                        {order.status === 'delivered' && (
-                          <Dropdown.Item onClick={() => handleInvoice(order.id)}>Invoice</Dropdown.Item>
-                        )}
-                        {order.status === 'cancelRequested' && (
-                          <>
-                            <Dropdown.Item onClick={() => handleApprove(order.id)}>Approve</Dropdown.Item>
-                            <Dropdown.Item onClick={() => handleDeny(order.id)}>Deny</Dropdown.Item>
-                          </>
-                        )}
-                      </Dropdown.Menu>
-                    </Dropdown>
-                    <Button
-                      variant="light"
-                      className="ms-2"
-                      onClick={() => handleDelete(order.id)}
-                    >
-                      <FaTrash />
-                    </Button>
-                  </div>
+                <div className="d-flex align-items-center">
+  <Dropdown className="custom-dropdown me-2"> {/* Added unique class */}
+    <Dropdown.Toggle variant="primary" id={`dropdown-${order.id}`} className="dropdown-toggle">
+      Actions
+    </Dropdown.Toggle>
+
+    <Dropdown.Menu className="dropdown-menu-custom"> {/* Added custom class for dropdown menu */}
+      {order.status === 'pending' && (
+        <>
+          <Dropdown.Item onClick={() => handleApprove(order.id)}>Approve</Dropdown.Item>
+          <Dropdown.Item onClick={() => handleDeny(order.id)}>Deny</Dropdown.Item>
+        </>
+      )}
+      {order.status === 'approved' && (
+        <>
+          <Dropdown.Item onClick={() => handleInvoice(order.id)}>Invoice</Dropdown.Item>
+          <Dropdown.Item onClick={() => handleDeny(order.id)}>Deny</Dropdown.Item>
+          <Dropdown.Item onClick={() => handleDelivered(order.id)}>Delivered</Dropdown.Item>
+        </>
+      )}
+      {order.status === 'denied' && (
+        <Dropdown.Item onClick={() => handleApprove(order.id)}>Approve</Dropdown.Item>
+      )}
+      {order.status === 'delivered' && (
+        <Dropdown.Item onClick={() => handleInvoice(order.id)}>Invoice</Dropdown.Item>
+      )}
+      {order.status === 'cancelRequested' && (
+        <>
+          <Dropdown.Item onClick={() => handleApprove(order.id)}>Approve</Dropdown.Item>
+          <Dropdown.Item onClick={() => handleDeny(order.id)}>Deny</Dropdown.Item>
+        </>
+      )}
+    </Dropdown.Menu>
+  </Dropdown>
+  <Button
+    variant="danger" // Red delete button
+    className="ms-2"
+    onClick={() => handleDelete(order.id)}
+    title="Delete Order" // Tooltip for better UX
+  >
+    <FaTrash />
+  </Button>
+</div>
+
                 </td>
               </tr>
               

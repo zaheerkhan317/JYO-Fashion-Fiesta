@@ -116,7 +116,7 @@ const Offers = () => {
             <Form.Select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
-              className="me-2"
+              className="me-2 "
             >
               <option value="">All Types</option>
               <option value="Kurtas">Kurtas</option>
@@ -178,7 +178,7 @@ const Offers = () => {
 
       <Row className="mb-4">
         <Col xs={12} md={4}>
-          <Button variant="primary" onClick={handleSaveFestivalOffers}>
+          <Button variant="warning" onClick={handleSaveFestivalOffers}>
             Save Festival Offers
           </Button>
         </Col>

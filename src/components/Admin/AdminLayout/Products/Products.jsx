@@ -443,11 +443,11 @@ const Products = () => {
 
   return (
     <Container fluid>
-  <h1 className="mb-4 text-center">Products</h1>
+  <h2 className="mt-4 text-center">Products</h2>
 
   {/* Button to open the modal */}
   <div className="d-flex justify-content-center mb-4">
-    <Button variant="primary" onClick={handleShowModal}>
+    <Button variant='warning' onClick={handleShowModal}>
       Add Product
     </Button>
   </div>
@@ -712,7 +712,7 @@ const Products = () => {
 
 
         <div className="d-flex justify-content-end mx-5">
-          <Button variant="primary" type="submit" className='mx-2'>
+          <Button variant="warning" type="submit" className='mx-2'>
             {selectedProduct ? 'Update Product' : 'Add Product'}
           </Button>
           <Button variant="secondary" onClick={handleCloseModal} className="mr-2 mx-2">

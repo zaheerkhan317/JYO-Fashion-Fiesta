@@ -17,7 +17,7 @@ const Sidebar = ({ isSidebarOpen, setSidebarOpen }) => {
     <div className={`sidebar ${isSidebarOpen ? '' : 'collapsed'}`}>
       <div className="sidebar-content">
         <div className="sidebar-header">
-          <h1 className={`text-light ${isSidebarOpen ? '' : 'd-none'}`}>Admin Panel</h1>
+          <h2 className={`text-light ${isSidebarOpen ? '' : 'd-none'}`}>Admin Panel</h2>
         </div>
         <Nav className="flex-column">
           <Nav.Link as={Link} to="/admin/dashboard" className="text-light d-flex align-items-center">
