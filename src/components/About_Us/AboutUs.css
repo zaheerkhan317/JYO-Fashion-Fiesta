@@ -1,0 +1,211 @@
+/* AboutUs.css */
+
+/* General Styling */
+.about-us-page {
+    background-color: #fdfdfd; /* Light cream background */
+    color: #2d2d2d; /* Dark slate text */
+    font-family: 'Poppins', sans-serif;
+    padding-bottom: 50px;
+  }
+  
+  .text-primary {
+    color: #000; /* Soft blue for main highlights */
+  }
+  
+  .text-secondary {
+    color: #f8a5c2 !important; /* Soft pink for secondary highlights */
+  }
+  
+  /* Header Section */
+  .header-section {
+    padding: 80px 0;/* Soft pink border */
+  }
+  
+  .header-section h1 {
+    font-weight: 700;
+    font-size: 3.5rem; /* Soft blue title */
+  }
+  
+  .header-section .lead {
+    font-size: 1.5rem;
+    color: #a8a8a8; /* Muted grey for subheading */
+    margin-bottom: 30px;
+  }
+  
+  /* Introduction Section */
+  .introduction-section {
+    padding: 60px 0;
+  }
+  
+  .introduction-section h2 {
+    font-weight: 700;
+    color: gold; /* Gold color */
+    font-size: 2.5rem; /* Larger size for better visibility */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), /* Dark shadow */
+                 0px 0px 8px rgba(255, 215, 0, 0.6); /* Gold glow effect */
+    margin-bottom: 20px;
+  }
+
+  
+  .introduction-section p {
+    line-height: 1.7;
+    color: #2d2d2d; /* Dark slate text */
+  }
+  
+  .introduction-section img {
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Soft shadow for images */
+    width: 100%; /* Make image responsive */
+  }
+  
+  /* Mission Section */
+  .mission-section {
+    margin-top: 60px;
+    padding: 60px 0; /* Soft pink background */
+    color: #2d2d2d; /* Dark slate text */
+  }
+  
+  .mission-section h2 {
+    font-weight: 700;
+    color: gold; /* Gold color */
+    font-size: 2.5rem; /* Larger size for better visibility */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), /* Dark shadow */
+                 0px 0px 8px rgba(255, 215, 0, 0.6); /* Gold glow effect */
+    margin-bottom: 20px;
+  }
+  
+  .mission-section p {
+    line-height: 1.7;
+    color: #000; /* White text */
+  }
+  
+  .mission-section img {
+    border-radius: 10px;
+    justify-content: center;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Soft shadow */
+  }
+  
+  /* Team Section */
+  .team-section {
+    padding: 60px 0;
+  }
+
+  .team-img {
+    width: 150px; /* Set a fixed width for the image */
+    height: 150px; /* Set a fixed height for the image */
+    object-fit: cover; /* Ensures the image scales properly within the circle */
+    margin: 20px auto; /* This ensures it's centered horizontally */
+    display: block;
+  }
+  
+  
+  .team-section h2 {
+    font-weight: 700;
+    color: gold; /* Gold color */
+    font-size: 2.5rem; /* Larger size for better visibility */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), /* Dark shadow */
+                 0px 0px 8px rgba(255, 215, 0, 0.6); /* Gold glow effect */
+    margin-bottom: 20px;
+  }
+  
+  .team-card {
+    background-color: #ffffff; /* White background for team cards */
+    border: none;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Card shadow */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .team-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* Hover shadow effect */
+  }
+  
+  .team-card img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border-radius: 50%; /* Circular team member image */
+    border: 3px solid gold; /* Soft blue border */
+  }
+  
+  .team-card .card-title {
+    color: #2d2d2d; /* Dark slate for name */
+    font-weight: 700;
+    margin-top: 15px;
+  }
+  
+  .team-card .card-text {
+    color: #a8a8a8; /* Muted grey for role */
+  }
+  
+  /* What We Do Section */
+  .what-we-do-section {
+    padding: 60px 0;/* White background */
+  }
+  
+  .what-we-do-section h2 {
+    font-weight: 700;
+    color: gold; /* Gold color */
+    font-size: 2.5rem; /* Larger size for better visibility */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), /* Dark shadow */
+                 0px 0px 8px rgba(255, 215, 0, 0.6); /* Gold glow effect */
+    margin-bottom: 20px;
+  }
+  
+  .what-we-do-section p {
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: #2d2d2d !important; /* Dark slate text */
+    margin-bottom: 40px;
+  }
+  
+  /* Buttons */
+  .learn-more-btn {
+    background-color: #000 !important; /* Soft blue button */
+    border: none;
+    color: white !important;
+    padding: 10px 25px;
+    border-radius: 30px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .learn-more-btn:hover{
+    background-color: gold !important; /* Soft pink on hover */
+    color: black !important;
+  }
+  
+  
+  /* Responsive Media Queries */
+  @media (max-width: 768px) {
+    .header-section h1 {
+      font-size: 2.5rem;
+    }
+  
+    .introduction-section img,
+    .mission-section img {
+      width: 100%;
+      height: auto;
+    }
+  
+    .team-section .team-card {
+      margin-bottom: 30px;
+    }
+  
+    .what-we-do-section h2 {
+      font-size: 2rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .header-section h1 {
+      font-size: 2rem;
+    }
+  
+    .introduction-section p,
+    .mission-section p {
+      font-size: 1rem;
+    }
+  }
+  

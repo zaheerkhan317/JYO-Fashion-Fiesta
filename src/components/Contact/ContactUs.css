@@ -1,0 +1,105 @@
+.contact-us-container {
+    padding: 50px 0;
+    background-color: #f8f9fa; /* Light background for the page */
+  }
+  
+  .contact-us-title {
+    font-weight: 700 !important;
+    font-size: 3.5rem !important;
+    color: #2d2d2d; /* Main heading in black */
+  }
+  
+  .contact-us-lead {
+    font-size: 1.5rem;
+    color: #a8a8a8; /* Muted grey for subheading */
+    margin-bottom: 30px;/* Dark gray for the lead text */
+  }
+  
+  .contact-info-section {
+    margin-bottom: 50px; /* Margin for spacing */
+  }
+  
+  .contact-info-title {
+    font-weight: 700;
+    color: gold; /* Gold color */
+    font-size: 2.5rem; /* Larger size for better visibility */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), /* Dark shadow */
+                 0px 0px 8px rgba(255, 215, 0, 0.6); /* Gold glow effect */
+    margin-bottom: 20px;
+  }
+  
+  .contact-info-list {
+    padding: 0;
+  }
+
+  .contact-info-list li {
+    margin-bottom: 15px; /* Space between list items */
+    line-height: 1.5; /* Improve readability */
+  }
+  
+  .contact-icon {
+    color: #FFD700; /* Gold color for icons */
+    margin-right: 10px;
+    font-size: 1.5em; /* Size of the icons */
+  }
+  
+  .contact-form-section {
+    margin-top: 20px; /* Spacing above the form */
+  }
+  
+  .contact-form-title {
+    font-weight: 700;
+    color: gold; /* Gold color */
+    font-size: 2.5rem; /* Larger size for better visibility */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), /* Dark shadow */
+                 0px 0px 8px rgba(255, 215, 0, 0.6); /* Gold glow effect */
+    margin-bottom: 20px;
+  }
+  
+  .contact-form-label {
+    color: #000; /* Black color for form labels */
+  }
+  
+  .contact-input-field { /* Gold border for input fields */
+    background-color: #fff; /* White background for input fields */
+    color: #000; /* Black text for input fields */
+  }
+  
+  .contact-input-field::placeholder {
+    color: #bbb; /* Placeholder text color */
+  }
+  
+  .contact-submit-button {
+    background-color: #000 !important; /* Soft blue button */
+    border: none;
+    color: white !important;
+    padding: 10px 25px;
+    border-radius: 30px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .contact-submit-button:hover {
+    background-color: gold !important; /* Soft pink on hover */
+    color: black !important; /* Darker gold on hover */
+  }
+  
+  .map-section {
+    margin-top: 50px; /* Margin for spacing */
+  }
+  
+  .map-title {
+    font-weight: 700;
+    color: gold; /* Gold color */
+    font-size: 2.5rem; /* Larger size for better visibility */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), /* Dark shadow */
+                 0px 0px 8px rgba(255, 215, 0, 0.6); /* Gold glow effect */
+    margin-bottom: 20px;
+  }
+  
+  .map-container {
+    margin-top: 20px;
+    border: 1px solid #FFD700; /* Gold border for map */
+    border-radius: 5px;
+  }
+  
