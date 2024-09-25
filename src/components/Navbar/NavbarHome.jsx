@@ -82,6 +82,7 @@ const NavbarHome = () => {
       setUser(null);
       setFirstName(''); 
       localStorage.removeItem('firstName');
+      localStorage.removeItem('displayName');
       localStorage.removeItem('adminUser'); // Remove admin user data
       localStorage.removeItem('cartCount'); // Remove cart count
       localStorage.removeItem('cartItems'); // Remove cart items
@@ -282,12 +283,15 @@ const NavbarHome = () => {
                 </>
               ) : (
                 <Nav.Item>
+                  
                 <Link to="/signup" 
                 className={`nav-link ${activeLink === 'signup' ? 'active' : ''}`}
                 onClick={() => setActiveLink('signup')}>
+
                   <FiUser size={30} style={{
                     color: activeLink === 'signup' ? 'gold' : 'white', // Change color dynamically
                   }} /> {/* Feather User Icon */}
+                  <span className="me-3">SignUp</span>
                 </Link>
               </Nav.Item>
               )}
