@@ -89,6 +89,7 @@ const Dashboard = () => {
   const [productGraph, setProductGraph] = useState([]);
   const [orderCount, setOrderCount] = useState(0);
   const [orderGraph, setOrderGraph] = useState([]);
+  const [reviewsCount, setReviewsCount] = useState(0);
   const [recentActivities, setRecentActivities] = useState([]);
   const [userRegistrations, setUserRegistrations] = useState([]);
   const db = getFirestore();
@@ -120,6 +121,9 @@ const Dashboard = () => {
 
       const ordersCollection = collection(db, 'orders');
       const ordersSnapshot = await getDocs(ordersCollection);
+
+      const reviewsCollection = collection(db, 'reviews');
+      const reviewsSnapshot = await getDocs(reviewsCollection);
     
       activitiesSnapshot.docs.forEach(doc => {
         const data = doc.data();
@@ -185,6 +189,9 @@ const Dashboard = () => {
 
       const totalOrders = ordersSnapshot.size;
       setOrderCount(totalOrders);
+
+      const totalReviews = reviewsSnapshot.size;
+      setReviewsCount(totalReviews);
     
       const totalUsers = usersSnapshot.size;
       setUserCount(totalUsers);
@@ -282,6 +289,7 @@ const Dashboard = () => {
 
   return (
     <Container fluid>
+      <h2 className='mt-3 mb-3'>Dashboard</h2>
   <Row className="mb-4">
     {/* First row with 4 cards (Users, Products, Orders, Reviews) */}
     <Col xs={12} sm={6} md={3} lg={3} className="mb-4">
@@ -322,7 +330,7 @@ const Dashboard = () => {
         <Card.Body>
           <Card.Title>Reviews</Card.Title>
           <Card.Text>
-            <h3><FaStar /> {/* {reviewCount} */}</h3>
+            <h3><FaStar /> {reviewsCount} </h3>
             Customer reviews and ratings
           </Card.Text>
         </Card.Body>
@@ -355,7 +363,7 @@ const Dashboard = () => {
                 <li><strong>Total Users:</strong> {userCount}</li>
                 <li><strong>Total Products:</strong> {productCount}</li>
                 <li><strong>Total Orders:</strong> {orderCount}</li>
-                <li><strong>Total Reviews:</strong> {/*{reviewCount}*/}</li>
+                <li><strong>Total Reviews:</strong> {reviewsCount}</li>
               </ul>
             </Card.Body>
           </Card>

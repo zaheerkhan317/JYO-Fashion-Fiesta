@@ -312,7 +312,6 @@ const Products = () => {
           cost: formData.cost,
           discountValue: formData.discountValue, // Store discount percentage
           discountedPrice: formData.discountedPrice,
-          quantityLeft: formData.quantityLeft,
           sizes: sortedSizes,
           colours: formData.colours,
           photos: { ...photoUrls },
@@ -337,7 +336,6 @@ const Products = () => {
           cost: formData.cost,
           discountValue: formData.discountValue,
           discountedPrice: formData.discountedPrice,
-          quantityLeft: formData.quantityLeft,
           sizes: sortedSizes,
           colours: formData.colours,
           isOffer: formData.isOffer || false,
@@ -386,7 +384,6 @@ const Products = () => {
       cost: product.cost,
       discountValue: product.discountValue,
       discountedPrice: product.discountedPrice,
-      quantityLeft: product.quantityLeft,
       sizes: product.sizes,
       colours: product.colours,
       photos: product.photos,
@@ -549,20 +546,6 @@ const Products = () => {
             </Col>
              )}
         </Row>      
-
-          <Form.Group as={Row} controlId="formQuantityLeft">
-            <Form.Label column sm={2}>Quantity Left</Form.Label>
-            <Col sm={10} md={4} className='mb-4'>
-              <Form.Control
-                type="number"
-                placeholder="Enter quantity left"
-                name="quantityLeft"
-                value={formData.quantityLeft}
-                onChange={(e) => setFormData({ ...formData, quantityLeft: e.target.value })}
-                onWheel={(e) => e.target.blur()} // Prevent changing value on scroll
-              />
-            </Col>
-          </Form.Group>
 
         {/* Sizes with Quantity */} 
 <Form.Group controlId="formSizes"> 
@@ -781,7 +764,6 @@ const Products = () => {
         <th>Cost</th>
         <th>Discount %</th>
         <th>After Discount</th>
-        <th>Quantity Left</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -796,7 +778,6 @@ const Products = () => {
           <td>{product.cost}</td>
           <td>{product.discountValue}</td>
           <td>{product.discountedPrice}</td>
-          <td>{product.quantityLeft}</td>
           <td>
             <Button variant="warning" onClick={() => handleEdit(product)}>Edit</Button>{' '}
             <Button variant="danger" onClick={() => handleDelete(product.id)}>Delete</Button>
