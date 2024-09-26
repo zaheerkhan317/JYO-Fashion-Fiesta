@@ -44,6 +44,7 @@ const Products = () => {
   const [isUpdate, setIsUpdate] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('');
+  const [limitedStockProducts, setLimitedStockProducts] = useState([]);
 
   const [formData, setFormData] = useState({
     brand: '',
@@ -74,17 +75,30 @@ const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        // Fetch all products from Firestore
         const querySnapshot = await getDocs(collection(db, 'products'));
         const productsList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  
+        // Set all fetched products to state
         setProducts(productsList);
+  
+        // Filter products where any size has less than 5 stock
+        const limitedStock = productsList.filter((product) => {
+          return Object.entries(product.sizes || {}).some(([size, qty]) => {
+            // Convert the quantity to a number and check if it's less than 5
+            return Number(qty) < 5;
+          });
+        });
+  
+        // Set limited stock products to state
+        setLimitedStockProducts(limitedStock);
       } catch (error) {
         console.error('Error fetching products: ', error);
       }
     };
-
+  
     fetchProducts();
   }, []);
-  
 
   useEffect(() => {
     if (formData.cost) {
@@ -786,6 +800,44 @@ const Products = () => {
       ))}
     </tbody>
   </Table>
+
+
+   {/* Limited Stock Table */}
+   <h2 className='mt-5 pt-5 mb-5'>Limited Stock Products (Less than 5)</h2>
+      <Table striped bordered hover responsive>
+        <thead>
+          <tr>
+            <th>Product ID</th>
+            <th>Brand</th>
+            <th>Item Name</th>
+            <th>Type</th>
+            <th>Cost</th>
+            <th>Discount</th>
+            <th>Sizes with Limited Stock</th>
+          </tr>
+        </thead>
+        <tbody>
+          {limitedStockProducts.map((product) => (
+            <tr key={product.id}>
+              <td>{product.id}</td>
+              <td>{product.brand}</td>
+              <td>{product.itemName}</td>
+              <td>{product.type}</td>
+              <td>{product.cost}</td>
+              <td>{product.discountValue}</td>
+              <td>
+                {Object.entries(product.sizes || {}).map(([size, qty]) => (
+                  Number(qty) < 5 && (
+                    <div key={size}>
+                      {size}: {qty}
+                    </div>
+                  )
+                ))}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
   </div>
 
   {/* Success Popup */}
