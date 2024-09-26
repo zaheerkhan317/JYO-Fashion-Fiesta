@@ -22,8 +22,10 @@ const NavbarHome = () => {
   const [loading, setIsLoading] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [festivalOffer, setFestivalOffer] = useState(null);
-  const [activeLink, setActiveLink] = useState('home'); // Set a default active link
-  const [isCategoriesActive, setIsCategoriesActive] = useState(false);
+  const [activeLink, setActiveLink] = useState(localStorage.getItem('activeLink') || 'home');
+  const [isCategoriesActive, setIsCategoriesActive] = useState(
+    localStorage.getItem('isCategoriesActive') === 'true' // Convert string to boolean
+  );
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   console.log("cart count",cartCount);
   // useEffect(() => {
@@ -102,6 +104,18 @@ const NavbarHome = () => {
   };
   
 
+  // Save activeLink to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('activeLink', activeLink);
+  }, [activeLink]);
+  
+
+  // Save isCategoriesActive to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('isCategoriesActive', isCategoriesActive);
+  }, [isCategoriesActive]);
+
+
   // Function to handle category selection
   const handleCategoryClick = (category) => {
     setIsCategoriesActive(true); // Keep categories active
@@ -122,7 +136,7 @@ const NavbarHome = () => {
   const dropdownRef = useRef(null);
 
   const handleMyOrdersClick = () => {
-    setActiveLink('myorders');
+    handleLinkClick('myorders');
 
     // Close the dropdown programmatically
     if (dropdownRef.current) {
@@ -266,7 +280,7 @@ const NavbarHome = () => {
     as={Link}
     to="/cart"
     className={`cart-icon d-flex justify-content-center align-items-center ${activeLink === 'cart' ? 'active' : ''}`}
-    onClick={() => setActiveLink('cart')} // Set active link when clicked
+    onClick={() => handleLinkClick('cart')} // Set active link when clicked
   >
 <Button id="cartButton" className="custom-cart-button border-dark bg-black text-white">
   <i className="fa-solid fa-cart-shopping"></i> {/* Cart icon */}
@@ -286,7 +300,7 @@ const NavbarHome = () => {
                   
                 <Link to="/signup" 
                 className={`nav-link ${activeLink === 'signup' ? 'active' : ''}`}
-                onClick={() => setActiveLink('signup')}>
+                onClick={() => handleLinkClick('signup')}>
 
                   <FiUser size={30} style={{
                     color: activeLink === 'signup' ? 'gold' : 'white', // Change color dynamically

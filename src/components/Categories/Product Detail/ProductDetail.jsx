@@ -15,6 +15,7 @@ const ProductDetail = () => {
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState(''); // New state for selected color
   const [showModal, setShowModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false); // For login modal
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -101,10 +102,15 @@ const ProductDetail = () => {
       setTimeout(() => {
         navigate('/cart', { replace: true }); // Navigate to /cart
         window.location.reload(); // Force the page to refresh
-      }, 1000); // Delay navigation slightly to show the modal briefly
+      }, 3000); // Delay navigation slightly to show the modal briefly
     } else {
-      alert('User not logged in');
+      setShowLoginModal(true);
     }
+  };
+
+  const handleLoginRedirect = () => {
+    setShowLoginModal(false);
+    navigate('/login'); // Redirect to login page
   };
 
   const handleCloseModal = () => setShowModal(false);
@@ -236,6 +242,22 @@ const ProductDetail = () => {
         <Modal.Body>Your item has been added to the cart successfully!</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+
+       {/* Modal for Login Prompt */}
+       <Modal show={showLoginModal} onHide={() => setShowLoginModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Login Required</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>You need to log in to add items to your cart.</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleLoginRedirect}>
+            Login
+          </Button>
+          <Button variant="secondary" onClick={() => setShowLoginModal(false)}>
+            Cancel
+          </Button>
         </Modal.Footer>
       </Modal>
     </Container>
