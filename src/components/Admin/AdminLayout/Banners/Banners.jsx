@@ -31,7 +31,7 @@ const Banners = () => {
 
   useEffect(() => {
     fetchBanners();
-  }, []);
+  }, [fetchBanners]);
 
   // Handle file selection
   const handleFileChange = (e) => {
