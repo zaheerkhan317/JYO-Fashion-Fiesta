@@ -40,9 +40,12 @@ const Footer = () => {
       </div>
 
       <div className="footer text-center p-3">
-        © 2024 Copyright: 
-        <a href="#jyo" className="text-white"> JYO Fashion Fiesta</a>
+        © 2024 Created by 
+        <a href="https://zaheerkhan317.github.io/zaheer-portfolio/" target='_blank' style={{ color: 'gold', textDecoration: 'none' }}> Gouse Jaheer</a>. All rights reserved.
       </div>
+
+
+
     </footer>
   );
 }
