@@ -86,3 +86,18 @@
     background-color: gold; /* Gold background on hover */
     color: #000; /* Black text on hover */
 }
+
+
+.table tbody tr {
+  transition: transform 0.2s; /* Smooth transition for scaling */
+  position: relative; /* Set position to relative */
+}
+
+.table tbody tr:hover {
+  transform: scale(1.01); /* Slightly scale row on hover */
+  z-index: 1; /* Ensure the hovered row has a higher z-index */
+}
+
+.custom-dropdown .dropdown-menu-custom {
+  z-index: 1050; /* Keep dropdown above other elements */
+}

@@ -96,12 +96,11 @@ const ProductDetail = () => {
        // Update cart count in localStorage
       const totalItems = cart[uid].length;
       localStorage.setItem('cartCount', totalItems.length > 0 ? totalItems.length : 0);
-
+      localStorage.setItem('activeLink','cart');
       setShowModal(true);
 
       setTimeout(() => {
-        navigate('/cart', { replace: true }); // Navigate to /cart
-        window.location.reload(); // Force the page to refresh
+        window.location.href = '/cart';// Force the page to refresh
       }, 3000); // Delay navigation slightly to show the modal briefly
     } else {
       setShowLoginModal(true);

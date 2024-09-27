@@ -196,9 +196,8 @@ const Cart = () => {
       alert(`Order placed successfully! Order ID: ${orderId}`);
       localStorage.setItem('activeLink', 'myorders');
       setTimeout(() => {
-        navigate('/myorders', { replace: true }); // Navigate to /myorders
-      }, 3000);
-      window.location.reload();
+        window.location.href = '/myorders'; // Navigate to /myorders
+      }, 2000);
     } catch (error) {
       console.error("Error placing order: ", error);
       setError("Error placing order. Please try again.");

@@ -21,14 +21,23 @@ const ContactUs = () => {
             <p>If you have any questions or feedback, please reach out to us:</p>
             <ul className="contact-info-list list-unstyled">
               <li>
-                <FaEnvelope className="contact-icon" /> <strong>Email:</strong> support@[yourcompany].com
+                <FaEnvelope className="contact-icon" /> <strong>Email:</strong> support@fashionfiesta.com
               </li>
               <li>
-                <FaPhone className="contact-icon" /> <strong>Phone:</strong> (123) 456-7890
+                <FaPhone className="contact-icon" /> <strong>Phone:</strong> (+91) 9989660937
               </li>
               <li>
-                <FaMapMarkerAlt className="contact-icon" /> <strong>Address:</strong> 123 Fashion St, Trend City, State, 12345
-              </li>
+  <div className="d-flex align-items-start">
+    <FaMapMarkerAlt className="contact-icon me-2" /> {/* Added margin end for spacing */}
+    <div>
+      <strong>Address: </strong>
+      12-6-1, Plot No:42, Lakshmi Ganapati Colony Line 3, Phool Bagh, Vizianagaram, 535002.
+    </div>
+  </div>
+</li>
+
+
+
             </ul>
           </Col>
 
@@ -63,8 +72,9 @@ const ContactUs = () => {
             <h2 className="map-title">Find Us Here</h2>
             <div className="map-container">
               {/* Replace with your actual Google Maps Embed link */}
+             
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.835434509559!2d144.9537353153167!3d-37.81720997975128!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad642af0f1235cb%3A0x5045678219a2f87e!2sYour%20Company%20Location!5e0!3m2!1sen!2sus!4v1618475643217!5m2!1sen!2sus"
+                src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3791.795574940821!2d83.41915697518219!3d18.12722908289165!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTjCsDA3JzM4LjAiTiA4M8KwMjUnMTguMiJF!5e0!3m2!1sen!2sin!4v1727461020066!5m2!1sen!2sin"
                 width="100%"
                 height="300"
                 style={{ border: 0 }}

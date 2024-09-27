@@ -5,7 +5,7 @@ import { collection, getDocs, getDoc, updateDoc, doc, deleteDoc } from 'firebase
 import { FaTrash } from 'react-icons/fa';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import logo from '../../../../img/logo.jpg'
+import logo from '../../../../img/logo.png';
 import { db } from '../../../../firebaseConfig.js'; // Adjust the import path as needed
 import './Orders.css';
 
@@ -319,14 +319,43 @@ const Orders = () => {
   
         // Add Logo (Optimized for size and quality)
         if (logo) {
-          doc.addImage(logo, 'PNG', 10, 10, 40, 15); // Adjust size for space
+          const logoWidth = 25; // Desired width of the logo in the PDF
+          const logoHeight = 25; // Desired height of the logo in the PDF
+          const logoX = 20; // X position in the PDF
+          const logoY = 10; // Y position in the PDF
+  
+          doc.addImage(logo, 'PNG', logoX, logoY, logoWidth, logoHeight); // Add logo
         }
   
+        // Set font size for the phone number and address
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+  
+        // Define the right-aligned phone number and address
+        const phoneNumber = '+91 9989660937';
+        const streetAddress = '12-6-1, plot no:42,';
+        const locality1 = 'Lakshmi Ganapati Colony Line 3,';
+        const locality = 'Phool Bagh,'; // Locality/Area
+        const city = 'Vizianagaram, 535002.';   // City
+  
+        // Right-aligned phone number and address positioning
+        const rightX = doc.internal.pageSize.getWidth() - 55; // 20 units from the right edge
+        const titleY = 0; // Y position for the title
+        const spacing = 7;  // Spacing between lines
+  
+        // Add phone number and address to the right side
+        doc.text(phoneNumber, rightX, titleY + spacing); // Phone number
+        doc.text(streetAddress, rightX, titleY + spacing * 2); // Street Address
+        doc.text(locality1, rightX, titleY + spacing * 3); // Locality/Area
+        doc.text(locality, rightX, titleY + spacing * 4); // Locality/Area
+        doc.text(city, rightX, titleY + spacing * 5); // City  
+
         // Centered Header with Title
         doc.setFontSize(16);
         doc.setFont('helvetica', 'bold');
-        doc.text('Invoice', doc.internal.pageSize.getWidth() / 2, 30, { align: 'center' });
-  
+        doc.text('JYO Fashion Fiesta', doc.internal.pageSize.getWidth() / 2, 30, { align: 'center' });
+
+
         // User Information and Order Summary
         const userInfo = [
           ['First Name', user.firstName || 'N/A'],
@@ -341,7 +370,7 @@ const Orders = () => {
         doc.autoTable({
           head: [['Field', 'Details']],
           body: userInfo,
-          startY: 40,
+          startY: 40, // Adjusted for proper spacing
           margin: { left: 10, right: 10 },
           theme: 'striped',
           styles: {
@@ -378,7 +407,6 @@ const Orders = () => {
           item.discountApplied ? `${item.couponDiscount || 0}%` : `${item.discountvalue || 0}%`, // Display coupon discount if applied
           `Rs. ${item.total || 0}`,
         ]);
-
   
         // Add product details in a table format
         doc.autoTable({
@@ -415,22 +443,21 @@ const Orders = () => {
           },
           pageBreak: 'avoid', // Avoid page breaks within tables
         });
-
-        // Calculate the total saved amount
+  
         // Calculate the total saved amount
         const totalSaved = (order.items || []).reduce((sum, item) => {
           return sum + (item.price - item.total);
-      }, 0);
-
-      // Add Saved Amount
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'bold');
-      doc.text(
+        }, 0);
+  
+        // Add Saved Amount
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text(
           `Saved Amount: Rs. ${totalSaved.toFixed(2)}`,
           doc.internal.pageSize.getWidth() / 2,
           doc.autoTable.previous.finalY + 20,
           { align: 'center' }
-      );
+        );
   
         // Add Total Amount to Pay
         doc.setFontSize(15);
@@ -441,14 +468,12 @@ const Orders = () => {
           doc.autoTable.previous.finalY + 30,
           { align: 'center' }
         );
-
-        
   
         // Add Footer
         doc.setFontSize(8);
         doc.setFont('helvetica', 'italic');
         doc.text(
-          'Thank you for shopping with us! For any queries, contact us at support@jyofashion.com',
+          'Thank you for shopping with us! For any queries, contact us at support@jyofashionfiesta.com',
           doc.internal.pageSize.getWidth() / 2,
           doc.internal.pageSize.getHeight() - 15,
           { align: 'center' }
@@ -460,8 +485,8 @@ const Orders = () => {
         doc.setFont('helvetica', 'bold');
         doc.text(
           order.paid ? 'PAID' : 'NOT PAID',
-          doc.internal.pageSize.getWidth() / 2,
-          doc.internal.pageSize.getHeight() / 2,
+          doc.internal.pageSize.getWidth() / 2 +30,
+          doc.internal.pageSize.getHeight() / 2 -10,
           {
             angle: 35, // Rotate text
             align: 'center',

@@ -1,6 +1,71 @@
-.navbar-link img { /* Space between logo and text (if any) */
-  border-radius: 50px;
+/* General styles for navbar brand */
+.navbar-brand-container {
+  display: flex; /* Use flexbox to align items */
+  align-items: center; /* Center items vertically */
 }
+
+.navbar-logo {
+  height: 40px; /* Size of the logo */
+  width: 40px;
+  margin-right: 8px; /* Space between logo and title */
+}
+
+/* Title and Tagline container */
+.navbar-title-container {
+  display: flex; /* Use flexbox for the title and tagline */
+  flex-direction: column; /* Stack title and tagline vertically */
+}
+
+/* Title */
+.navbar-brand-title {
+  font-size: 1.3rem; /* Size of the title */
+  font-weight: bold; /* Bold font */
+  color: gold; /* Gold color */
+  letter-spacing: 1px; /* Letter spacing for title */
+}
+
+/* Tagline */
+.navbar-brand-tagline {
+  font-size: 0.8rem; /* Size of the tagline */
+  font-style: italic; /* Italic style for tagline */
+  color: gold; /* Gold color */
+  letter-spacing: 0.5px; /* Letter spacing for tagline */
+  line-height: 1rem; /* Line height for spacing */
+  margin-top: -2px; /* Reduce space between title and tagline */
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .navbar-logo {
+    height: 35px; /* Adjust size for smaller screens */
+    width: 35px;
+  }
+
+  .navbar-brand-title {
+    font-size: 1.3rem; /* Adjust title size */
+  }
+
+  .navbar-brand-tagline {
+    font-size: 0.7rem; /* Adjust tagline size */
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar-logo {
+    height: 30px; /* Further adjust size for very small screens */
+    width: 30px;
+  }
+
+  .navbar-brand-title {
+    font-size: 1.2rem; /* Further reduce title size */
+  }
+
+  .navbar-brand-tagline {
+    font-size: 0.6rem; /* Further adjust tagline size */
+  }
+}
+
+
 
 .custom-button {
   width: 90px; 

@@ -8,7 +8,7 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { FiUser } from 'react-icons/fi';
 import { useUser } from '../Context/UserProvider';
-import logo from '../../img/logo.jpg';
+import logo from '../../img/logo.png';
 
 const NavbarHome = () => {
   const { user, setUser, firstName, setFirstName, displayName, uid, setUid } = useUser();
@@ -92,9 +92,8 @@ const NavbarHome = () => {
       localStorage.removeItem('orderStatus'); // Remove order status
       localStorage.removeItem('uid'); // Remove order status
       // Add any other items that need to be cleared from local storage
-  
-      navigate('/home');
-      window.location.reload();
+      localStorage.setItem('activeLink','home');
+      window.location.href = '/home';
     } catch (error) {
       console.error("Logout error:", error);
       // Handle any errors if necessary
@@ -163,17 +162,32 @@ const NavbarHome = () => {
         )}
       </div>
 
-
-
-      
-
       {/* Navbar */}
       <Navbar className="sticky-top navbar-glossy" expand="lg">
         <Container>
           {/* Logo */}
           <Navbar.Brand as={Link} to="/home" className={`navbar-link ${activeLink === '' ? 'active' : ''}`} onClick={() => handleLinkClick('')}>
-              <img src={logo} alt="Logo" style={{ height: '30px', width:'50px'}} /> {/* Adjust height as needed */}
-          </Navbar.Brand>
+  <div className="navbar-brand-container">
+    {/* Logo Image */}
+    <img 
+      src={logo} 
+      alt="Logo" 
+      className="navbar-logo" 
+    /> 
+
+    {/* Title and Tagline */}
+    <div className="navbar-title-container">
+      {/* Main Title */}
+      <span className="navbar-brand-title">JYO</span>
+
+      {/* Tagline */}
+      <span className="navbar-brand-tagline">
+        Fashion Fiesta
+      </span>
+    </div>
+  </div>
+</Navbar.Brand>
+
 
           <Navbar.Toggle aria-controls="basic-navbar-nav" onClick={toggleDropdown}>
             {/* Custom toggle button */}

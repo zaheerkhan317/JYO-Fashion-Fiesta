@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Spinner, Alert, Modal, Form } from 'react-bootstrap';
 import { getFirestore, collection, query, updateDoc, getDocs, getDoc, doc, deleteDoc, addDoc, where } from 'firebase/firestore';
 import { FaStar } from 'react-icons/fa';
-import logo from '../../../img/logo.jpg'
+import logo from '../../../img/logo.png';
 import { jsPDF } from 'jspdf';
 import { auth } from '../../../firebaseConfig';
 import { useMediaQuery } from 'react-responsive';
@@ -152,8 +152,37 @@ const MyOrders = () => {
 
         // Add Logo (Optimized for size and quality)
         if (logo) {
-          doc.addImage(logo, 'PNG', 10, 10, 40, 15); // Adjust size for space
+          const logoWidth = 25; // Desired width of the logo in the PDF
+          const logoHeight = 25; // Desired height of the logo in the PDF
+          const logoX = 20; // X position in the PDF
+          const logoY = 10; // Y position in the PDF
+    
+          doc.addImage(logo, 'PNG', logoX, logoY, logoWidth, logoHeight); // Add logo
         }
+
+            // Set font for the address
+          doc.setFontSize(8);
+          doc.setFont('helvetica', 'normal');
+
+          // Define the right-aligned phone number and address
+          const phoneNumber = '+91 9989660937';
+          const streetAddress = '12-6-1, plot no:42,';
+          const locality1 = 'Lakshmi Ganapati Colony Line 3,';
+          const locality = 'Phool Bagh,'; // Locality/Area
+          const city = 'Vizianagaram, 535002.';   // City
+
+          // Right-aligned phone number and address positioning
+          const rightX = doc.internal.pageSize.getWidth() - 55; // 20 units from the right edge
+          const titleY = 0; // Y position for the title
+          const spacing = 7;  // Spacing between lines
+
+          // Add phone number and address to the right side
+          doc.text(phoneNumber, rightX, titleY + spacing); // Phone number
+          doc.text(streetAddress, rightX, titleY + spacing * 2); // Street Address
+          doc.text(locality1, rightX, titleY + spacing * 3); // Locality/Area
+          doc.text(locality, rightX, titleY + spacing * 4); // Locality/Area
+          doc.text(city, rightX, titleY + spacing * 5); // City
+          
 
         // Centered Header with Title
         doc.setFontSize(16);
@@ -284,7 +313,7 @@ const MyOrders = () => {
         doc.setFontSize(8);
         doc.setFont('helvetica', 'italic');
         doc.text(
-          'Thank you for shopping with us! For any queries, contact us at support@jyofashion.com',
+          'Thank you for shopping with us! For any queries, contact us at support@jyofashionfiesta.com',
           doc.internal.pageSize.getWidth() / 2,
           doc.internal.pageSize.getHeight() - 15,
           { align: 'center' }
