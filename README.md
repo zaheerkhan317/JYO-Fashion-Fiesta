@@ -69,3 +69,69 @@ To set up this project locally, follow the steps below:
 1. Clone the repository:
    ```bash
    git clone https://github.com/yourusername/jyo-fashion-fiesta.git  <!-- Replace with your GitHub username -->
+   ```
+2. Navigate to the project directory:
+   ```bash
+   cd jyo-fashion-fiesta
+   ```
+3. Install the necessary dependencies:
+   ```bash
+   npm install
+   ```
+
+---
+
+## Usage
+
+To start the application, run the following command in your terminal:
+```bash
+npm start
+```
+This command launches the app in development mode. You can view it in your browser at [http://localhost:3000](http://localhost:3000). The app will automatically reload if you make edits.
+
+### Building for Production
+To build the app for production, use:
+```bash
+npm run build
+```
+This command creates a production-ready build in the `build` folder, optimizing the application for performance.
+
+---
+
+## Contributing
+
+We welcome contributions to **JYO Fashion Fiesta**! If you'd like to contribute, please follow these steps:
+
+1. **Fork the repository** to your own GitHub account.
+2. **Clone the forked repository** to your local machine:
+   ```bash
+   git clone https://github.com/yourusername/jyo-fashion-fiesta.git  <!-- Replace with your GitHub username -->
+   ```
+3. **Create a new feature branch**:
+   ```bash
+   git checkout -b feature/YourFeature
+   ```
+4. **Make your changes** and **commit them**:
+   ```bash
+   git commit -m 'Add your feature'
+   ```
+5. **Push your changes** to your fork:
+   ```bash
+   git push origin feature/YourFeature
+   ```
+6. **Open a Pull Request** in the original repository.
+
+Please ensure your code adheres to the existing style and includes appropriate tests if applicable.
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE). 
+
+For more details, please refer to the LICENSE file in the repository.
+
+---
+
+Thank you for checking out **JYO Fashion Fiesta**! We hope you enjoy your shopping experience.
+
