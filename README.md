@@ -24,17 +24,18 @@ Welcome to **JYO Fashion Fiesta**, your ultimate destination for trendy fashion!
 ---
 
 ## Screenshots
-![Home Page](public\screenshots\1.png)  <!-- Replace with actual paths to your screenshots -->
-![Home Page (New Arrivals)](public\screenshots\2.png)
-![Home Page (Best Selling Products)](public\screenshots\3.png)
-![Home Page (User Reviews)](public\screenshots\4.png)
-![Categories/kurtas Page](public\screenshots\5.png)
-![Offers Zone Page](public\screenshots\6.png)
-![About Us Page](public\screenshots\7.png)
-![Contact Us Page](public\screenshots\8.png)
-![My Order Page](public\screenshots\9.png)
-![Cart Page](public\screenshots\10.png)
-![Admin Page](public\screenshots\11.png)
+![Home Page](public/screenshots/1.png)
+![Home Page (New Arrivals)](public/screenshots/2.png)
+![Home Page (Best Selling Products)](public/screenshots/3.png)
+![Home Page (User Reviews)](public/screenshots/4.png)
+![Categories/kurtas Page](public/screenshots/5.png)
+![Offers Zone Page](public/screenshots/6.png)
+![About Us Page](public/screenshots/7.png)
+![Contact Us Page](public/screenshots/8.png)
+![My Order Page](public/screenshots/9.png)
+![Cart Page](public/screenshots/10.png)
+![Admin Page](public/screenshots/11.png)
+
 
 ---
 
