@@ -1,6 +1,6 @@
 # JYO Fashion Fiesta
 
-![Project Logo](path/to/logo.png)  <!-- Replace with your project's logo -->
+![Project Logo](src/img/logo.png)  <!-- Replace with your project's logo -->
 
 Welcome to **JYO Fashion Fiesta**, your ultimate destination for trendy fashion! This project is designed to provide a seamless shopping experience, showcasing a variety of stylish apparel crafted for modern fashion enthusiasts.
 
