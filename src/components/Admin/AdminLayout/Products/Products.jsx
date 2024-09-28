@@ -478,9 +478,12 @@ const Products = () => {
               <Form.Control as="select" name="brand" value={formData.brand} 
               onChange={(e) => setFormData({ ...formData, brand: e.target.value })} > 
               <option value="">Select brand</option> 
-              <option value="Adidas">Adidas</option> 
-              <option value="Puma">Puma</option> 
-              <option value="Bata">Bata</option> 
+              <option value="BIBA">BIBA</option> 
+              <option value="Nyka Fashion">Nyka Fashion</option> 
+              <option value="Manyavar">Manyavar</option> 
+              <option value="Peter England">Peter England</option>
+              <option value="Libas">Libas</option>
+              <option value="High Lander">High Lander</option> 
               </Form.Control> 
             </Form.Group>
           </Col>
@@ -494,12 +497,19 @@ const Products = () => {
             </Form.Group>
           </Col>
           <Col xs={12} md={6} className='mb-4'>
-            <Form.Group controlId="formItemDescription">
-              <Form.Label>Description</Form.Label>
-              <Form.Control type="text" placeholder="Enter item name" name="itemName" value={formData.description} 
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
-            </Form.Group>
-          </Col>
+  <Form.Group controlId="formItemDescription">
+    <Form.Label>Description</Form.Label>
+    <Form.Control
+      as="textarea"
+      rows={4}  // Adjust the number of rows for the textarea
+      placeholder="Enter item description"
+      name="description"
+      value={formData.description}
+      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+    />
+  </Form.Group>
+</Col>
+
 
           {/* Type */}
           <Col xs={12} md={6} className='mb-4'>

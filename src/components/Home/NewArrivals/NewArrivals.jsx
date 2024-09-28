@@ -80,7 +80,7 @@ const NewArrivals = () => {
 
       const fetchedNewArrivals = docs.map(doc => ({
         id: doc.id,
-        itemName: doc.data().itemName,
+        brand: doc.data().brand,
         type: doc.data().type,
         colours: doc.data().colours,
         sizes: doc.data().sizes,
@@ -147,7 +147,7 @@ const NewArrivals = () => {
           <Card key={arrival.id} className="new-arrival-card">
             <Card.Img variant="top" className="card-img" src={getFirstImageUrl(arrival.photos)} alt={arrival.itemName} />
             <Card.Body className="d-flex flex-column p-3">
-              <Card.Title className="text-center mb-2">{arrival.itemName}</Card.Title>
+              <Card.Title className="text-center mb-2">{arrival.brand}</Card.Title>
               <Card.Text className="text-center mb-1"><strong>Product ID:</strong> {arrival.id}</Card.Text>
               <Card.Text className="text-center mb-1"><strong>Categories:</strong> {arrival.type}</Card.Text>
               <Card.Text className="text-center mb-1"><strong>Size:</strong> {formatSizes(arrival.sizes)}</Card.Text>

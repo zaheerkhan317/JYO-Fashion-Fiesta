@@ -127,7 +127,7 @@ const ProductDetail = () => {
   }
 
   return (
-    <Container className="product-detail-section mt-5">
+    <Container className="product-detail-section mt-5 mb-5">
       <Row className="justify-content-center">
         {/* Image Column */}
         <Col md={2}>
@@ -155,7 +155,17 @@ const ProductDetail = () => {
         <Col md={5}>
           <div className="product-detail-info">
             <h2 className="product-title">{product.itemName}</h2>
-            <p className="product-description">{product.description}</p>
+            <strong>Description : </strong> 
+            <span className="product-description">
+
+  {product.description.split('\n').map((item, index) => (
+    <React.Fragment key={index}>
+      {item}
+      <br />
+    </React.Fragment>
+  ))}
+</span>
+
             <p className="product-brand"><strong>Brand : </strong> {product.brand}</p>
             <p className="product-id"><strong>Product ID : </strong> {product.id}</p>
             <p className="product-price">

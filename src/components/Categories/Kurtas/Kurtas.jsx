@@ -93,10 +93,10 @@ const Kurtas = ({ products }) => {
                     #{product.id}
                   </Card.Text>
 
-                  {/* Product Description */}
+                  {/* Product Description
                   <Card.Text className="text-muted description">
                     {product.description}
-                  </Card.Text>
+                  </Card.Text> */}
 
                   {/* Brand */}
                   <Card.Text className="text-muted">
@@ -134,11 +134,11 @@ const Kurtas = ({ products }) => {
                   </div>
                 </Card.Text>
 
-                  {/* Quantity Left */}
+                  {/* Quantity Left
                   <Card.Text className="text-muted">
                     <strong>Quantity Left: </strong>
                     {product.quantityLeft}
-                  </Card.Text>
+                  </Card.Text> */}
 
                   {/* Pricing Section */}
                   <Card.Text className="price-section mt-auto">

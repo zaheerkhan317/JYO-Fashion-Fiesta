@@ -82,7 +82,7 @@ const BestSellingProducts = () => {
 
       const fetchedBestSellingProducts = docs.map(doc => ({
         id: doc.id,
-        itemName: doc.data().itemName,
+        brand: doc.data().brand,
         type: doc.data().type,
         colours: doc.data().colours,
         sizes: doc.data().sizes,
@@ -148,7 +148,7 @@ const BestSellingProducts = () => {
           <Card key={product.id} className="best-selling-product-card">
             <Card.Img variant="top" className="card-img" src={getFirstImageUrl(product.photos)} alt={product.itemName} />
             <Card.Body className="d-flex flex-column p-3">
-              <Card.Title className="text-center mb-2">{product.itemName}</Card.Title>
+              <Card.Title className="text-center mb-2">{product.brand}</Card.Title>
               <Card.Text className="text-center mb-1"><strong>Product ID:</strong> {product.id}</Card.Text>
               <Card.Text className="text-center mb-1"><strong>Categories:</strong> {product.type}</Card.Text>
               <Card.Text className="text-center mb-1"><strong>Size:</strong> {formatSizes(product.sizes)}</Card.Text>

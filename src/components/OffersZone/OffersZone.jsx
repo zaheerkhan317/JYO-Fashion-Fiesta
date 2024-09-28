@@ -114,10 +114,10 @@ const OffersZone = () => {
                     #{product.id}
                   </Card.Text>
 
-                  {/* Product Description */}
+                  {/* Product Description
                   <Card.Text className="text-muted description">
                     {product.description}
-                  </Card.Text>
+                  </Card.Text> */}
 
                   {/* Brand */}
                   <Card.Text className="text-muted">
