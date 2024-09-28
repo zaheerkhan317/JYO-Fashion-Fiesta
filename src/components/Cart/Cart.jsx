@@ -323,9 +323,9 @@ const Cart = () => {
                 <div className="info-group">
                   <strong>Product Id:</strong> <span>#{item.id}</span>
                 </div>
-                <div className="info-group">
+                {/* <div className="info-group">
                   <strong>Description:</strong> <span>{item.description}</span>
-                </div>
+                </div> */}
                 <div className="info-group">
                   <strong>Brand:</strong> <span>{item.brand}</span>
                 </div>
