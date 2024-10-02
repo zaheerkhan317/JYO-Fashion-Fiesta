@@ -643,6 +643,51 @@ const Orders = () => {
     // Export the workbook to an Excel file
     XLSX.writeFile(workbook, 'orders_export.xlsx');
   };
+
+  const parseDate = (dateString) => {
+    const [datePart, timePart] = dateString.split(', ');
+    const [day, month, year] = datePart.split('/');
+  
+    // Combine the date and time into a standard format
+    const formattedDate = `${year}-${month}-${day} ${timePart}`;
+  
+    return new Date(formattedDate);
+  };
+  
+  const handleSortByDate = (sortOrder) => {
+    // Clone the orders array to avoid mutating the original state directly
+    const sortedOrders = [...orders];
+  
+    // Sort the orders by the 'orderDate' field using parseDate
+    sortedOrders.sort((a, b) => {
+      const dateA = parseDate(a.orderDate); // Convert orderDate to Date object
+      const dateB = parseDate(b.orderDate);
+      return sortOrder === 'asc' ? dateA - dateB : dateB - dateA; 
+    });
+  
+    // Update the orders state with the sorted array
+    setOrders(sortedOrders);
+  };
+  
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case 'pending':
+        return { backgroundColor: '#FFA500', color: 'black', padding: '5px 15px', borderRadius: '10px' }; // Orange for pending orders
+      case 'approved':
+        return { backgroundColor: '#4CAF50', color: 'black', padding: '5px 15px', borderRadius: '10px' }; // Green for approved orders
+      case 'denied':
+        return { backgroundColor: '#FF6347', color: 'black', padding: '5px 15px', borderRadius: '10px' }; // Tomato for denied orders
+      case 'delivered':
+        return { backgroundColor: '#4682B4', color: 'black', padding: '5px 15px', borderRadius: '10px' }; // Steel Blue for delivered orders
+      case 'cancelRequested':
+        return { backgroundColor: '#800080', color: 'black', padding: '5px 15px', borderRadius: '10px' }; // Purple for cancel requested orders
+      default:
+        return { backgroundColor: '#A9A9A9', color: 'black', padding: '5px 15px', borderRadius: '10px' }; // Dark Gray for other statuses
+    }
+  };
+  
+
+  
   
 
   return (
@@ -685,12 +730,17 @@ const Orders = () => {
             <Dropdown.Header>Payment Status</Dropdown.Header>
             <Dropdown.Item onClick={() => handleFilterChange(filterStatus, 'paid')}>Paid</Dropdown.Item>
             <Dropdown.Item onClick={() => handleFilterChange(filterStatus, 'not paid')}>Not Paid</Dropdown.Item>
+
+            <Dropdown.Header>Date Sorting</Dropdown.Header>
+            <Dropdown.Item onClick={() => handleSortByDate('desc')}>Latest Orders</Dropdown.Item>
+            <Dropdown.Item onClick={() => handleSortByDate('asc')}>Oldest Orders</Dropdown.Item>
           </Dropdown.Menu>
       </Dropdown>
       
   <Button className="ms-auto" onClick={handleExport} variant="success">
     Export to Excel
   </Button>
+  
       </div>
       <Table striped bordered hover>
         <thead>
@@ -708,7 +758,15 @@ const Orders = () => {
         </thead>
         <tbody>
           
-          {filteredOrders.map(order => {
+          {filteredOrders
+          .sort((a, b) => {
+            // Convert orderDate strings to Date objects
+            const dateA = new Date(a.orderDate);
+            const dateB = new Date(b.orderDate);
+            // Sort in descending order (newest to oldest)
+            return dateB - dateA;
+          })
+          .map(order => {
             // Aggregate sizes and quantities for the current order
             const sizeQuantities = aggregateSizes(order.items);
             // Sort sizes
@@ -737,7 +795,9 @@ const Orders = () => {
                 </td>
                 <td>₹{order.totalPrice}</td>
                 <td>{order.orderDate}</td>
-                <td>{order.status}</td>
+                <td>
+                  <span style={getStatusStyle(order.status)}>{order.status}</span>
+                </td>
                 <td>
                   <div className="form-check form-switch">
                     <input
