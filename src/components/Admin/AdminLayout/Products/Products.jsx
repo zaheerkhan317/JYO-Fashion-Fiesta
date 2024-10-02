@@ -36,6 +36,7 @@ const generateUniqueId = async () => {
 
 const Products = () => {
 
+  const [errors, setErrors] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null); // Store the product being edited
@@ -59,7 +60,35 @@ const Products = () => {
     photos: {}
   });
 
-
+  const validateForm = () => {
+    let newErrors = {};
+  
+    if (!formData.brand) newErrors.brand = "Brand is required.";
+    if (!formData.itemName) newErrors.itemName = "Item name is required.";
+    if (!formData.description) newErrors.description = "Description is required.";
+    if (!formData.type) newErrors.type = "Type is required.";
+    if (!formData.cost || formData.cost <= 0) newErrors.cost = "Valid cost is required.";
+    
+    // Validate sizes
+    const sizeKeys = Object.keys(formData.sizes);
+    if (sizeKeys.length === 0) {
+      newErrors.sizes = "At least one size must be selected.";
+    } else {
+      sizeKeys.forEach((size) => {
+        if (!formData.sizes[size] || formData.sizes[size] <= 0) {
+          newErrors.sizes = `Quantity for size ${size} is required.`;
+        }
+      });
+    }
+  
+    // Validate colours
+    if (!formData.colours.length) newErrors.colours = "At least one colour must be selected.";
+  
+    setErrors(newErrors);
+    
+    // Return true if no errors, false otherwise
+    return Object.keys(newErrors).length === 0;
+  };
   
 
   // Filter products based on search term and filter type
@@ -299,6 +328,7 @@ const Products = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if(validateForm()){
       // Define the size order
   const sizeOrder = ['S', 'M', 'L', 'XL', 'XXL'];
 
@@ -375,6 +405,7 @@ const Products = () => {
     } catch (e) {
       console.error("Error adding/updating product: ", e);
     }
+  }
   };
 
   const handleEdit = (product) => {
@@ -485,6 +516,7 @@ const Products = () => {
               <option value="Libas">Libas</option>
               <option value="High Lander">High Lander</option> 
               </Form.Control> 
+              {errors.brand && <Form.Text className="text-danger">{errors.brand}</Form.Text>}
             </Form.Group>
           </Col>
 
@@ -494,6 +526,7 @@ const Products = () => {
               <Form.Label>Item Name</Form.Label>
               <Form.Control type="text" placeholder="Enter item name" name="itemName" value={formData.itemName} 
               onChange={(e) => setFormData({ ...formData, itemName: e.target.value })} />
+              {errors.itemName && <Form.Text className="text-danger">{errors.itemName}</Form.Text>}
             </Form.Group>
           </Col>
           <Col xs={12} md={6} className='mb-4'>
@@ -507,6 +540,7 @@ const Products = () => {
       value={formData.description}
       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
     />
+    {errors.description && <Form.Text className="text-danger">{errors.description}</Form.Text>}
   </Form.Group>
 </Col>
 
@@ -522,6 +556,7 @@ const Products = () => {
                 <option value="Sarees">Sarees</option>
                 <option value="Lounge wear">Lounge wear</option>
               </Form.Control>
+              {errors.type && <Form.Text className="text-danger">{errors.type}</Form.Text>}
             </Form.Group>
           </Col>
 
@@ -540,6 +575,7 @@ const Products = () => {
                 onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
                 onWheel={(e) => e.target.blur()} // Prevent changing value on scroll
               />
+              {errors.cost && <Form.Text className="text-danger">{errors.cost}</Form.Text>}
               {showDiscountInput && (
                 <Form.Text className="text-muted">
                   <strong>Want to apply a discount?</strong>
@@ -561,6 +597,7 @@ const Products = () => {
                   onChange={handleChange}
                   onWheel={(e) => e.target.blur()} // Prevent changing value on scroll
                 />
+                {errors.discountValue && <Form.Text className="text-danger">{errors.discountValue}</Form.Text>}
                 {formData.discountedPrice && (
                   <Form.Text className="mt-2">
                     <strong>Price after discount:</strong> ${formData.discountedPrice}
@@ -614,6 +651,7 @@ const Products = () => {
       </div> 
     ))} 
   </div> 
+  {errors.sizes && <Form.Text className="text-danger">{errors.sizes}</Form.Text>}
 </Form.Group>
 
 
@@ -678,6 +716,7 @@ const Products = () => {
                 </div>
             ))}
           </div>
+          {errors.colours && <Form.Text className="text-danger">{errors.colours}</Form.Text>}
         </Form.Group>
 
 
