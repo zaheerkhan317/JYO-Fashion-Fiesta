@@ -38,7 +38,7 @@ const TopCollections = () => {
     }
   };
 
-  const handleAddToCart = (productId) => {
+  const handleCardClick = (productId) => {
     navigate(`/product/${productId}`); // Navigate to the product detail page
   };
 
@@ -147,7 +147,7 @@ const TopCollections = () => {
       <h2 className="top-collections-heading text-center mb-5">Top Collections</h2>
       <div className="scroll-container pt-5" ref={scrollRef}>
         {collections.map(collection => (
-          <Card key={collection.id} className="top-collection-card">
+          <Card key={collection.id} className="top-collection-card" onClick={() => handleCardClick(collection.id)} style={{ cursor: 'pointer' }}>
             <Card.Img variant="top" className="card-img" src={getFirstImageUrl(collection.photos)} alt={collection.itemName} />
             <Card.Body className="d-flex flex-column p-3">
               <Card.Title className="text-center mb-2">{collection.brand}</Card.Title>
@@ -156,7 +156,7 @@ const TopCollections = () => {
               <Card.Text className="text-center mb-1"><strong>Size:</strong> {formatSizes(collection.sizes)}</Card.Text>
               <Card.Text className="text-center mb-2"><strong>Colors:</strong> {formatColours(collection.colours)}</Card.Text>
               {/* Call to Action Button */}
-              <Button
+              {/* <Button
   variant="primary"
   className="mt-3"
   style={{
@@ -170,7 +170,7 @@ const TopCollections = () => {
   onClick={() => handleAddToCart(collection.id)}
 >
   View Product
-</Button>
+</Button> */}
 
             </Card.Body>
           </Card>

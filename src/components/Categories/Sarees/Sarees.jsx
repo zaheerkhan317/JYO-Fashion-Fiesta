@@ -8,7 +8,7 @@ const Sarees = ({ products }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
-  const handleAddToCart = (productId) => {
+  const handleCardClick = (productId) => {
     navigate(`/product/${productId}`); // Navigate to the product detail page
   };
 
@@ -35,7 +35,7 @@ const Sarees = ({ products }) => {
       <Row className="grid-container">
         {filteredProducts.map(product => (
           <Col key={product.id} md={4} sm={6} xs={12} className="mb-4">
-            <Card className="product-card h-100 shadow position-relative">
+            <Card className="product-card h-100 shadow position-relative" onClick={() => handleCardClick(product.id)} style={{ cursor: 'pointer' }}>
               <div className="ribbon-wrapper">
                 {product.topCollections && (
                   <div className="ribbon top-collection">Top Collection</div>
@@ -140,14 +140,14 @@ const Sarees = ({ products }) => {
                   )}
                 </Card.Text>
 
-                {/* Call to Action Button */}
+                {/* Call to Action Button
                 <Button
                   variant="primary"
                   className="mt-3"
                   onClick={() => handleAddToCart(product.id)}
                 >
                   View Product
-                </Button>
+                </Button> */}
               </Card.Body>
             </Card>
           </Col>

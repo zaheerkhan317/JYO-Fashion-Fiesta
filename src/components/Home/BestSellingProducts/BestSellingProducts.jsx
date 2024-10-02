@@ -33,7 +33,7 @@ const BestSellingProducts = () => {
   }, [bestSellingProducts]); // Re-run when bestSellingProducts are updated
 
 
-  const handleAddToCart = (productId) => {
+  const handleCardClick = (productId) => {
     navigate(`/product/${productId}`); // Navigate to the product detail page
   };
 
@@ -145,7 +145,7 @@ const BestSellingProducts = () => {
       <h2 className="best-selling-heading text-center mb-5">Best Selling Products</h2>
       <div className="scroll-container mt-5 pt-5" ref={scrollRef}>
         {bestSellingProducts.map(product => (
-          <Card key={product.id} className="best-selling-product-card">
+          <Card key={product.id} className="best-selling-product-card" onClick={() => handleCardClick(product.id)} style={{ cursor: 'pointer' }}>
             <Card.Img variant="top" className="card-img" src={getFirstImageUrl(product.photos)} alt={product.itemName} />
             <Card.Body className="d-flex flex-column p-3">
               <Card.Title className="text-center mb-2">{product.brand}</Card.Title>
@@ -154,7 +154,7 @@ const BestSellingProducts = () => {
               <Card.Text className="text-center mb-1"><strong>Size:</strong> {formatSizes(product.sizes)}</Card.Text>
               <Card.Text className="text-center mb-2"><strong>Colors:</strong> {formatColours(product.colours)}</Card.Text>
               {/* Call to Action Button */}
-              <Button
+              {/* <Button
   variant="primary"
   className="mt-3"
   style={{
@@ -168,7 +168,7 @@ const BestSellingProducts = () => {
   onClick={() => handleAddToCart(product.id)}
 >
   View Product
-</Button>
+</Button> */}
 
             </Card.Body>
           </Card>

@@ -32,7 +32,7 @@ const NewArrivals = () => {
     return () => clearAutoScroll(); // Clean up on unmount
   }, [newArrivals]); // Re-run when newArrivals are updated
 
-  const handleAddToCart = (productId) => {
+  const handleCardClick = (productId) => {
     navigate(`/product/${productId}`); // Navigate to the product detail page
   };
 
@@ -144,7 +144,7 @@ const NewArrivals = () => {
       <h2 className="new-arrivals-heading text-center mb-5">New Arrivals</h2>
       <div className="scroll-container pt-5" ref={scrollRef}>
         {newArrivals.map(arrival => (
-          <Card key={arrival.id} className="new-arrival-card">
+          <Card key={arrival.id} className="new-arrival-card" onClick={() => handleCardClick(arrival.id)} style={{ cursor: 'pointer' }}>
             <Card.Img variant="top" className="card-img" src={getFirstImageUrl(arrival.photos)} alt={arrival.itemName} />
             <Card.Body className="d-flex flex-column p-3">
               <Card.Title className="text-center mb-2">{arrival.brand}</Card.Title>
@@ -153,7 +153,7 @@ const NewArrivals = () => {
               <Card.Text className="text-center mb-1"><strong>Size:</strong> {formatSizes(arrival.sizes)}</Card.Text>
               <Card.Text className="text-center mb-2"><strong>Colors:</strong> {formatColours(arrival.colours)}</Card.Text>
               {/* Call to Action Button */}
-              <Button
+              {/* <Button
   variant="primary"
   className="mt-3"
   style={{
@@ -167,7 +167,7 @@ const NewArrivals = () => {
   onClick={() => handleAddToCart(arrival.id)}
 >
   View Product
-</Button>
+</Button> */}
 
 
 
