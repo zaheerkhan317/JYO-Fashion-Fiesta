@@ -130,6 +130,11 @@
   .size-box:hover {
     background-color: #e0e0e0;
   }
+
+  .disabled-size {
+    opacity: 0.5; /* Make the disabled size look faded */
+    pointer-events: none; /* Prevent click events on disabled sizes */
+  }
   
   .selected-size {
     background-color: #007bff;

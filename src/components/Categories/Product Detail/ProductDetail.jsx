@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useSwipeable } from 'react-swipeable'; // Import the useSwipeable hook
 import { Container, Row, Col, Image, Button, Modal } from 'react-bootstrap';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
@@ -18,6 +19,13 @@ const ProductDetail = () => {
   const [selectedColor, setSelectedColor] = useState(''); // New state for selected color
   const [showModal, setShowModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false); // For login modal
+
+  const handlers = useSwipeable({
+    onSwipedLeft: () => handleSwipe('LEFT'),
+    onSwipedRight: () => handleSwipe('RIGHT'),
+    preventDefaultTouchmoveEvent: true,
+    trackMouse: true, // Allow mouse swipe for desktop
+  });
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -48,9 +56,6 @@ const ProductDetail = () => {
     fetchProduct();
   }, [productId]);
 
-  const handleImageClick = (image) => {
-    setSelectedImage(image);
-  };
 
   const handleColorClick = (color) => {
     setSelectedColor(color);
@@ -132,8 +137,29 @@ const ProductDetail = () => {
     return <div className="text-center mt-5">Product not found</div>;
   }
 
+   const handleImageClick = (image) => {
+    setSelectedImage(image);
+  };
+
+  const handleSwipe = (direction) => {
+    const images = product.photos[selectedColor];
+    const currentIndex = images.indexOf(selectedImage);
+
+    if (direction === 'LEFT') {
+      // Swipe left - go to the next image
+      const nextIndex = (currentIndex + 1) % images.length; // Loop to the start if at the end
+      setSelectedImage(images[nextIndex]);
+    } else if (direction === 'RIGHT') {
+      // Swipe right - go to the previous image
+      const prevIndex = (currentIndex - 1 + images.length) % images.length; // Loop to the end if at the start
+      setSelectedImage(images[prevIndex]);
+    }
+  };
+
+
+
   return (
-    <Container className="product-detail-section mt-5 mb-5">
+    <Container className="product-detail-section mt-5 mb-5" {...handlers}>
       <Row className="justify-content-center">
         {/* Image Column */}
         <Col md={2}>
@@ -193,15 +219,18 @@ const ProductDetail = () => {
   <div className="size-options">
     {Object.keys(product.sizes)
       .sort((a, b) => ["S", "M", "L", "XL", "XXL"].indexOf(a) - ["S", "M", "L", "XL", "XXL"].indexOf(b))
-      .map((size, index) => (
+      .map((size, index) => {
+      const isAvailable = product.sizes[size] > 0; // Check if size is available
+        return (
         <div
           key={index}
-          className={`size-box ${size === selectedSize ? 'selected-size' : ''}`}
-          onClick={() => setSelectedSize(size)}
+          className={`size-box ${size === selectedSize ? 'selected-size' : ''} ${!isAvailable ? 'disabled-size' : ''}`}
+          onClick={() => isAvailable && setSelectedSize(size)}
         >
           {size}
         </div>
-      ))
+        );
+      })
     }
   </div>
 </div>
