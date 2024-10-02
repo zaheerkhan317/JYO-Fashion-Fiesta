@@ -45,6 +45,8 @@ const Home = () => {
     );
   }
 
+  {/* just for testing */}
+
   if (error) {
     return <p>{error}</p>;
   }
