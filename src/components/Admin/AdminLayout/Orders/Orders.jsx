@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
+import * as XLSX from 'xlsx';
 import { Container, Table, Spinner, Alert, Dropdown, Button, Form, Modal } from 'react-bootstrap';
 import { collection, getDocs, getDoc, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { FaTrash } from 'react-icons/fa';
@@ -602,6 +603,46 @@ const Orders = () => {
       ));
     }
   };
+
+
+  const handleExport = () => {
+    const exportData = filteredOrders.map(order => {
+      const userDetails = users[order.userId] || {}; // Get user details
+  
+      // Aggregate size and quantities for each product
+      const productDetails = order.items.map(item => ({
+        productId: item.id,
+        size: item.size,
+        quantity: item.quantity,
+      }));
+  
+      // Flatten the order and product details into one object
+      return {
+        'Order ID': order.orderId,
+        'First Name': userDetails.firstName || 'N/A',
+        'Last Name': userDetails.lastName || 'N/A',
+        'Email': userDetails.email || 'N/A',
+        'Phone Number': userDetails.phoneNumber || 'Google User',
+        'Contact Number': order.contactPhoneNumber || 'N/A',
+        'Product ID': productDetails.map(item => item.productId).join(', '),
+        'Sizes': productDetails.map(item => item.size).join(', '),
+        'Quantities': productDetails.map(item => item.quantity).join(', '),
+        'Total Price': `₹${order.totalPrice}`,
+        'Order Date': order.orderDate,
+        
+      };
+    });
+  
+    // Create a worksheet from the data
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+  
+    // Create a new workbook and append the worksheet
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Orders');
+  
+    // Export the workbook to an Excel file
+    XLSX.writeFile(workbook, 'orders_export.xlsx');
+  };
   
 
   return (
@@ -646,6 +687,10 @@ const Orders = () => {
             <Dropdown.Item onClick={() => handleFilterChange(filterStatus, 'not paid')}>Not Paid</Dropdown.Item>
           </Dropdown.Menu>
       </Dropdown>
+      
+  <Button className="ms-auto" onClick={handleExport} variant="success">
+    Export to Excel
+  </Button>
       </div>
       <Table striped bordered hover>
         <thead>
