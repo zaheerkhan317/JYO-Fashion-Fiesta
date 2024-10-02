@@ -14,6 +14,7 @@ const Banners = () => {
   const db = getFirestore();
   const storage = getStorage();
 
+  
   const fetchBanners = useCallback(async () => {
     const db = getFirestore();
     const bannersRef = collection(db, 'banners');
