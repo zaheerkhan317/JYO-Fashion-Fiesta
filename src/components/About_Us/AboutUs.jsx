@@ -2,6 +2,8 @@ import React from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import mission from '../../img/mission.jpeg';
 import whoweare from '../../img/whoweare.jpeg';
+import male from '../../img/male.png';
+import female from '../../img/female.png';
 import './AboutUs.css';
 
 const AboutUs = () => {
@@ -11,6 +13,24 @@ const AboutUs = () => {
     localStorage.setItem('isCategoriesActive','true');
     window.location.href = '/categories/kurtas';
   };
+
+  const teamMembers = [
+    {
+      name: 'B.Jyothi',
+      role: 'CEO & Founder',
+      img: female, // Replace with the actual girl image URL
+    },
+    {
+      name: 'P.Raj Sekhar',
+      role: 'Manager',
+      img: male, // Replace with the actual boy image URL
+    },
+    {
+      name: 'S.Gouse Jaheer',
+      role: 'Technical Co-Ordinator',
+      img: male, // Replace with the actual boy image URL
+    },
+  ];
 
   return (
     <div className="about-us-page">
@@ -37,7 +57,7 @@ const AboutUs = () => {
               From fashion trends to timeless designs, we believe in combining quality
               and aesthetics, ensuring every customer feels confident in our offerings.
             </p>
-            <Button variant="outline-gold" className="learn-more-btn mb-4">Learn More</Button>
+            {/* <Button variant="outline-gold" className="learn-more-btn mb-4">Learn More</Button> */}
           </Col>
           <Col md={6}>
             <img
@@ -78,18 +98,18 @@ const AboutUs = () => {
           <Row>
             <h2 className="text-gold mb-4">Meet Our Team</h2>
           </Row>
-          {['B.Jyothi', 'P.Raj Sekhar', 'S.Gouse Jaheer'].map((name, idx) => (
+          {teamMembers.map((member, idx) => (
             <Col md={4} key={idx} className="mb-4">
               <Card className="team-card text-light">
                 <Card.Img
                   variant="top"
-                  src={`https://via.placeholder.com/300x300`} // Replace with actual image URLs
-                  alt={name}
+                  src={member.img}
+                  alt={member.name}
                   className="rounded-circle team-img"
                 />
                 <Card.Body>
-                  <Card.Title>{name}</Card.Title>
-                  <Card.Text>{idx === 0 ? 'CEO & Founder' : idx === 1 ? 'Manager' : 'Technical Co-Ordinator'}</Card.Text>
+                  <Card.Title>{member.name}</Card.Title>
+                  <Card.Text>{member.role}</Card.Text>
                 </Card.Body>
               </Card>
             </Col>
