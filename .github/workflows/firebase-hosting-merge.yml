@@ -23,6 +23,8 @@ jobs:
         run: npm install # Use npm ci for a clean install
       
       - name: Build
+        env:
+          CI: false
         run: npm run build # Ensure the build directory is created
       
       - name: Deploy to Firebase
