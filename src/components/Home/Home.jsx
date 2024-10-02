@@ -44,6 +44,7 @@ const Home = () => {
       </div>
     );
   }
+  
 
   if (error) {
     return <p>{error}</p>;
