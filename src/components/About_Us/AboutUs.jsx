@@ -59,6 +59,7 @@ const AboutUs = () => {
             </p>
             {/* <Button variant="outline-gold" className="learn-more-btn mb-4">Learn More</Button> */}
           </Col>
+          
           <Col md={6}>
             <img
               src={whoweare} // Replace with actual image
