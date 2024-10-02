@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getFirestore, collection, addDoc, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { Button, Card, Container, Row, Col, Alert, Form, Spinner } from 'react-bootstrap';
@@ -14,22 +14,20 @@ const Banners = () => {
   const db = getFirestore();
   const storage = getStorage();
 
-  // Fetch existing banners from Firestore
-  const fetchBanners = async () => {
+  const fetchBanners = useCallback(async () => {
+    const db = getFirestore();
+    const bannersRef = collection(db, 'banners');
+  
     try {
-      const bannersRef = collection(db, 'banners');
       const querySnapshot = await getDocs(bannersRef);
-      const fetchedBanners = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const fetchedBanners = querySnapshot.docs.map(doc => doc.data().imageUrl);
       setBanners(fetchedBanners);
     } catch (error) {
       console.error('Error fetching banners:', error);
       setError('Error fetching banners');
     }
-  };
-
+  }, []); // Empty array to memoize the function
+  
   useEffect(() => {
     fetchBanners();
   }, [fetchBanners]);
