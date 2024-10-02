@@ -3,10 +3,12 @@ import { Container, Row, Col, Image, Button, ListGroup, Card, Modal, Form } from
 import { FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
 import { collection, addDoc, doc, getDoc, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
+import { useUser } from '../Context/UserProvider';
 import { useNavigate } from 'react-router-dom';
 import './Cart.css'; // Import custom CSS
 
 const Cart = () => {
+  const { cartCount, updateCartCount } = useUser();
   const [cartItems, setCartItems] = useState([]);
   const [error, setError] = useState(null);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -74,28 +76,50 @@ const Cart = () => {
 
   const confirmRemoveFromCart = () => {
     const uid = localStorage.getItem('uid');
-
+  
     if (uid && itemToRemove !== null) {
       const cart = JSON.parse(localStorage.getItem('cart')) || {};
-      
+  
       if (cart[uid]) {
+        // Get total items before removing
+        const totalItemsBefore = cart[uid].length;
+  
+        // Remove the item from the cart
         cart[uid].splice(itemToRemove, 1);
+  
+        // Check if the cart for this user is now empty
         if (cart[uid].length === 0) {
+          // If the cart is empty, remove it from localStorage
           delete cart[uid];
           localStorage.removeItem('cart');
           localStorage.removeItem('discounts');
-          localStorage.setItem('cartCount', 0); 
-          setCartItems([]);// Set cart count to 0 if empty
+          
+          // Update cart count to 0 and context
+          localStorage.setItem('cartCount', 0);
+          updateCartCount(0); // Set cart count in context
+          setCartItems([]); // Set cart items state to an empty array
         } else {
+          // If the cart still has items, update the localStorage
           localStorage.setItem('cart', JSON.stringify(cart));
-          localStorage.setItem('cartCount', cart[uid].length);
+          
+          // Update cart count and context
+          const totalItemsAfter = cart[uid].length;
+          localStorage.setItem('cartCount', totalItemsAfter);
+          updateCartCount(totalItemsAfter); // Set cart count in context
+          
+          // Update cart items state
           setCartItems(cart[uid]);
         }
+  
+        // Optional: You can also alert the user about the updated cart count
+        console.log(`Cart count updated: ${totalItemsBefore - 1} -> ${cart[uid]?.length}`);
       }
-    
     }
+  
+    // Close the modal after removal
     setShowRemoveModal(false);
   };
+  
 
   const handleQuantityChange = (index, change) => {
     const updatedCartItems = [...cartItems];

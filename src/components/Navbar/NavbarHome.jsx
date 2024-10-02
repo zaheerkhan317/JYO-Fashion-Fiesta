@@ -18,7 +18,7 @@ const NavbarHome = () => {
   console.log("User firstName", firstName);
   // console.log("user.firstname",user.firstName);
   const navigate = useNavigate();
-  const [cartCount, setCartCount] = useState(0);
+  const { cartCount, updateCartCount } = useUser();
   const [loading, setIsLoading] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [festivalOffer, setFestivalOffer] = useState(null);
@@ -54,11 +54,25 @@ const NavbarHome = () => {
   //   }
   // }, [setFirstName]);
 
-  useEffect(() => {
-    // Retrieve the cart count from localStorage when the Navbar is mounted
-    const storedCartCount = localStorage.getItem('cartCount') || 0;
-    setCartCount(Number(storedCartCount));
-  }, []);
+ // Function to update the cart count
+//  const updateCartCount = () => {
+//   const storedCartCount = localStorage.getItem('cartCount');
+//   setCartCount(storedCartCount ? Number(storedCartCount) : 0);
+// };
+
+// useEffect(() => {
+//   // Get the initial cart count from localStorage
+//   updateCartCount();
+
+//   // Optional: Set an interval to check for changes (fallback)
+//   const intervalId = setInterval(updateCartCount, 1000);
+
+//   // Cleanup function to clear the interval
+//   return () => {
+//     clearInterval(intervalId);
+//   };
+// }, []);
+  
   
   useEffect(() => {
     const fetchFestivalOffer = async () => {

@@ -10,6 +10,7 @@ export const UserProvider = ({ children }) => {
   const [firstName, setFirstName] = useState(() => localStorage.getItem('firstName') || '');
   const [uid, setUid] = useState(() => localStorage.getItem('uid') || '');
   const [displayName, setDisplayName] = useState('');
+  const [cartCount, setCartCount] = useState(() => Number(localStorage.getItem('cartCount')) || 0); // Initialize cart count
 
   useEffect(() => {
     const loadUserFromLocalStorage = () => {
@@ -77,8 +78,14 @@ export const UserProvider = ({ children }) => {
     return () => unsubscribe();
   }, [displayName, user, uid]);
 
+    // Function to update cart count
+  const updateCartCount = (newCount) => {
+    setCartCount(newCount);
+    localStorage.setItem('cartCount', newCount);
+  };
+
   return (
-    <UserContext.Provider value={{ user, setUser, firstName, setFirstName, displayName, setUid, uid }}>
+    <UserContext.Provider value={{ user, setUser, firstName, setFirstName, displayName, setUid, uid, cartCount, updateCartCount }}>
       {children}
     </UserContext.Provider>
   );

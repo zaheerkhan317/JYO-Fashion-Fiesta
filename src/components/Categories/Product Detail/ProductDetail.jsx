@@ -3,9 +3,11 @@ import { useParams } from 'react-router-dom';
 import { Container, Row, Col, Image, Button, Modal } from 'react-bootstrap';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../../Context/UserProvider';
 import './ProductDetail.css'; // Import the custom CSS
 
 const ProductDetail = () => {
+  const { cartCount, updateCartCount } = useUser();
   const { productId } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
@@ -55,6 +57,7 @@ const ProductDetail = () => {
     setSelectedImage(product.photos[color][0]); // Set the first image of the selected color
   };
 
+
   const handleAddToCart = () => {
     if (!selectedSize) {
       alert('Please select a size');
@@ -96,12 +99,15 @@ const ProductDetail = () => {
        // Update cart count in localStorage
       const totalItems = cart[uid].length;
       localStorage.setItem('cartCount', totalItems.length > 0 ? totalItems.length : 0);
+      updateCartCount(totalItems);
       localStorage.setItem('activeLink','cart');
       setShowModal(true);
-
-      setTimeout(() => {
-        window.location.href = '/cart';// Force the page to refresh
-      }, 3000); // Delay navigation slightly to show the modal briefly
+      setTimeout(()=>{
+        setShowModal(false);
+      },2000);
+      // setTimeout(() => {
+      //   window.location.href = '/cart';// Force the page to refresh
+      // }, 3000); // Delay navigation slightly to show the modal briefly
     } else {
       setShowLoginModal(true);
     }
