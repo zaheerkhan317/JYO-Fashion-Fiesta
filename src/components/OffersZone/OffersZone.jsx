@@ -73,7 +73,7 @@ const OffersZone = () => {
 
           return (
             <Col key={product.id} md={4} sm={6} xs={12} className="mb-4">
-              <Card className="product-card h-100 shadow position-relative">
+              <Card className="product-card h-100 shadow position-relative" onClick={() => handleViewProduct(product.id)} style={{ cursor: 'pointer' }}>
                 {/* Ribbons */}
                 <div className="ribbon-wrapper">
                   {product.topCollections && (
@@ -169,9 +169,9 @@ const OffersZone = () => {
                   </Card.Text>
 
                   {/* Call to Action Button */}
-                  <Button variant="primary" className="mt-3" onClick={() => handleViewProduct(product.id)}>
+                  {/* <Button variant="primary" className="mt-3" onClick={() => handleViewProduct(product.id)}>
                     View Product
-                  </Button>
+                  </Button> */}
                 </Card.Body>
               </Card>
             </Col>
