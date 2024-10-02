@@ -9,6 +9,7 @@ const Banners = () => {
   const [uploading, setUploading] = useState(false);
   const [banners, setBanners] = useState([]);
   const [error, setError] = useState(null);
+  const [redirectUrls, setRedirectUrls] = useState([]);
 
   const db = getFirestore();
   const storage = getStorage();
@@ -38,6 +39,12 @@ const Banners = () => {
     setFiles(Array.from(e.target.files));
   };
 
+  const handleUrlChange = (index, value) => {
+    const newUrls = [...redirectUrls];
+    newUrls[index] = value;
+    setRedirectUrls(newUrls);
+  };
+
   // Upload files to Firebase Storage and save URLs to Firestore
   const handleUpload = async () => {
     if (files.length === 0) {
@@ -49,7 +56,8 @@ const Banners = () => {
     const urls = [];
 
     try {
-      for (const file of files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
         const storageRef = ref(storage, `banners/${file.name}`);
         
         // Upload file to Firebase Storage
@@ -57,15 +65,16 @@ const Banners = () => {
         
         // Get file URL
         const imageUrl = await getDownloadURL(storageRef);
-        urls.push({ imageUrl, fileName: file.name });
+        urls.push({ imageUrl, fileName: file.name, redirectUrl: redirectUrls[i] }); // Include redirect URL
       }
 
       // Save URLs to Firestore
-      for (const { imageUrl, fileName } of urls) {
-        await addDoc(collection(db, 'banners'), { imageUrl, fileName });
+      for (const { imageUrl, fileName, redirectUrl } of urls) {
+        await addDoc(collection(db, 'banners'), { imageUrl, fileName, redirectUrl });
       }
 
       setFiles([]);
+      setRedirectUrls([]); // Clear the URLs after upload
       setError(null);
       alert('Banners uploaded successfully');
       fetchBanners(); // Refresh banner list
@@ -121,6 +130,16 @@ const Banners = () => {
                     className="mb-3"
                     />
                 </Form.Group>
+                {files.map((file, index) => (
+                  <Form.Group key={index} controlId={`formUrl-${index}`} className="mb-3">
+                    <Form.Label className="fw-bold">Redirect URL for {file.name}</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter redirect URL"
+                      onChange={(e) => handleUrlChange(index, e.target.value)}
+                    />
+                  </Form.Group>
+                ))}
                 <Button
                     variant="warning"
                     onClick={handleUpload}

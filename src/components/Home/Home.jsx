@@ -6,11 +6,13 @@ import TopCollections from './TopCollections/TopCollections';
 import { FaStar, FaMoneyBillWave, FaClock } from 'react-icons/fa';
 import BestSellingProducts from './BestSellingProducts/BestSellingProducts';
 import NewArrivals from './NewArrivals/NewArrivals';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
   const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBanners = async () => {
@@ -19,7 +21,10 @@ const Home = () => {
 
       try {
         const querySnapshot = await getDocs(bannersRef);
-        const fetchedBanners = querySnapshot.docs.map(doc => doc.data().imageUrl);
+        const fetchedBanners = querySnapshot.docs.map(doc => ({
+          imageUrl: doc.data().imageUrl,
+          redirectUrl: doc.data().redirectUrl // Assuming banners in Firestore have a targetUrl field
+        }));
         setBanners(fetchedBanners);
       } catch (error) {
         console.error('Error fetching banners:', error);
@@ -47,12 +52,18 @@ const Home = () => {
   return (
     <div>
       <Carousel id="carouselExampleIndicators" interval={2000} controls={false}>
-        {banners.map((bannerUrl, index) => (
+        {banners.map((banner, index) => (
           <Carousel.Item key={index}>
-            <img className="d-block w-100" src={bannerUrl} alt={`Slide ${index + 1}`} />
+            <div
+              onClick={() => navigate(banner.redirectUrl)}
+              style={{ cursor: 'pointer' }}
+            >
+              <img className="d-block w-100" src={banner.imageUrl} alt={`Slide ${index + 1}`} />
+            </div>
           </Carousel.Item>
         ))}
       </Carousel>
+
 
       <div className="container mt-5 mb-5">
         <div className="row justify-content-center">

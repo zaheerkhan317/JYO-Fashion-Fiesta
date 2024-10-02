@@ -65,8 +65,8 @@ function AppContent() {
       
       <Routes>
         
-      <Route path="/" element={<Navigate to="/home" />} />
-        <Route path="/home" element= {<Home />} />
+      <Route path="/" element={<Home />} />
+        <Route path="/home" element= {<Navigate to="/" />} />
         <Route path="/offers" element={<OffersZone />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<ContactUs />} />
