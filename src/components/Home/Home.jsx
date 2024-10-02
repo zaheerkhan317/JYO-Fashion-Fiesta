@@ -45,7 +45,7 @@ const Home = () => {
     );
   }
 
-  {/* just for testing */}
+  {/* jtesting */}
 
   if (error) {
     return <p>{error}</p>;
