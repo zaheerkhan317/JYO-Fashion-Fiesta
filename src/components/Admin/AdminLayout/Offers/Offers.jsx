@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Row, Col, Form, Button, Container } from 'react-bootstrap';
+import { Card, Row, Col, Form, Button, Container, Alert } from 'react-bootstrap';
 import { db } from '../../../../firebaseConfig';
 import { collection, getDocs, updateDoc, doc, getDoc, setDoc } from 'firebase/firestore';
 import './Offers.css';
@@ -12,6 +12,16 @@ const Offers = () => {
   const [couponCode, setCouponCode] = useState('');
   const [discountPercentage, setDiscountPercentage] = useState('');
   const [festivalOffers, setFestivalOffers] = useState(null);
+  const [multiOffers, setMultiOffers] = useState(null);
+
+  const [numItems, setNumItems] = useState('');
+  const [totalValue, setTotalValue] = useState('');
+  const [offerPrice, setOfferPrice] = useState('');
+  const [multiItemOffers, setMultiItemOffers] = useState(null);
+
+    // State for temporary success/error messages
+    const [festivalMessage, setFestivalMessage] = useState(null);
+    const [multiItemMessage, setMultiItemMessage] = useState(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -34,9 +44,28 @@ const Offers = () => {
       }
     };
 
+    const fetchMultiOffers = async () => {
+      const multiOffersRef = doc(db, 'FestivalOffers', 'multioffers');
+      const multiOffersDoc = await getDoc(multiOffersRef);
+      if (multiOffersDoc.exists()) {
+        setMultiOffers(multiOffersDoc.data());
+      } else {
+        setMultiOffers(null);
+      }
+    };
+
     fetchProducts();
     fetchFestivalOffers();
+    fetchMultiOffers();
   }, []);
+
+    // Function to display a temporary message
+    const displayMessage = (setter, message) => {
+      setter(message);
+      setTimeout(() => {
+        setter(null);
+      }, 2000); // Show message for 2 seconds
+    };
 
   const handleOfferToggle = async (productId, currentIsOffer) => {
     try {
@@ -61,18 +90,49 @@ const Offers = () => {
       couponCode,
       discountPercentage: parseFloat(discountPercentage),
     });
-    alert('Festival Offers Updated!');
+    displayMessage(setFestivalMessage, 'Festival offers saved successfully!');
+      // Clear the input fields
+    setFestivalName('');
+    setCouponCode('');
+    setDiscountPercentage('');
+
+  };
+
+  const handleSaveMultiItemOffers = async () => {
+    const multiOffersRef = doc(db, 'FestivalOffers', 'multioffers');
+    await setDoc(multiOffersRef, {
+      numItems,
+      totalValue,
+      offerPrice,
+    });
+    displayMessage(setMultiItemMessage, 'Multi-item offers saved successfully!');
+    // Clear the input fields
+    setNumItems('');
+    setTotalValue('');
+    setOfferPrice('');
   };
 
   const handleRemoveFestivalOffer = async () => {
     const festivalOffersRef = doc(db, 'FestivalOffers', 'current');
     await setDoc(festivalOffersRef, {
+      numItems: '',
+      totalValue: '',
+      offerPrice: 0,
+    });
+    setFestivalOffers(null);
+    displayMessage(setFestivalMessage, 'Festival offer removed successfully!');
+  };
+
+
+  const handleRemoveMultiOffer = async () => {
+    const multiOffersRef = doc(db, 'FestivalOffers', 'multioffers');
+    await setDoc(multiOffersRef, {
       festivalName: '',
       couponCode: '',
       discountPercentage: 0,
     });
     setFestivalOffers(null);
-    alert('Festival Offer Removed!');
+    displayMessage(setMultiItemMessage, 'Multi-item offer removed successfully!');
   };
 
   const filteredProducts = products.filter((product) => {
@@ -99,6 +159,20 @@ const Offers = () => {
             </div>
           )}
 
+        </Col>
+      </Row>
+
+      {/* Display multi-offers if needed */}
+      <Row className="mb-4">
+        <Col xs={12}>
+          {multiOffers && Object.keys(multiOffers).length > 0 && (
+            <div className="multi-offer-banner text-black text-center">
+              <p>
+                <strong>Multi-item Offer</strong>: Buy {multiOffers.numItems} items for just <strong>₹{multiOffers.offerPrice}/-</strong>{' '} 
+                Total value: <strong>₹{multiOffers.totalValue}/-</strong>
+              </p>
+            </div>
+          )}
         </Col>
       </Row>
 
@@ -176,6 +250,15 @@ const Offers = () => {
         </Col>
       </Row>
 
+      {/* Success/Error Message for Festival Offers */}
+      {festivalMessage && (
+        <Row className="mb-4">
+          <Col xs={12}>
+            <Alert variant="info">{festivalMessage}</Alert>
+          </Col>
+        </Row>
+      )}
+
       <Row className="mb-4">
         <Col xs={12} md={4}>
           <Button variant="warning" onClick={handleSaveFestivalOffers}>
@@ -186,6 +269,72 @@ const Offers = () => {
           <Col xs={12} md={4}>
             <Button variant="danger" onClick={handleRemoveFestivalOffer}>
               Remove Festival Offer
+            </Button>
+          </Col>
+        )}
+      </Row>
+
+
+      {/* Multi-Item Offers Section */}
+      <Row className="mb-4">
+        <Col xs={12}>
+          <h3>Multi-Item Offers</h3>
+        </Col>
+        <Col xs={12} md={4}>
+          <Form.Group controlId="numItems">
+            <Form.Label>Number of Items for Offer</Form.Label>
+            <Form.Control
+              type="number"
+              placeholder="Enter the number of items (e.g., 3)"
+              value={numItems}
+              onChange={(e) => setNumItems(e.target.value)}
+            />
+          </Form.Group>
+        </Col>
+        <Col xs={12} md={4}>
+          <Form.Group controlId="totalValue">
+            <Form.Label>Total Value of Items</Form.Label>
+            <Form.Control
+              type="number"
+              placeholder="Enter total value (e.g., 1597)"
+              value={totalValue}
+              onChange={(e) => setTotalValue(e.target.value)}
+            />
+          </Form.Group>
+        </Col>
+        <Col xs={12} md={4}>
+          <Form.Group controlId="offerPrice">
+            <Form.Label>Offer Price</Form.Label>
+            <Form.Control
+              type="number"
+              placeholder="Enter special offer price (e.g., 999)"
+              value={offerPrice}
+              onChange={(e) => setOfferPrice(e.target.value)}
+            />
+          </Form.Group>
+        </Col>
+      </Row>
+
+      {/* Success/Error Message for Multi-Item Offers */}
+      {multiItemMessage && (
+        <Row className="mb-4">
+          <Col xs={12}>
+            <Alert variant="info">{multiItemMessage}</Alert>
+          </Col>
+        </Row>
+      )}
+
+      {/* Save and Remove Multi-Item Offers */}
+      <Row className="mb-4">
+        <Col xs={12} md={4}>
+          <Button variant="warning" onClick={handleSaveMultiItemOffers}>
+            Save Multi-Item Offers
+          </Button>
+        </Col>
+        {multiItemOffers && (
+          <Col xs={12} md={4}>
+            <Button variant="danger" onClick={handleRemoveMultiOffer}>
+              Remove Multi-Item Offer
             </Button>
           </Col>
         )}
