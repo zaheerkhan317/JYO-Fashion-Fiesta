@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Image, Button, ListGroup, Card, Modal, Form } from 'react-bootstrap';
 import { FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
-import { collection, addDoc, doc, getDoc, query, where, getDocs } from "firebase/firestore";
+import { getFirestore, collection, addDoc, doc, getDoc, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import { useUser } from '../Context/UserProvider';
 import { useNavigate } from 'react-router-dom';
 import './Cart.css'; // Import custom CSS
 
 const Cart = () => {
+  const [updatedOfferItems, setUpdatedOfferItems] = useState([]);
+  const [isOfferEnabled, setIsOfferEnabled] = useState(false);
   const { cartCount, updateCartCount } = useUser();
+  const [offerPrice, setOfferPrice] = useState(0); // Dynamic offer price
+  const [numItems, setNumItems] = useState(1); // Number of items from Firestore
   const [cartItems, setCartItems] = useState([]);
+  const [totalOfferValueFromDB, setTotalOfferValueFromDB] = useState(0);
   const [error, setError] = useState(null);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [showPhoneModal, setShowPhoneModal] = useState(false);
@@ -22,6 +27,136 @@ const Cart = () => {
   const [couponError, setCouponError] = useState({}); // New state for coupon error
   
   const navigate = useNavigate();
+
+   // Load cart items from local storage when the component mounts
+   useEffect(() => {
+    const uid = localStorage.getItem('uid');
+    const cart = JSON.parse(localStorage.getItem('cart')) || {};
+    const items = cart[uid] || [];
+    setCartItems(items); // Set the initial cart items state
+
+    // Fetch the number of items for the offer from Firestore
+    const fetchOfferDetails = async () => {
+      const db = getFirestore();
+      const offerDocRef = doc(db, 'FestivalOffers', 'multioffers'); // Adjust the document ID accordingly
+
+      try {
+        const offerDoc = await getDoc(offerDocRef);
+        if (offerDoc.exists()) {
+          const offerData = offerDoc.data();
+          console.log("Offer data: ", offerData);
+          setNumItems(offerData.numItems || 1); // Default to 1 if not found
+          setTotalOfferValueFromDB(offerData.totalValue || 0); // Fetch total offer value from Firestore
+        } else {
+          console.error("No such document!");
+        }
+      } catch (error) {
+        console.error("Error fetching offer details:", error);
+      }
+    };
+
+    fetchOfferDetails();
+  }, []);
+
+  // Calculate the dynamic offer price based on numItems
+  useEffect(() => {
+    if (numItems > 0) {
+      setOfferPrice(totalOfferValueFromDB / numItems); // Adjust the offer price based on numItems
+    }
+  }, [numItems]);
+
+  // Function to check if the multi-item offer can be enabled
+  const canEnableMultiItemOffer = () => {
+    const eligibleOfferItems = cartItems.filter(item => item.isOffer);
+    console.log("eligible offer items : ", eligibleOfferItems);
+    const allHaveQuantityOne = eligibleOfferItems.every(item => item.quantity === 1);
+    const totalOfferValue = eligibleOfferItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    console.log("total Offer value: ",totalOfferValue);
+    console.log("total offer value from db", totalOfferValueFromDB);
+    const eligibleCount = eligibleOfferItems.length;
+    console.log("eligible count: ", eligibleCount);
+
+    // Condition 1: If there are 3 `isOffer = true` products
+    if (eligibleCount === 3 && totalOfferValue >= totalOfferValueFromDB && allHaveQuantityOne) {
+      return true;
+    }
+
+    // Condition 2: If there are 2 `isOffer = true` and 1 `isOffer = false` product
+    if (eligibleCount === 2 && cartItems.some(item => !item.isOffer) && totalOfferValue >= totalOfferValueFromDB) {
+      return totalOfferValue >= totalOfferValueFromDB ? false : false;
+    }
+
+    // Condition 3: If there are 2 `isOffer = true` products where one has quantity 2 and another has quantity 1
+    if (allHaveQuantityOne && totalOfferValue >= totalOfferValueFromDB) {
+      return false; 
+    }
+
+
+    return false; // Default to disable the button
+  };
+
+  useEffect(() => {
+    setIsOfferEnabled(canEnableMultiItemOffer());
+  }, [cartItems, totalOfferValueFromDB]);
+
+  const handleEnableOffer = () => {
+    let offerAppliedCount = 0; // Track how many offer prices have been applied
+    let updatedOfferItems = []; // Temporary array for calculated offer prices
+
+    cartItems.forEach(item => {
+      if (item.isOffer && offerAppliedCount < 3) {
+        const applicableQuantity = Math.min(item.quantity, 3 - offerAppliedCount); // Limit to 3 total offers
+        const newTotal = offerPrice * applicableQuantity; // Calculate new total for this item
+
+        offerAppliedCount += applicableQuantity; // Increase the count by the quantity of the current item
+
+        // Push to temporary array with updated price and total for offer items
+        updatedOfferItems.push({
+          ...item,
+          price: parseFloat(offerPrice).toFixed(2), // Set the offer price (333)
+          total: parseFloat(newTotal).toFixed(2), // Set the new total for this item
+          quantity: item.quantity, // Maintain original quantity
+          discountvalue: calculateDiscountPercentage(numItems, offerPrice, totalOfferValueFromDB) 
+        });
+      } else {
+        // Push unchanged items or items beyond the count limit
+        updatedOfferItems.push({
+          ...item,
+          price: item.price, // Use the original price for non-offer items
+          total: parseFloat(item.price * item.quantity * (1 - (item.discountvalue / 100))).toFixed(2) // Calculate total with original price
+        });
+      }
+    });
+
+   // Update cart items and save back to local storage
+  setCartItems(updatedOfferItems);
+  
+    
+};
+
+const calculateDiscountPercentage = (numItems, offerPrice, totalValue) => {
+  // Convert string values to numbers
+  const numItemsNumber = parseInt(numItems, 10);
+  const offerPriceNumber = parseFloat(offerPrice);
+  const totalValueNumber = parseFloat(totalValue);
+
+  // Calculate the discount percentage
+  const discountPercentage = ((totalValueNumber - offerPriceNumber) / totalValueNumber) * 100;
+
+  // Return formatted discount percentage
+  return discountPercentage.toFixed(2);
+};
+
+
+  const handleRemoveOffer = (index) => {
+    const item = cartItems[index];
+    if (item.isOffer) {
+      // Revert the price back to the original price
+      item.price = item.originalPrice; // Assuming originalPrice is stored in item
+      item.total = item.price * item.quantity; // Update total accordingly
+    }
+    handleRemoveFromCart(index); // Call to remove the item from cart
+  };
 
   useEffect(() => {
     const fetchCartItems = () => {
@@ -445,6 +580,14 @@ const Cart = () => {
             </div>
           </Col>
         ))}
+        
+        {isOfferEnabled && (
+        <Col md={12} className="text-center mt-4">
+          <Button variant="success" onClick={handleEnableOffer}>
+            Enable Multi-Items Offer
+          </Button>
+        </Col>
+      )}
         <Col md={12} className="text-center mt-4">
           <Card>
             <Card.Body>
@@ -564,6 +707,7 @@ const Cart = () => {
                     </Button>
                 </Modal.Footer>
             </Modal>
+            
 
        
       {error && <div className="alert alert-danger mt-3">{error}</div>}

@@ -81,8 +81,20 @@ const ProductDetail = () => {
         cart[uid] = [];
       }
 
-      
-      // Add the selected product to the user's cart
+      // Check for duplicates
+    const existingItemIndex = cart[uid].findIndex(item =>
+      item.id === product.id &&
+      item.size === selectedSize &&
+      item.color === selectedColor
+    );
+
+    // If the item already exists, update the quantity
+    if (existingItemIndex !== -1) {
+      cart[uid][existingItemIndex].quantity += 1; // Increment quantity
+      // Optionally update total if necessary
+      cart[uid][existingItemIndex].total = (cart[uid][existingItemIndex].quantity * (product.cost - (product.cost * (product.discountValue / 100)))).toFixed(2);
+    } else {
+      // Add the selected product to the user's cart if not a duplicate
       cart[uid].push({
         id: product.id,
         name: product.itemName,
@@ -97,6 +109,7 @@ const ProductDetail = () => {
         total: (product.cost - (product.cost * (product.discountValue / 100))).toFixed(2),
         quantity: 1 // Set initial quantity
       });
+    }
 
       // Save the updated cart back to localStorage
       localStorage.setItem('cart', JSON.stringify(cart));
@@ -105,7 +118,7 @@ const ProductDetail = () => {
       const totalItems = cart[uid].length;
       localStorage.setItem('cartCount', totalItems.length > 0 ? totalItems.length : 0);
       updateCartCount(totalItems);
-      localStorage.setItem('activeLink','cart');
+      
       setShowModal(true);
       setTimeout(()=>{
         setShowModal(false);
