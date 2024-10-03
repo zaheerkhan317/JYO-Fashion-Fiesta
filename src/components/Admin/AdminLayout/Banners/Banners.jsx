@@ -21,7 +21,10 @@ const Banners = () => {
   
     try {
       const querySnapshot = await getDocs(bannersRef);
-      const fetchedBanners = querySnapshot.docs.map(doc => doc.data().imageUrl);
+      const fetchedBanners = querySnapshot.docs.map(doc => ({
+        id: doc.id,  // Get the document ID
+        ...doc.data()  // Spread the rest of the data (imageUrl, fileName, redirectUrl)
+      }));
       setBanners(fetchedBanners);
     } catch (error) {
       console.error('Error fetching banners:', error);
