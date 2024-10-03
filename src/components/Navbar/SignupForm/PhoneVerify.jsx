@@ -126,7 +126,7 @@ const PhoneVerify = ({ auth }) => {
     try{
       const { email, countryCode, phoneNumber } = formData;
       const userRef = collection(db, 'users');
-
+      
       // Check for existing email
       const emailQuery = query(userRef, where('email', '==', email));
       const emailSnapshot = await getDocs(emailQuery);
@@ -140,16 +140,22 @@ const PhoneVerify = ({ auth }) => {
         return true; // User exists
       }
 
-      // Generate OTP
-      const otp = generateOtp();
-      setStoredOtp(otp);
+      const emailVerified = localStorage.getItem('isVerified'); // Assuming email verification status is stored in localStorage
+      if (emailVerified === 'true') {
+        setError('');
+        
+      }else{
 
-      // Send OTP to email
-      await sendOtpToEmail(email, formData.name, otp);
-      setOtpSent(true); // Update state to indicate OTP has been sent
-      setError(''); // Clear any previous error messages
+        // Generate OTP
+        const otp = generateOtp();
+        setStoredOtp(otp);
 
-      return false; // User does not exist, OTP sent
+        // Send OTP to email
+        await sendOtpToEmail(email, formData.name, otp);
+        setOtpSent(true); // Update state to indicate OTP has been sent
+        setError(''); // Clear any previous error messages
+        return false;
+      }
     }catch (error) {
       console.error('Error checking if user exists:', error);
       setError('An error occurred while checking user details.');
@@ -206,18 +212,37 @@ const EmailVerifyOtp = () => {
 
 
 const handleEmailSendOtp = async ()=>{
+    // Check if the email is already verified from localStorage
+    const emailVerified = localStorage.getItem('isVerified'); // Assuming 'isVerified' is set as 'true' after verification
+
+    if (emailVerified === 'true') {
+      // If email is verified, restrict OTP sending
+      setError("Email is already verified. No need to send OTP.");
+      return; // Stop the function execution
+    }
    await checkUserExists();
 }
 
 
-  const handleSendOtp = async () => {
-    if (!validateForm()) return; // If form is invalid, stop OTP process
+  const handleSendOtp = async (event) => {
+    event.preventDefault();
+    if (!validateForm()) {
+      setError("Please fill in all required fields correctly.");
+      return; // If form is invalid, stop OTP process
+  }
 
+      // Check if email is verified from local storage
+      const emailVerified = localStorage.getItem('isVerified'); // Assuming you store email verification status in localStorage
+      if (emailVerified !== 'true') {
+          setError("Email must be verified before proceeding."); // Inform user about email verification requirement
+          return; // Stop OTP process if email is not verified
+      }
     setIsLoading(true);
     setError('');
     console.log('phone number',`${formData.countryCode} ${formData.phoneNumber}`);
     const userExists = await checkUserExists();
     if (!userExists) {
+      
 
     const appVerifier = window.recaptchaVerifier;
     if (!appVerifier) {
@@ -236,6 +261,8 @@ const handleEmailSendOtp = async ()=>{
       .catch((error) => {
         console.error("Error during signInWithPhoneNumber:", error);
         if (error.code === 'auth/billing-not-enabled' || error.code === 'auth/too-many-requests') {
+          localStorage.removeItem('verifiedEmail'); // Clear stored email from localStorage
+          localStorage.removeItem('isVerified'); // Clear verification status from localStorage
           storeUserInFirestore().then(() => setIsLoading(false));
         } else {
           setError("Error during OTP request. Please try again.");
@@ -421,7 +448,7 @@ const handleEmailSendOtp = async ()=>{
     <div className="container mt-5">
   <h2 className="text-center mb-4">Phone Verification</h2>
   {showForm ? (
-    <form className="needs-validation" noValidate>
+    <form className="needs-validation" noValidate onSubmit={handleSendOtp}>
       <div className="row mb-3">
         <div className="col-md-4">
           <div className="form-group">
@@ -450,6 +477,7 @@ const handleEmailSendOtp = async ()=>{
                 value={formData.email}
                 onChange={handleInputChange}
                 disabled={isVerified}
+                required
             />
             {isVerified && (
                 <div className="input-group-append">
@@ -473,7 +501,7 @@ const handleEmailSendOtp = async ()=>{
         </span>
     </div>
 )}
-
+{formErrors.email && <div className="invalid-feedback">{formErrors.email}</div>}
         </div>
 
         {!otpSent && !isVerified &&(
@@ -509,7 +537,7 @@ const handleEmailSendOtp = async ()=>{
             </div>
         )}
 
-        {formErrors.email && <div className="invalid-feedback">{formErrors.email}</div>}
+        
         {message && <div className="alert alert-info mt-2">{message}</div>} {/* Display message */}
     </div>
 </div>
