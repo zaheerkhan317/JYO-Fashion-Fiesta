@@ -61,7 +61,7 @@ function LoginForm() {
           localStorage.setItem('firstName', userData.firstName);
           localStorage.setItem('uid', userData.uid);
           console.log("firstname in loginform : ", userData.firstName);
-
+          localStorage.setItem('activeLink', 'home');
           navigate('/home');
         }
       });

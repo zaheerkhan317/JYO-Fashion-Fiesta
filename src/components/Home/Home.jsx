@@ -57,7 +57,10 @@ const Home = () => {
         {banners.map((banner, index) => (
           <Carousel.Item key={index}>
             <div
-              onClick={() => navigate(banner.redirectUrl)}
+              onClick={() => {
+                navigate(banner.redirectUrl);
+                localStorage.setItem('activeLink', banner.redirectUrl);
+              }}
               style={{ cursor: 'pointer' }}
             >
               <img className="d-block w-100" src={banner.imageUrl} alt={`Slide ${index + 1}`} />

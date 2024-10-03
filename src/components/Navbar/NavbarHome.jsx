@@ -128,6 +128,21 @@ const NavbarHome = () => {
     localStorage.setItem('isCategoriesActive', isCategoriesActive);
   }, [isCategoriesActive]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const storedActiveLink = localStorage.getItem('activeLink');
+      const storedIsCategoriesActive = localStorage.getItem('isCategoriesActive') === 'true';
+
+      if (storedActiveLink !== activeLink) {
+        setActiveLink(storedActiveLink);
+      }
+      if (storedIsCategoriesActive !== isCategoriesActive) {
+        setIsCategoriesActive(storedIsCategoriesActive);
+      }
+    }, 1000); // Check every second (adjust interval as needed)
+
+    return () => clearInterval(interval); // Clear interval on component unmount
+  }, [activeLink, isCategoriesActive]);
 
   // Function to handle category selection
   const handleCategoryClick = (category) => {

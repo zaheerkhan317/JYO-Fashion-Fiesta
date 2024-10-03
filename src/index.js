@@ -5,7 +5,11 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import "bootstrap/dist/css/bootstrap.min.css";
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { init } from 'emailjs-com';
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
+const PUBLIC_KEY = 'wk-CgN38kIwdatKp4'; // Replace with your actual EmailJS public key
+init(PUBLIC_KEY);
 root.render(
   <React.StrictMode>
     <App />

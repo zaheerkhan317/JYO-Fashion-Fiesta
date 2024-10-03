@@ -3,6 +3,8 @@ import { getFirestore, doc, setDoc, addDoc, getDocs, query, where, collection, T
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import * as firebaseui from "firebaseui";
+import { sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
+import { send } from 'emailjs-com';
 import "firebaseui/dist/firebaseui.css";
 import { db } from "../../../firebaseConfig";
 import { useNavigate } from "react-router-dom";
@@ -21,12 +23,16 @@ const PhoneVerify = ({ auth }) => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [otp, setOtp] = useState('');
+  const [inputOtp, setInputOtp] = useState('');
+  const [storedOtp, setStoredOtp] = useState('');
   const [confirmResult, setConfirmResult] = useState(null);
   const [showForm, setShowForm] = useState(true);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [error, setError] = useState('');
   const [formErrors, setFormErrors] = useState({});
+  const [otpSent, setOtpSent] = useState(false);
+  const [message, setMessage] = useState(''); 
   const { setUid, setFirstName, setUser } = useUser();
 
 
@@ -111,26 +117,98 @@ const PhoneVerify = ({ auth }) => {
     }));
   };
 
+  const generateOtp = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString(); // Generates a 6-digit OTP
+};
 
   
   const checkUserExists = async () => {
-    const { email, countryCode, phoneNumber } = formData;
-    const userRef = collection(db, 'users');
+    try{
+      const { email, countryCode, phoneNumber } = formData;
+      const userRef = collection(db, 'users');
 
-    // Check for existing email
-    const emailQuery = query(userRef, where('email', '==', email));
-    const emailSnapshot = await getDocs(emailQuery);
-    
-    // Check for existing phone number
-    const phoneQuery = query(userRef, where('phoneNumber', '==', `${countryCode} ${phoneNumber}`));
-    const phoneSnapshot = await getDocs(phoneQuery);
+      // Check for existing email
+      const emailQuery = query(userRef, where('email', '==', email));
+      const emailSnapshot = await getDocs(emailQuery);
+      
+      // Check for existing phone number
+      const phoneQuery = query(userRef, where('phoneNumber', '==', `${countryCode} ${phoneNumber}`));
+      const phoneSnapshot = await getDocs(phoneQuery);
 
-    if (!emailSnapshot.empty || !phoneSnapshot.empty) {
-      setError('User email and phone number already exists');
-      return true; // User exists
+      if (!emailSnapshot.empty || !phoneSnapshot.empty) {
+        setError('User email and phone number already exists');
+        return true; // User exists
+      }
+
+      // Generate OTP
+      const otp = generateOtp();
+      setStoredOtp(otp);
+
+      // Send OTP to email
+      await sendOtpToEmail(email, formData.name, otp);
+      setOtpSent(true); // Update state to indicate OTP has been sent
+      setError(''); // Clear any previous error messages
+
+      return false; // User does not exist, OTP sent
+    }catch (error) {
+      console.error('Error checking if user exists:', error);
+      setError('An error occurred while checking user details.');
+      return true; // Return true to stop further form submission in case of error
     }
-    return false; // User does not exist
   };
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('verifiedEmail');
+    const savedVerificationStatus = localStorage.getItem('isVerified');
+
+    if (savedEmail && savedVerificationStatus === 'true') {
+        setFormData(prev => ({ ...prev, email: savedEmail }));
+        setIsVerified(true);
+    }
+}, []);
+
+const sendOtpToEmail = async (email, name, otp) => {
+  const templateParams = {
+      to_name: name,
+      to_email: email,
+      message: otp, // Dynamic content
+  };
+
+  try {
+      const response = await send('service_259nwwi', 'template_dax9t0f', templateParams); // Replace with your Service ID and Template ID
+      setMessage('OTP sent to your email!'); // Set message
+      setTimeout(() => setMessage(''), 2000); // Clear message after 2 seconds
+  } catch (error) {
+    setMessage('Error sending OTP. Please try again.'); // Set error message
+    setTimeout(() => setMessage(''), 2000); // Clear message after 2 seconds
+  }
+};
+
+
+
+
+const EmailVerifyOtp = () => {
+  if (!inputOtp) {
+      setMessage('Please enter the OTP.'); // Message if OTP is empty
+      setTimeout(() => setMessage(''), 2000); // Clear message after 2 seconds
+      return;
+  }
+  if (inputOtp === storedOtp) {
+      setIsVerified(true); // Update verification state
+      localStorage.setItem('verifiedEmail', formData.email); // Save email to localStorage
+      localStorage.setItem('isVerified', 'true'); // Save verification status to localStorage
+      setMessage('OTP verified successfully!'); // Success message
+  } else {
+    setMessage('Invalid OTP. Please try again.');
+  }
+  setTimeout(() => setMessage(''), 2000);
+};
+
+
+const handleEmailSendOtp = async ()=>{
+   await checkUserExists();
+}
+
 
   const handleSendOtp = async () => {
     if (!validateForm()) return; // If form is invalid, stop OTP process
@@ -248,6 +326,7 @@ const PhoneVerify = ({ auth }) => {
       });
   
       console.log("User data stored in Firestore.");
+      localStorage.setItem('activeLink', 'home');
       navigate('/home');
     } catch (error) {
       console.error("Error storing user data in Firestore:", error);
@@ -312,6 +391,7 @@ const PhoneVerify = ({ auth }) => {
           setIsVerified(true);
           setError('');
           setTimeout(() => {
+            localStorage.setItem('activeLink', 'home');
             navigate('/home');
           }, 1000);
         })
@@ -358,12 +438,82 @@ const PhoneVerify = ({ auth }) => {
           </div>
         </div>
         <div className="col-md-4">
-          <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input type="email" className={`form-control ${formErrors.email ? 'is-invalid' : ''}`} id="email" name="email" placeholder="Email" value={formData.email} onChange={handleInputChange} />
-          {formErrors.email && <div className="invalid-feedback">{formErrors.email}</div>}
-          </div>
+    <div className="form-group">
+        <label htmlFor="email">Email</label>
+        <div className="input-group">
+            <input
+                type="email"
+                className={`form-control ${formErrors.email ? 'is-invalid' : ''}`}
+                id="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleInputChange}
+                disabled={isVerified}
+            />
+            {isVerified && (
+                <div className="input-group-append">
+                    <span className="input-group-text" style={{ color: 'green' }}>✓</span>
+                    
+                </div>                
+            )}
+            {isVerified && (
+    <div style={{ marginTop: '5px', marginLeft: '5px' }}>
+        <span 
+            style={{ cursor: 'pointer', color: 'red', fontSize: '14px' }} 
+            onClick={() => {
+                setFormData({ ...formData, email: '' }); // Clear email input
+                setIsVerified(false); // Reset verification state
+                localStorage.removeItem('verifiedEmail'); // Clear stored email from localStorage
+                localStorage.removeItem('isVerified'); // Clear verification status from localStorage
+            }}
+            title="Clear Email"
+        >
+            Clear
+        </span>
+    </div>
+)}
+
         </div>
+
+        {!otpSent && !isVerified &&(
+            <button
+                type="button"
+                className="btn btn-primary mt-2"
+                onClick={handleEmailSendOtp}
+            >
+                Send OTP
+            </button>
+        )}
+
+        {otpSent && !isVerified && (
+            <div className="mt-3">
+                <div className="input-group mb-3">
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter OTP"
+                        value={inputOtp}
+                        onChange={(e) => setInputOtp(e.target.value)} // Set the input OTP
+                    />
+                    <div className="input-group-append">
+                        <button
+                            type="button"
+                            className="btn btn-success"
+                            onClick={EmailVerifyOtp}
+                        >
+                            Verify OTP
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {formErrors.email && <div className="invalid-feedback">{formErrors.email}</div>}
+        {message && <div className="alert alert-info mt-2">{message}</div>} {/* Display message */}
+    </div>
+</div>
+
       </div>
       <div className="row mb-3">
         <div className="col-md-6 mx-auto">
