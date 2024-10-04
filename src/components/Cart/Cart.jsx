@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useRef } from 'react';
 import { Container, Row, Col, Image, Button, ListGroup, Card, Modal, Form } from 'react-bootstrap';
 import { FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
 import { getFirestore, collection, addDoc, doc, getDoc, query, where, getDocs } from "firebase/firestore";
@@ -10,10 +11,12 @@ import './Cart.css'; // Import custom CSS
 const Cart = () => {
   const [updatedOfferItems, setUpdatedOfferItems] = useState([]);
   const [isOfferEnabled, setIsOfferEnabled] = useState(false);
+  const [isMultiItemOfferApplied, setIsMultiItemOfferApplied] = useState(false);
   const { cartCount, updateCartCount } = useUser();
   const [offerPrice, setOfferPrice] = useState(0); // Dynamic offer price
   const [numItems, setNumItems] = useState(1); // Number of items from Firestore
   const [cartItems, setCartItems] = useState([]);
+  const [offerItems, setOfferItems] = useState(cartItems); // Initialize with cartItems
   const [totalOfferValueFromDB, setTotalOfferValueFromDB] = useState(0);
   const [error, setError] = useState(null);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -26,6 +29,7 @@ const Cart = () => {
   const [discount, setDiscount] = useState({}); // New state for discount
   const [couponError, setCouponError] = useState({}); // New state for coupon error
   
+ 
   const navigate = useNavigate();
 
    // Load cart items from local storage when the component mounts
@@ -69,15 +73,22 @@ const Cart = () => {
   const canEnableMultiItemOffer = () => {
     const eligibleOfferItems = cartItems.filter(item => item.isOffer);
     console.log("eligible offer items : ", eligibleOfferItems);
+
+     // Condition: At least one of the eligible products must NOT have discount applied
+    const hasDiscountApplied = eligibleOfferItems.some(item => item.discountApplied);
+
     const allHaveQuantityOne = eligibleOfferItems.every(item => item.quantity === 1);
+
     const totalOfferValue = eligibleOfferItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     console.log("total Offer value: ",totalOfferValue);
+
     console.log("total offer value from db", totalOfferValueFromDB);
+
     const eligibleCount = eligibleOfferItems.length;
     console.log("eligible count: ", eligibleCount);
 
     // Condition 1: If there are 3 `isOffer = true` products
-    if (eligibleCount === 3 && totalOfferValue >= totalOfferValueFromDB && allHaveQuantityOne) {
+    if (eligibleCount === 3 && !hasDiscountApplied && totalOfferValue >= totalOfferValueFromDB && allHaveQuantityOne) {
       return true;
     }
 
@@ -99,40 +110,71 @@ const Cart = () => {
     setIsOfferEnabled(canEnableMultiItemOffer());
   }, [cartItems, totalOfferValueFromDB]);
 
-  const handleEnableOffer = () => {
-    let offerAppliedCount = 0; // Track how many offer prices have been applied
-    let updatedOfferItems = []; // Temporary array for calculated offer prices
+  useEffect(() => {
+    // Log the multi-item offer status at regular intervals
+    const interval = setInterval(() => {
+      console.log("Current multi-item offer applied status:", isMultiItemOfferApplied);
+    }, 1000); // Log every second
 
-    cartItems.forEach(item => {
-      if (item.isOffer && offerAppliedCount < 3) {
-        const applicableQuantity = Math.min(item.quantity, 3 - offerAppliedCount); // Limit to 3 total offers
-        const newTotal = offerPrice * applicableQuantity; // Calculate new total for this item
+    // Clear the interval when the component unmounts or when isMultiItemOfferApplied changes
+    return () => clearInterval(interval);
+  }, [isMultiItemOfferApplied]);
 
-        offerAppliedCount += applicableQuantity; // Increase the count by the quantity of the current item
+  
 
-        // Push to temporary array with updated price and total for offer items
-        updatedOfferItems.push({
-          ...item,
-          price: parseFloat(offerPrice).toFixed(2), // Set the offer price (333)
-          total: parseFloat(newTotal).toFixed(2), // Set the new total for this item
-          quantity: item.quantity, // Maintain original quantity
-          discountvalue: calculateDiscountPercentage(numItems, offerPrice, totalOfferValueFromDB) 
-        });
-      } else {
-        // Push unchanged items or items beyond the count limit
-        updatedOfferItems.push({
-          ...item,
-          price: item.price, // Use the original price for non-offer items
-          total: parseFloat(item.price * item.quantity * (1 - (item.discountvalue / 100))).toFixed(2) // Calculate total with original price
-        });
-      }
-    });
+const handleEnableOffer = () => {
+  console.log("Before enabling offer: ", isMultiItemOfferApplied);
+    
+  // Set the multi-item offer to true
+  setIsMultiItemOfferApplied(true);
+  
+  // Log the updated state after the next render
+  console.log("After enabling offer: ", isMultiItemOfferApplied);
 
-   // Update cart items and save back to local storage
+  let offerAppliedCount = 0; // Track how many offer prices have been applied
+  const updatedOfferItems = cartItems.map((item) => {
+    if (item.isOffer && offerAppliedCount < 3) {
+      const applicableQuantity = Math.min(item.quantity, 3 - offerAppliedCount); // Limit to 3 total offers
+      const newTotal = offerPrice * applicableQuantity; // Calculate new total for this item
+
+      offerAppliedCount += applicableQuantity; // Increase the count by the quantity of the current item
+      
+      // Return updated price and total for offer items
+      return {
+        ...item,
+        price: parseFloat(offerPrice).toFixed(2), // Set the offer price
+        total: parseFloat(newTotal).toFixed(2), // Set the new total for this item
+        quantity: item.quantity, // Maintain original quantity
+        discountvalue: calculateDiscountPercentage(numItems, offerPrice, totalOfferValueFromDB),
+        hideCouponInput: true, // Hide coupon input for eligible items
+        discountApplied: true
+      };
+      
+    } else {
+      // Return unchanged items or items beyond the count limit
+      return {
+        ...item,
+        total: parseFloat(item.price * item.quantity * (1 - (item.discountvalue / 100))).toFixed(2), // Calculate total with original price
+        hideCouponInput: false, // Show coupon input for non-offer items
+        discountApplied: false
+      };
+    }
+  });
+
+  // Update offer items without modifying original cart items
   setCartItems(updatedOfferItems);
   
-    
+  console.log("multi item offer: ", isMultiItemOfferApplied);
 };
+
+
+const handleResetOffer = () => {
+  window.location.reload();
+};
+
+
+
+
 
 const calculateDiscountPercentage = (numItems, offerPrice, totalValue) => {
   // Convert string values to numbers
@@ -495,58 +537,73 @@ const calculateDiscountPercentage = (numItems, offerPrice, totalValue) => {
                   <strong>Color:</strong> <span>{item.color}</span>
                 </div>
                 <div className="info-group d-flex flex-row align-items-center">
-  <strong>Quantity:</strong>
-  <div className="d-flex flex-row align-items-center mt-2 mt-sm-0 ms-2">
-    <Button
-      variant="outline-secondary"
-      className="quantity-btn"
-      onClick={() => handleQuantityChange(index, -1)}
-      
-    >
-      <FaMinus />
-    </Button>
-    <span className="quantity-span mx-2" >
-      {item.quantity}
-    </span>
-    <Button
-      variant="outline-secondary"
-      className="quantity-btn"
-      onClick={() => handleQuantityChange(index, 1)}
-      
-    >
-      <FaPlus />
-    </Button>
-  </div>
-</div>
-
+                  <strong>Quantity:</strong>
+                  <div className="d-flex flex-row align-items-center mt-2 mt-sm-0 ms-2">
+                    <Button
+                      variant="outline-secondary"
+                      className="quantity-btn"
+                      onClick={() => handleQuantityChange(index, -1)}
+                      disabled={item.hideCouponInput}
+                    >
+                      <FaMinus />
+                    </Button>
+                    <span className="quantity-span mx-2" >
+                      {item.quantity}
+                    </span>
+                    <Button
+                      variant="outline-secondary"
+                      className="quantity-btn"
+                      onClick={() => handleQuantityChange(index, 1)}
+                      disabled={item.hideCouponInput}
+                    >
+                      <FaPlus />
+                    </Button>
+                  </div>
+                </div>
+                
                 <div className="info-group">
                   <strong>Original Price:</strong> <span className="original-price">₹{item.price} per one</span>
                 </div>
                 <div className="info-group">
     <strong>Discount:</strong> 
     {item.discountApplied ? (
-        <div className="d-flex align-items-center">
+    <div className="d-flex align-items-center">
+        {isMultiItemOfferApplied ? (
+            <span className="discount-price">
+                Multi Offer Discount Applied
+            </span>
+        ) : (
+          <>
             <span className="discount-price">
                 {item.couponDiscount}% - Coupon Code Discount
             </span>
             <Button
-                variant="link"
-                className="remove-discount-btn ms-2"
-                onClick={() => handleRemoveDiscount(index)}
-            >
-                X
-            </Button>
-        </div>
-    ) : (
-        <span className="discount-price">{item.discountvalue}%</span>
-    )}
+            variant="link"
+            className="remove-discount-btn ms-2"
+            onClick={() => handleRemoveDiscount(index)}
+          >
+            X
+          </Button>
+          </>
+        )}
+        {/* Only show the button if it's not a multi-offer discount */}
+
+    </div>
+) : (
+    <span className="discount-price">{item.discountvalue}%</span>
+)}
+
 </div>
                 <div className="info-group">
                   <strong>Total:</strong> <span className="total-price">₹{item.total}</span>
                 </div>
+                
                 <div className="cart-item-actions mt-3 mb-3">
                   <Form.Group controlId={`formCouponCode${index}`}>
+
                     <Row className="align-items-center">
+                    {!item.hideCouponInput && (
+                      <>
                       <Col xs={12} md={6} className="mb-2">
                         <Form.Control
                           type="text"
@@ -564,12 +621,15 @@ const calculateDiscountPercentage = (numItems, offerPrice, totalValue) => {
                           Apply Code
                         </Button>
                       </Col>
+                      </>
+                    )}
                       <Col xs={12} md={2} className="d-flex align-items-center justify-content-start">
                         <Button variant="danger" onClick={() => handleRemoveFromCart(index)}>
                           <FaTrash />
                         </Button>
                       </Col>
                     </Row>
+
                     {couponError[index] && <p className="error-message">{couponError[index]}</p>}
                     {discount[index] > 0 && cartItems[index].isOffer && (
                       <p>Discount Applied: {discount[index]}%</p>
@@ -581,13 +641,21 @@ const calculateDiscountPercentage = (numItems, offerPrice, totalValue) => {
           </Col>
         ))}
         
-        {isOfferEnabled && (
         <Col md={12} className="text-center mt-4">
-          <Button variant="success" onClick={handleEnableOffer}>
-            Enable Multi-Items Offer
-          </Button>
+        {isOfferEnabled && (
+            <Button variant="success" onClick={handleEnableOffer}>
+              Apply Multi-Item Offer
+            </Button>
+          )}
+          
+          {isMultiItemOfferApplied && (
+            <Button variant="danger" onClick={handleResetOffer}>
+              Reset Offer
+            </Button>
+          )}
+          
         </Col>
-      )}
+      
         <Col md={12} className="text-center mt-4">
           <Card>
             <Card.Body>
