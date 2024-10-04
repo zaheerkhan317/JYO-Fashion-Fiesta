@@ -134,10 +134,10 @@ const Loungewear = ({ products }) => {
                 </Card.Text>
 
                   {/* Quantity Left */}
-                  <Card.Text className="text-muted">
+                  {/* <Card.Text className="text-muted">
                     <strong>Quantity Left: </strong>
                     {product.quantityLeft}
-                  </Card.Text>
+                  </Card.Text> */}
 
                   {/* Pricing Section */}
                   <Card.Text className="price-section mt-auto">
