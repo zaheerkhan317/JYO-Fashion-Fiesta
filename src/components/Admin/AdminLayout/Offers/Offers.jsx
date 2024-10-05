@@ -168,7 +168,7 @@ const Offers = () => {
           {multiOffers && Object.keys(multiOffers).length > 0 && (
             <div className="multi-offer-banner text-black text-center">
               <p>
-                <strong>Multi-item Offer</strong>: Buy {multiOffers.numItems} items for just <strong>₹{multiOffers.offerPrice}/-</strong>{' '} 
+                <strong>Multi-item Offer</strong>: Buy <strong>{multiOffers.numItems}</strong> items for just <strong>₹{multiOffers.offerPrice}/-</strong>{' '} 
                 Total value: <strong>₹{multiOffers.totalValue}/-</strong>
               </p>
             </div>

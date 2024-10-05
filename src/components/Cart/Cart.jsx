@@ -81,7 +81,7 @@ const Cart = () => {
 
     const allHaveQuantityOne = eligibleOfferItems.every(item => item.quantity === 1);
 
-    const totalOfferValue = eligibleOfferItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const totalOfferValue = eligibleOfferItems.reduce((total, item) => total + (item.total * item.quantity), 0);
     console.log("total Offer value: ",totalOfferValue);
 
     console.log("total offer value from db", totalOfferValueFromDB);
@@ -135,9 +135,9 @@ const handleEnableOffer = () => {
 
   let offerAppliedCount = 0; // Track how many offer prices have been applied
   const updatedOfferItems = cartItems.map((item) => {
-    if (item.isOffer && offerAppliedCount < 3) {
+    if (item.isOffer && offerAppliedCount < numItems) {
       console.log("Offer price:",offerPrice);
-      const applicableQuantity = Math.min(item.quantity, 3 - offerAppliedCount); // Limit to 3 total offers
+      const applicableQuantity = Math.min(item.quantity, numItems - offerAppliedCount); // Limit to 3 total offers
       console.log("applicable quanity:", applicableQuantity);
       const newTotal = offerPrice * applicableQuantity; // Calculate new total for this item
       console.log("new total : ",newTotal);
