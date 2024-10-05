@@ -19,6 +19,7 @@ const ProductDetail = () => {
   const [selectedColor, setSelectedColor] = useState(''); // New state for selected color
   const [showModal, setShowModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false); // For login modal
+  const [showSizeModal, setShowSizeModal] = useState(false); // Modal for size selection alert
 
   const handlers = useSwipeable({
     onSwipedLeft: () => handleSwipe('LEFT'),
@@ -65,7 +66,8 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     if (!selectedSize) {
-      alert('Please select a size');
+      setShowSizeModal(true);
+      setTimeout(() => setShowSizeModal(false), 2000); // Close modal after 2 seconds
       return;
     }
 
@@ -128,6 +130,9 @@ const ProductDetail = () => {
       // }, 3000); // Delay navigation slightly to show the modal briefly
     } else {
       setShowLoginModal(true);
+      setTimeout(()=>{
+        setShowLoginModal(false);
+      },2000);
     }
   };
 
@@ -291,12 +296,20 @@ const ProductDetail = () => {
         </Col>
       </Row>
 
+      {/* Modal for Size Selection Alert */}
+      <Modal show={showSizeModal} onHide={() => setShowSizeModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Select Size</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Please select a size to continue.</Modal.Body>
+      </Modal>
+
       {/* Modal */}
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>Item Added to Cart</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Your item has been added to the cart successfully!</Modal.Body>
+        <Modal.Body>Item has been added to the cart successfully!</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>Close</Button>
         </Modal.Footer>

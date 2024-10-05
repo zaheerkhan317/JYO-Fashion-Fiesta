@@ -78,7 +78,7 @@ const Kurtas = ({ products }) => {
                   
                 </div>
                 {/* Discount Badge */}
-                {product.discountValue && (
+                {product.discountValue>0 && (
                     <Badge bg="success" className="discount-badge">
                       {product.discountValue}% Off
                     </Badge>
@@ -120,14 +120,16 @@ const Kurtas = ({ products }) => {
                   <div className="size-list">
                     {product.sizes && typeof product.sizes === 'object' ? (
                       // Define the correct size order
-                      ['S', 'M', 'L', 'XL', 'XXL'].map(size => (
+                      
+                      ['S', 'M', 'L', 'XL', 'XXL'].map(size => {
+                        const isAvailable = product.sizes[size] > 0;
                         // For each size in the predefined order, get its quantity from the product.sizes object
-                        product.sizes.hasOwnProperty(size) ? (
-                          <div key={size} className="size-item">
+                        return product.sizes.hasOwnProperty(size) ? (
+                          <div key={size} className={`size-item ${!isAvailable ? 'disabled-size' : ''}`}>
                             <span>{size}</span>
                           </div>
                         ) : null
-                      ))
+                        })
                     ) : (
                       <span>No sizes available</span> // Fallback message if sizes are not available
                     )}

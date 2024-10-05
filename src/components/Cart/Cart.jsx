@@ -14,6 +14,7 @@ const Cart = () => {
   const [isMultiItemOfferApplied, setIsMultiItemOfferApplied] = useState(false);
   const { cartCount, updateCartCount } = useUser();
   const [offerPrice, setOfferPrice] = useState(0); // Dynamic offer price
+  const [offerPriceDB, setOfferPriceDB] = useState(0);
   const [numItems, setNumItems] = useState(1); // Number of items from Firestore
   const [cartItems, setCartItems] = useState([]);
   const [offerItems, setOfferItems] = useState(cartItems); // Initialize with cartItems
@@ -49,6 +50,7 @@ const Cart = () => {
         if (offerDoc.exists()) {
           const offerData = offerDoc.data();
           console.log("Offer data: ", offerData);
+          setOfferPriceDB(offerData.offerPrice);
           setNumItems(offerData.numItems || 1); // Default to 1 if not found
           setTotalOfferValueFromDB(offerData.totalValue || 0); // Fetch total offer value from Firestore
         } else {
@@ -65,7 +67,7 @@ const Cart = () => {
   // Calculate the dynamic offer price based on numItems
   useEffect(() => {
     if (numItems > 0) {
-      setOfferPrice(totalOfferValueFromDB / numItems); // Adjust the offer price based on numItems
+      setOfferPrice(offerPriceDB / numItems); // Adjust the offer price based on numItems
     }
   }, [numItems]);
 
@@ -86,14 +88,14 @@ const Cart = () => {
 
     const eligibleCount = eligibleOfferItems.length;
     console.log("eligible count: ", eligibleCount);
-
+    console.log("number of items: ", numItems);
     // Condition 1: If there are 3 `isOffer = true` products
-    if (eligibleCount === 3 && !hasDiscountApplied && totalOfferValue >= totalOfferValueFromDB && allHaveQuantityOne) {
+    if ((eligibleCount == numItems) && !hasDiscountApplied && totalOfferValue >= totalOfferValueFromDB && allHaveQuantityOne) {
       return true;
     }
 
     // Condition 2: If there are 2 `isOffer = true` and 1 `isOffer = false` product
-    if (eligibleCount === 2 && cartItems.some(item => !item.isOffer) && totalOfferValue >= totalOfferValueFromDB) {
+    if (eligibleCount == numItems-1 && cartItems.some(item => !item.isOffer) && totalOfferValue >= totalOfferValueFromDB) {
       return totalOfferValue >= totalOfferValueFromDB ? false : false;
     }
 
@@ -134,9 +136,11 @@ const handleEnableOffer = () => {
   let offerAppliedCount = 0; // Track how many offer prices have been applied
   const updatedOfferItems = cartItems.map((item) => {
     if (item.isOffer && offerAppliedCount < 3) {
+      console.log("Offer price:",offerPrice);
       const applicableQuantity = Math.min(item.quantity, 3 - offerAppliedCount); // Limit to 3 total offers
+      console.log("applicable quanity:", applicableQuantity);
       const newTotal = offerPrice * applicableQuantity; // Calculate new total for this item
-
+      console.log("new total : ",newTotal);
       offerAppliedCount += applicableQuantity; // Increase the count by the quantity of the current item
       
       // Return updated price and total for offer items
@@ -643,14 +647,17 @@ const calculateDiscountPercentage = (numItems, offerPrice, totalValue) => {
         
         <Col md={12} className="text-center mt-4">
         {isOfferEnabled && (
+          <>
+          <p>Cart Items are eligible for Multi item offer</p>
             <Button variant="success" onClick={handleEnableOffer}>
-              Apply Multi-Item Offer
+              Apply Offer
             </Button>
+            </>
           )}
           
           {isMultiItemOfferApplied && (
             <Button variant="danger" onClick={handleResetOffer}>
-              Reset Offer
+              Cancel Offer
             </Button>
           )}
           
